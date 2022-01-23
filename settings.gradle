@@ -7,11 +7,12 @@ pluginManagement {
 
 plugins {
 	id "com.gradle.enterprise" version "3.8.1"
-	id "io.spring.ge.conventions" version "0.0.9"
+	// 注释掉，解决：A build scan was not published as you have not authenticated with server 'ge.spring.io'.
+	// id "io.spring.ge.conventions" version "0.0.9"
 }
 
 include "spring-aop"
-include "spring-aspects"
+// include "spring-aspects"   嗨森排除 2022-01-23
 include "spring-beans"
 include "spring-context"
 include "spring-context-indexer"
