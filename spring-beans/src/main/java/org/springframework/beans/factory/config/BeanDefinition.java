@@ -38,6 +38,9 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.beans.factory.support.RootBeanDefinition
  * @see org.springframework.beans.factory.support.ChildBeanDefinition
  */
+/**
+ * Bean 定义，IOC 实现中，在 xml 中的描述的 Bean 信息最后都将保存至 BeanDefinition 对象中，其中 xml bean 与 BeanDefinition 是一对一的关系
+ */
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	/**
@@ -46,7 +49,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * @see #setScope
 	 * @see ConfigurableBeanFactory#SCOPE_SINGLETON
 	 */
-	String SCOPE_SINGLETON = ConfigurableBeanFactory.SCOPE_SINGLETON;
+	String SCOPE_SINGLETON = ConfigurableBeanFactory.SCOPE_SINGLETON;		// "singleton"
 
 	/**
 	 * Scope identifier for the standard prototype scope: {@value}.
@@ -54,7 +57,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * @see #setScope
 	 * @see ConfigurableBeanFactory#SCOPE_PROTOTYPE
 	 */
-	String SCOPE_PROTOTYPE = ConfigurableBeanFactory.SCOPE_PROTOTYPE;
+	String SCOPE_PROTOTYPE = ConfigurableBeanFactory.SCOPE_PROTOTYPE;		// "prototype"
 
 
 	/**
