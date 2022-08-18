@@ -56,7 +56,7 @@ import org.springframework.util.StringUtils;
  * @see ChildBeanDefinition
  */
 @SuppressWarnings("serial")
-public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccessor
+public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccessor	//
 		implements BeanDefinition, Cloneable {
 
 	/**
@@ -139,17 +139,17 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 
 	@Nullable
-	private volatile Object beanClass;
+	private volatile Object beanClass;						// class
 
 	@Nullable
-	private String scope = SCOPE_DEFAULT;
+	private String scope = SCOPE_DEFAULT;					// SCOPE_SINGLETON、SCOPE_PROTOTYPE
 
 	private boolean abstractFlag = false;
 
 	@Nullable
-	private Boolean lazyInit;
+	private Boolean lazyInit;								// lazy-init
 
-	private int autowireMode = AUTOWIRE_NO;
+	private int autowireMode = AUTOWIRE_NO;					// autowire
 
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
 
@@ -176,18 +176,18 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private String factoryMethodName;
 
 	@Nullable
-	private ConstructorArgumentValues constructorArgumentValues;
+	private ConstructorArgumentValues constructorArgumentValues;	// constructor-arg
 
 	@Nullable
-	private MutablePropertyValues propertyValues;
+	private MutablePropertyValues propertyValues;					// property
 
 	private MethodOverrides methodOverrides = new MethodOverrides();
 
 	@Nullable
-	private String initMethodName;
+	private String initMethodName;									// init-method
 
 	@Nullable
-	private String destroyMethodName;
+	private String destroyMethodName;								// destroy-method
 
 	private boolean enforceInitMethod = true;
 
