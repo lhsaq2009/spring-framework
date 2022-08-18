@@ -37,6 +37,21 @@ import org.springframework.lang.Nullable;
  * @since 1.1
  * @see org.springframework.core.io.Resource
  */
+/**
+ *           BeanDefinitionReader
+ *                    ▲
+ *   AbstractBeanDefinitionReader
+ *                    ▲
+ *        XmlBeanDefinitionReader
+ * PropertiesBeanDefinitionReader
+ *     GroovyBeanDefinitionReader
+ *
+ * Bean 定义读取：
+ * 		1、BeanDefinitionReader 读取 spring.xml
+ * 		2、读取后创建 BeanDefinition
+ * 		3、创建好后注册到 BeanDefinitionRegister
+ */
+// xml bean 到 BeanDefinition 然后注册到 BeanDefinitionRegistry 整个过程
 public interface BeanDefinitionReader {
 
 	/**
@@ -44,6 +59,7 @@ public interface BeanDefinitionReader {
 	 * <p>The factory is exposed through the BeanDefinitionRegistry interface,
 	 * encapsulating the methods that are relevant for bean definition handling.
 	 */
+	// 获取注册器
 	BeanDefinitionRegistry getRegistry();
 
 	/**
@@ -64,6 +80,7 @@ public interface BeanDefinitionReader {
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 */
 	@Nullable
+	// 获取资源装载器
 	ResourceLoader getResourceLoader();
 
 	/**
@@ -73,6 +90,7 @@ public interface BeanDefinitionReader {
 	 * with the corresponding Classes to be resolved later (or never).
 	 */
 	@Nullable
+	// 获取 bean 类加载器
 	ClassLoader getBeanClassLoader();
 
 	/**
@@ -88,6 +106,7 @@ public interface BeanDefinitionReader {
 	 * @return the number of bean definitions found
 	 * @throws BeanDefinitionStoreException in case of loading or parsing errors
 	 */
+	// 基于资源装载 Bean 定义并注册到注册器
 	int loadBeanDefinitions(Resource resource) throws BeanDefinitionStoreException;
 
 	/**
@@ -110,6 +129,7 @@ public interface BeanDefinitionReader {
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource)
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
+	// 基于资源路径装载 Bean 定义并注册到注册器
 	int loadBeanDefinitions(String location) throws BeanDefinitionStoreException;
 
 	/**
