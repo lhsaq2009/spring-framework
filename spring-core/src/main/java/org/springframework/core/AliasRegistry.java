@@ -23,7 +23,7 @@ package org.springframework.core;
  * @author Juergen Hoeller
  * @since 2.5.2
  */
-public interface AliasRegistry {
+public interface AliasRegistry {	//
 
 	/**
 	 * Given a name, register an alias for it.
