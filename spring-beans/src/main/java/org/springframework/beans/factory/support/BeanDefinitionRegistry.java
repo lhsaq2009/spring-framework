@@ -45,6 +45,7 @@ import org.springframework.core.AliasRegistry;
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
  * @see PropertiesBeanDefinitionReader
  */
+// Bean 注册器
 public interface BeanDefinitionRegistry extends AliasRegistry {
 
 	/**
@@ -59,15 +60,14 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	 * @see RootBeanDefinition
 	 * @see ChildBeanDefinition
 	 */
-	void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
-			throws BeanDefinitionStoreException;
+	void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) throws BeanDefinitionStoreException;
 
 	/**
 	 * Remove the BeanDefinition for the given name.
 	 * @param beanName the name of the bean instance to register
 	 * @throws NoSuchBeanDefinitionException if there is no such bean definition
 	 */
-	void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
+	void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;	//
 
 	/**
 	 * Return the BeanDefinition for the given bean name.
@@ -75,27 +75,27 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	 * @return the BeanDefinition for the given name (never {@code null})
 	 * @throws NoSuchBeanDefinitionException if there is no such bean definition
 	 */
-	BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
+	BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;	//
 
 	/**
 	 * Check if this registry contains a bean definition with the given name.
 	 * @param beanName the name of the bean to look for
 	 * @return if this registry contains a bean definition with the given name
 	 */
-	boolean containsBeanDefinition(String beanName);
+	boolean containsBeanDefinition(String beanName);		//
 
 	/**
 	 * Return the names of all beans defined in this registry.
 	 * @return the names of all beans defined in this registry,
 	 * or an empty array if none defined
 	 */
-	String[] getBeanDefinitionNames();
+	String[] getBeanDefinitionNames();		//
 
 	/**
 	 * Return the number of beans defined in the registry.
 	 * @return the number of beans defined in the registry
 	 */
-	int getBeanDefinitionCount();
+	int getBeanDefinitionCount();		//
 
 	/**
 	 * Determine whether the given bean name is already in use within this registry,
@@ -103,6 +103,6 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 	 * @param beanName the name to check
 	 * @return whether the given bean name is already in use
 	 */
-	boolean isBeanNameInUse(String beanName);
+	boolean isBeanNameInUse(String beanName);	//
 
 }
