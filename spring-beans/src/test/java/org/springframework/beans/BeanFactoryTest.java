@@ -34,7 +34,8 @@ public class BeanFactoryTest {
          *      main:25,                 BeanFactoryTest (com.demo.spring)
          */
 
-        System.out.println(beanFactory.getBean("student"));
+//        System.out.println(beanFactory.getBean("student"));
+//        System.out.println(beanFactory.getBean(BeanDefinitionReaderTest.Student.class));    // TODO：
         System.out.println(beanFactory.getBean("student_aliase"));
     }
 }
