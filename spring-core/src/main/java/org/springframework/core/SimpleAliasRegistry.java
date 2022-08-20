@@ -206,7 +206,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	 * @param name the user-specified name
 	 * @return the transformed name
 	 */
-	public String canonicalName(String name) {
+	public String canonicalName(String name) {		// 不论输出真名，还是别名，返回 真名(raw name)
 		String canonicalName = name;
 		// Handle aliasing...
 		String resolvedName;
