@@ -201,7 +201,7 @@ public abstract class BeanUtils {
 						argsWithDefaultValues[i] = args[i];
 					}
 				}
-				return ctor.newInstance(argsWithDefaultValues);
+				return ctor.newInstance(argsWithDefaultValues);		// =>> 12、getBean 通过反射去创建对象
 			}
 		}
 		catch (InstantiationException ex) {
