@@ -1,6 +1,5 @@
 package org.springframework.beans;
 
-import groovy.transform.builder.Builder;
 import org.springframework.beans.factory.support.BeanDefinitionReader;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.SimpleBeanDefinitionRegistry;
@@ -66,6 +65,27 @@ public class BeanDefinitionReaderTest {
         }
 
         public Student(Integer id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    static class Teacher {
+        private Integer id;
+        private String name;
+
+        public Teacher() {
+        }
+
+        public Teacher(Integer id, String name) {
             this.id = id;
             this.name = name;
         }
