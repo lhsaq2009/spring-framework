@@ -114,7 +114,7 @@ import org.springframework.lang.Nullable;
  * @see DisposableBean#destroy
  * @see org.springframework.beans.factory.support.RootBeanDefinition#getDestroyMethodName
  */
-public interface BeanFactory {
+public interface BeanFactory {		//
 
 	/**
 	 * Used to dereference a {@link FactoryBean} instance and distinguish it from
@@ -137,6 +137,7 @@ public interface BeanFactory {
 	 * @throws NoSuchBeanDefinitionException if there is no bean with the specified name
 	 * @throws BeansException if the bean could not be obtained
 	 */
+	// 基于 id 或 name 获取一个 bean
 	Object getBean(String name) throws BeansException;
 
 	/**
@@ -154,6 +155,7 @@ public interface BeanFactory {
 	 * @throws BeanNotOfRequiredTypeException if the bean is not of the required type
 	 * @throws BeansException if the bean could not be created
 	 */
+	// 基于 bean 的类别获取 bean（如果出现多个该类的实例，则会报错）但是可以指定 primary="true" 调整优先级来解决该报错
 	<T> T getBean(String name, Class<T> requiredType) throws BeansException;
 
 	/**
@@ -170,6 +172,7 @@ public interface BeanFactory {
 	 * @throws BeansException if the bean could not be created
 	 * @since 2.5
 	 */
+	// 基于名词获取一个 bean，并覆盖默认的构造参数
 	Object getBean(String name, Object... args) throws BeansException;
 
 	/**
@@ -318,6 +321,7 @@ public interface BeanFactory {
 	 * @see #getBean
 	 * @see #getType
 	 */
+	// 指定 bean 与指定 class 是否匹配
 	boolean isTypeMatch(String name, Class<?> typeToMatch) throws NoSuchBeanDefinitionException;
 
 	/**
