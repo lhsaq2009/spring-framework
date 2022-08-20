@@ -61,6 +61,8 @@ public class BeanDefinitionReaderTest {
         private Integer id;
         private String name;
 
+        private Teacher teacher;
+
         public Student() {
         }
 
@@ -76,11 +78,17 @@ public class BeanDefinitionReaderTest {
         public void setName(String name) {
             this.name = name;
         }
+
+        public void setTeacher(Teacher teacher) {
+            this.teacher = teacher;
+        }
     }
 
     static class Teacher {
         private Integer id;
         private String name;
+
+        private Student student;
 
         public Teacher() {
         }
@@ -96,6 +104,10 @@ public class BeanDefinitionReaderTest {
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public void setStudent(Student student) {
+            this.student = student;
         }
     }
 }
