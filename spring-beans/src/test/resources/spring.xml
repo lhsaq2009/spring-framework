@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="student" name="student_aliase" class="org.springframework.beans.BeanDefinitionReaderTest.Student">
+        <property name="id" value="1"></property>
+        <property name="name" value="haisen"></property>
+        <property name="teacher" value="teacher"></property>
+    </bean>
+
+    <bean id="teacher" name="teacher_aliase" class="org.springframework.beans.BeanDefinitionReaderTest.Teacher">
+        <property name="id" value="10"></property>
+        <property name="name" value="teacher_01"></property>
+
+        <property name="student" value="student"></property>
+    </bean>
+
+    <!--<bean class="org.springframework.beans.BeanDefinitionReaderTest.Student">
+        <property name="id" value="2"></property>
+        <property name="name" value="x_2"></property>
+    </bean>
+
+    <bean class="org.springframework.beans.BeanDefinitionReaderTest.Student">
+        <property name="id" value="3"></property>
+        <property name="name" value="x_3"></property>
+    </bean>
+
+    <bean id="di" name="di2" class="org.springframework.beans.BeanDefinitionReaderTest.Student"
+          lazy-init="false" scope="singleton" init-method="init" destroy-method="destroy"/>-->
+
+</beans>
