@@ -144,15 +144,15 @@ public class ServletRequestAttributes extends AbstractRequestAttributes {
 
 	@Override
 	public Object getAttribute(String name, int scope) {
-		if (scope == SCOPE_REQUEST) {
+		if (scope == SCOPE_REQUEST) {						// 0，SCOPE_SESSION = 1
 			if (!isRequestActive()) {
 				throw new IllegalStateException(
 						"Cannot ask for request attribute - request is not active anymore!");
 			}
-			return this.request.getAttribute(name);
+			return this.request.getAttribute(name);			// 结果 = {Class@5340} "class org.apache.catalina.connector.RequestFacade"
 		}
 		else {
-			HttpSession session = getSession(false);
+			HttpSession session = getSession(false);		// allowCreate = false
 			if (session != null) {
 				try {
 					Object value = session.getAttribute(name);

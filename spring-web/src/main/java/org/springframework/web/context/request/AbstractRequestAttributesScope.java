@@ -37,6 +37,11 @@ import org.springframework.lang.Nullable;
  */
 public abstract class AbstractRequestAttributesScope implements Scope {
 
+	/**
+	 * 总结：
+	 * 	1、先冲缓存里看看有没有
+	 * 	2、若没有则创建，并缓存到对应的 scope
+	 */
 	@Override
 	public Object get(String name, ObjectFactory<?> objectFactory) {
 		RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
