@@ -1,7 +1,5 @@
 package org.springframework.beans.model;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanDefinitionReaderTest;
 
 public class Teacher {

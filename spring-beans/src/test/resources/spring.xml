@@ -18,7 +18,7 @@
           class="org.springframework.beans.model.Student"
           parent="person"
           depends-on="food"
-          scope="session"
+          scope="singleton"
           init-method="initMethod"
           destroy-method="destroyMethod"
     >
