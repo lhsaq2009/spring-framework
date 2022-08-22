@@ -45,7 +45,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	/** Map from alias to canonical name. */
+	// 存储着 Bean 的别名，eg：aliasMap = {ConcurrentHashMap@2252} "{student_aliase=student}"
 	private final Map<String, String> aliasMap = new ConcurrentHashMap<>(16);
 
 
