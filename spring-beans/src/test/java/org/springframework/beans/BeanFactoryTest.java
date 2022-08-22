@@ -2,6 +2,7 @@ package org.springframework.beans;
 
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.beans.model.IStudent;
 import org.springframework.core.io.DefaultResourceLoader;
 
 /**
@@ -35,7 +36,15 @@ public class BeanFactoryTest {
          */
 
 //        System.out.println(beanFactory.getBean("student"));
-//        System.out.println(beanFactory.getBean(BeanDefinitionReaderTest.Student.class));    // TODO：
+//        System.out.println(beanFactory.getBean(IStudent.class));    // TODO：
         System.out.println(beanFactory.getBean("student_aliase"));
     }
+
+/**
+ *                   HttpSession    Session
+ *                       ▲ ▲           ▲
+ *           ┌───────────┘ └────┐ ┌────┘
+ * StandardSessionFacade  StandardSession
+ */
+
 }
