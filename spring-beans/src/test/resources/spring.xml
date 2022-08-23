@@ -2,49 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-    <bean id="food" class="org.springframework.beans.model.Food"></bean>
-
-    <bean id="person" class="org.springframework.beans.model.Person">
-        <property name="sex" value="boy"/>
+    <bean class="org.springframework.beans.model.Environment">
+    <property name="food">
+        <bean class="org.springframework.beans.model.Food"/>
+    </property>
     </bean>
-
-    <!-- <bean id="food"    ... -->
-    <!-- <bean id="person"  ... -->
-    <!-- <bean id="teacher" ... -->
-    <bean id="student"
-          name="student_aliase"
-          primary="true"
-          class="org.springframework.beans.model.Student"
-          parent="person"
-          depends-on="food"
-          scope="singleton"
-          init-method="initMethod"
-          destroy-method="destroyMethod"
-    >
-        <property name="id" value="1"></property>
-        <property name="name" value="haisen"></property>
-        <property name="teacher" ref="teacher"></property>
-    </bean>
-
-    <bean id="teacher" name="teacher_aliase" class="org.springframework.beans.model.Teacher">
-        <property name="id" value="10"></property>
-        <property name="name" value="teacher_01"></property>
-
-        <property name="student" ref="student"></property>
-    </bean>
-
-    <!--<bean class="org.springframework.beans.model.Student">
-        <property name="id" value="2"></property>
-        <property name="name" value="x_2"></property>
-    </bean>
-
-    <bean class="org.springframework.beans.model.Student">
-        <property name="id" value="3"></property>
-        <property name="name" value="x_3"></property>
-    </bean>
-
-    <bean id="di" name="di2" class="org.springframework.beans.model.Student"
-          lazy-init="false" scope="singleton" init-method="init" destroy-method="destroy"/>-->
-
+    <bean id="food" name="food_name2" class="org.springframework.beans.model.Food"/>
 </beans>

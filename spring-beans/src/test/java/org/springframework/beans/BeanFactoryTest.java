@@ -1,8 +1,10 @@
 package org.springframework.beans;
 
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.beans.model.IStudent;
+import org.springframework.beans.model.Student;
 import org.springframework.core.io.DefaultResourceLoader;
 
 /**
@@ -12,8 +14,11 @@ import org.springframework.core.io.DefaultResourceLoader;
  */
 public class BeanFactoryTest {
     public static void main(String[] args) {
+
         DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();      // 注册中心
-        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(beanFactory);      // 读取器
+
+        BeanDefinitionRegistry registry = beanFactory;
+        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(registry);         // 读取器
         reader.setResourceLoader(new DefaultResourceLoader());                          // 设置资源加载器
         reader.loadBeanDefinitions("spring.xml");                                       // 装载构建 Bean 的定义
 
@@ -35,9 +40,11 @@ public class BeanFactoryTest {
          *      main:25,                 BeanFactoryTest (com.demo.spring)
          */
 
+//        beanFactory.registerSingleton("student2", new Student());                       // 手动注册
+
 //        System.out.println(beanFactory.getBean("student"));
-//        System.out.println(beanFactory.getBean(IStudent.class));    // TODO：
-        System.out.println(beanFactory.getBean("student_aliase"));
+        // System.out.println(beanFactory.getBean(IStudent.class));    // TODO：
+        // System.out.println(beanFactory.getBean("student_aliase"));
     }
 
 /**

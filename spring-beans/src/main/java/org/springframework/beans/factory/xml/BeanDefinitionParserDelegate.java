@@ -409,11 +409,19 @@ public class BeanDefinitionParserDelegate {
 	 * Parses the supplied {@code <bean>} element. May return {@code null}
 	 * if there were errors during parse. Errors are reported to the
 	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+	 *
+	 * 当解析 <property> 子标签时，若子标签是 <bean> 会嵌套调用本方法，containingBean 就是外部 <bean> 对应的
+	 *
+	 * 		<bean class="org.springframework.beans.model.Environment">
+	 * 		    <property name="food">
+	 * 		        <bean class="org.springframework.beans.model.Food"/>
+	 * 		    </property>
+	 * 		</bean>
 	 */
 	@Nullable
-	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
-		String id = ele.getAttribute(ID_ATTRIBUTE);
-		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
+	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {  // N5m!Qut@8ARA
+		String id = ele.getAttribute(ID_ATTRIBUTE);							// 解析 id=""，beanName
+		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);					// 解析 name=""，别名
 
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
@@ -425,24 +433,42 @@ public class BeanDefinitionParserDelegate {
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
 			if (logger.isTraceEnabled()) {
-				logger.trace("No XML 'id' specified - using '" + beanName +
-						"' as bean name and " + aliases + " as aliases");
+				logger.trace("No XML 'id' specified - using '" + beanName + "' as bean name and " + aliases + " as aliases");
 			}
 		}
-
+		// 只有处于 <beans> 下面的 <bean> 才会被解析
 		if (containingBean == null) {
-			checkNameUniqueness(beanName, aliases, ele);
+			checkNameUniqueness(beanName, aliases, ele);					// 通过 set 判重
 		}
 
+		/*
+		 * 解析 <Bean> 标签，如果内部有 <Bean> 子标签，则会嵌套解析：
+		 *
+		 * beanDefinition = {GenericBeanDefinition@2589}
+		 *     beanClass = "org.springframework.beans.model.Environment"
+		 *     propertyValues = {MutablePropertyValues@2679} "PropertyValues: length=1; bean property 'food'"
+		 *         propertyValueList = {ArrayList@2683}  size = 1
+		 *             0 = {PropertyValue@2658} "bean property 'food'"
+		 *                 name = "food"
+		 *                 value = {BeanDefinitionHolder@2649}				// <bean> 子标签
+		 *                 ...
+		 *     ...
+		 */
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
-			if (!StringUtils.hasText(beanName)) {
+			if (!StringUtils.hasText(beanName)) {							// <bean ...> 没有 id，也没有 name ..
 				try {
 					if (containingBean != null) {
+						// 当 <bean ...> 被其它 <bean ...> 包裹着，beanName = org.springframework.beans.model.Food#5a7fe64f
 						beanName = BeanDefinitionReaderUtils.generateBeanName(
 								beanDefinition, this.readerContext.getRegistry(), true);
 					}
 					else {
+						/*
+						 * 根据 类名 生成默认：
+						 * 		beanName     = "org.springframework.beans.model.Food#0",             // 构成说明：全类名#数字，数字从 0 开始，同类名无名的 <bean ..> 数字取 1，以此类推，然后是 2, 3, ...
+						 * 		aliasesArray = ["org.springframework.beans.model.Food"]              // 全类名，同类名无名的 <bean ..> 无默认别名
+						 */
 						beanName = this.readerContext.generateBeanName(beanDefinition);
 						// Register an alias for the plain bean class name, if still possible,
 						// if the generator returned the class name plus a suffix.
@@ -450,6 +476,7 @@ public class BeanDefinitionParserDelegate {
 						String beanClassName = beanDefinition.getBeanClassName();
 						if (beanClassName != null &&
 								beanName.startsWith(beanClassName) && beanName.length() > beanClassName.length() &&
+								// 同一个类，多个无名 <bean ..> 配置，只有首次第一个 <bean> 会配置 全类名作为别名
 								!this.readerContext.getRegistry().isBeanNameInUse(beanClassName)) {
 							aliases.add(beanClassName);
 						}
@@ -478,7 +505,7 @@ public class BeanDefinitionParserDelegate {
 	protected void checkNameUniqueness(String beanName, List<String> aliases, Element beanElement) {
 		String foundName = null;
 
-		if (StringUtils.hasText(beanName) && this.usedNames.contains(beanName)) {
+		if (StringUtils.hasText(beanName) && this.usedNames.contains(beanName)) {	// TODO：
 			foundName = beanName;
 		}
 		if (foundName == null) {
@@ -515,15 +542,23 @@ public class BeanDefinitionParserDelegate {
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
-			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
+			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));	// 解析：解析 <description> 子标签
 
-			parseMetaElements(ele, bd);
-			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
-			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
+			parseMetaElements(ele, bd);										// 解析：<meta key="" value=""/> 子标签
+			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());	// 解析：<lookup-method></lookup-method> 子标签
+			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());	// 解析：<replaced-method></replaced-method> 子标签
 
-			parseConstructorArgElements(ele, bd);
+			parseConstructorArgElements(ele, bd);							// 解析：<constructor-arg> 子标签
+			/*
+			 * 解析：<property> 子标签：
+			 *
+			 * <property name="food">
+			 *      <!-- property 子标签的解析： -->
+			 * 		<bean id="food" name="food_name1" class="org.springframework.beans.model.Food"/>
+			 * </property>
+			 */
 			parsePropertyElements(ele, bd);
-			parseQualifierElements(ele, bd);
+			parseQualifierElements(ele, bd);								// 解析：<qualifier> 子标签
 
 			bd.setResource(this.readerContext.getResource());
 			bd.setSource(extractSource(ele));
@@ -951,7 +986,7 @@ public class BeanDefinitionParserDelegate {
 			return valueHolder;
 		}
 		else if (subElement != null) {
-			return parsePropertySubElement(subElement, bd);
+			return parsePropertySubElement(subElement, bd);		// 解析子标签
 		}
 		else {
 			// Neither child element nor "ref" or "value" attribute found.
@@ -979,13 +1014,25 @@ public class BeanDefinitionParserDelegate {
 	 * @param defaultValueType the default type (class name) for any
 	 * {@code <value>} tag that might be created
 	 */
+	/**
+	 * 解析：<property> 的子标签：
+	 * <property name="food">
+	 *     <list></list>
+	 *     <array></array>
+	 *     <props></props>
+	 *     <set></set>
+	 *     <map></map>
+	 *     <bean .../>
+	 *     ...
+	 * </property>
+	 */
 	@Nullable
 	public Object parsePropertySubElement(Element ele, @Nullable BeanDefinition bd, @Nullable String defaultValueType) {
 		if (!isDefaultNamespace(ele)) {
 			return parseNestedCustomElement(ele, bd);
 		}
 		else if (nodeNameEquals(ele, BEAN_ELEMENT)) {
-			BeanDefinitionHolder nestedBd = parseBeanDefinitionElement(ele, bd);
+			BeanDefinitionHolder nestedBd = parseBeanDefinitionElement(ele, bd);		// 嵌套调用
 			if (nestedBd != null) {
 				nestedBd = decorateBeanDefinitionIfRequired(ele, nestedBd, bd);
 			}

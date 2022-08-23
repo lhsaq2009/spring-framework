@@ -302,13 +302,27 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * Process the given bean element, parsing the bean definition
 	 * and registering it with the registry.
 	 */
+	/**
+	 * ele = {DeferredElementNSImpl@2170}
+	 * 		localName = "bean"
+	 * 		name = "bean"
+	 * 		attributes = {AttributeMap@2610}
+	 * 			nodes = {ArrayList@2624}  size = 5
+	 * 				0 = {DeferredAttrNSImpl@2627} "autowire="default""
+	 * 				1 = {DeferredAttrNSImpl@2628} "autowire-candidate="default""
+	 * 				2 = {DeferredAttrNSImpl@2629} "class="org.springframework.beans.model.Food""
+	 * 				3 = {DeferredAttrNSImpl@2630} "id="food""
+	 * 				4 = {DeferredAttrNSImpl@2631} "lazy-init="default""
+	 *	    ...
+	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
 		if (bdHolder != null) {
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
 				// Register the final decorated instance.
-				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
+				// bdHolder = {BeanDefinitionHolder@2746}，getReaderContext().getRegistry() = {DefaultListableBeanFactory@2945}
+				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());	// =>> 13
 			}
 			catch (BeanDefinitionStoreException ex) {
 				getReaderContext().error("Failed to register bean definition with name '" +
