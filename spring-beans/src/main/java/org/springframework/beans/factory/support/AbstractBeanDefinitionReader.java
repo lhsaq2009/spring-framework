@@ -51,7 +51,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private final BeanDefinitionRegistry registry;
+	private final BeanDefinitionRegistry registry;		//
 
 	@Nullable
 	private ResourceLoader resourceLoader;
@@ -190,7 +190,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		return count;
 	}
 
-	@Override
+	@Override		// eg："spring.xml"
 	public int loadBeanDefinitions(String location) throws BeanDefinitionStoreException {
 		return loadBeanDefinitions(location, null);
 	}
@@ -210,6 +210,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource)
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
 	 */
+	// location = "spring.xml"，actualResources = null
 	public int loadBeanDefinitions(String location, @Nullable Set<Resource> actualResources) throws BeanDefinitionStoreException {
 		ResourceLoader resourceLoader = getResourceLoader();
 		if (resourceLoader == null) {

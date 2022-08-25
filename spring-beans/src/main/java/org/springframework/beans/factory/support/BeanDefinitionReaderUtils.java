@@ -117,7 +117,13 @@ public abstract class BeanDefinitionReaderUtils {
 			throw new BeanDefinitionStoreException("Unnamed bean definition specifies neither " +
 					"'class' nor 'parent' nor 'factory-bean' - can't generate bean name");
 		}
-
+		/**
+		 * <bean class="org.springframework.beans.model.Environment">
+		 *     <property name="food">
+		 *         <bean class="org.springframework.beans.model.Food"/>
+		 *     </property>
+		 * </bean>
+		 */
 		if (isInnerBean) {
 			// Inner bean: generate identity hashcode suffix.
 			return generatedBeanName + GENERATED_BEAN_NAME_SEPARATOR + ObjectUtils.getIdentityHexString(definition);
@@ -155,13 +161,12 @@ public abstract class BeanDefinitionReaderUtils {
 	 * @param registry the bean factory to register with
 	 * @throws BeanDefinitionStoreException if registration failed
 	 */
-	public static void registerBeanDefinition(
-			BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry)
+	public static void registerBeanDefinition(BeanDefinitionHolder definitionHolder, BeanDefinitionRegistry registry)
 			throws BeanDefinitionStoreException {
 
 		// Register bean definition under primary name.
 		String beanName = definitionHolder.getBeanName();
-		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
+		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());		// =>> 14
 
 		// Register aliases for bean name, if any.
 		String[] aliases = definitionHolder.getAliases();

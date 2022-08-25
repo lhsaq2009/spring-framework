@@ -485,7 +485,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Make sure bean class is actually resolved at this point, and
 		// clone the bean definition in case of a dynamically resolved Class
 		// which cannot be stored in the shared merged bean definition.
-		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
+		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);	// 得到 Bean 的全类名
 		if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
 			mbdToUse = new RootBeanDefinition(mbd);
 			mbdToUse.setBeanClass(resolvedClass);
@@ -513,7 +513,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
-			Object beanInstance = doCreateBean(beanName, mbdToUse, args);
+			Object beanInstance = doCreateBean(beanName, mbdToUse, args);		// =>> 07、getBean
 			if (logger.isTraceEnabled()) {
 				logger.trace("Finished creating instance of bean '" + beanName + "'");
 			}
@@ -553,7 +553,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			instanceWrapper = createBeanInstance(beanName, mbd, args);
+			instanceWrapper = createBeanInstance(beanName, mbd, args);		// =>> 08、getBean
 		}
 		Object bean = instanceWrapper.getWrappedInstance();
 		Class<?> beanType = instanceWrapper.getWrappedClass();
@@ -598,8 +598,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				throw (BeanCreationException) ex;
 			}
 			else {
-				throw new BeanCreationException(
-						mbd.getResourceDescription(), beanName, "Initialization of bean failed", ex);
+				throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Initialization of bean failed", ex);
 			}
 		}
 
@@ -1192,7 +1191,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				return autowireConstructor(beanName, mbd, null, null);
 			}
 			else {
-				return instantiateBean(beanName, mbd);
+				return instantiateBean(beanName, mbd);		// =>> 09、getBean
 			}
 		}
 
@@ -1303,11 +1302,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			Object beanInstance;
 			if (System.getSecurityManager() != null) {
 				beanInstance = AccessController.doPrivileged(
-						(PrivilegedAction<Object>) () -> getInstantiationStrategy().instantiate(mbd, beanName, this),
+						(PrivilegedAction<Object>) () -> getInstantiationStrategy().instantiate(mbd, beanName, this),	// =>> 10、getBean
 						getAccessControlContext());
 			}
 			else {
-				beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, this);
+				// eg：getInstantiationStrategy() = CglibSubclassingInstantiationStrategy
+				beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, this);		// =>> 10、getBean
 			}
 			BeanWrapper bw = new BeanWrapperImpl(beanInstance);
 			initBeanWrapper(bw);

@@ -3,8 +3,8 @@ package org.springframework.beans;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.beans.model.IStudent;
-import org.springframework.beans.model.Student;
+import org.springframework.beans.model.Man;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 
 /**
@@ -40,11 +40,21 @@ public class BeanFactoryTest {
          *      main:25,                 BeanFactoryTest (com.demo.spring)
          */
 
-//        beanFactory.registerSingleton("student2", new Student());                       // 手动注册
+        // beanFactory.registerSingleton("student2", new Student());                       // 手动注册
 
-//        System.out.println(beanFactory.getBean("student"));
-        // System.out.println(beanFactory.getBean(IStudent.class));    // TODO：
-        // System.out.println(beanFactory.getBean("student_aliase"));
+        /** {@link org.springframework.beans.factory.support.AbstractBeanFactory#beanPostProcessors} */
+        beanFactory.addBeanPostProcessor(new Man());
+
+        Object man = beanFactory.getBean("man");
+        System.out.println(man);
+
+        // TODO：BeanPostProcessor 未生效？？--> https://juejin.cn/post/6963641851047837704
+        // https://www.jianshu.com/p/cb77412fde4d
+        // 构建 ClassPathXmlApplicationContext 实例对象的时候， 其中 refresh 方法会调用 registerBeanPostProcessors() 方法。这个方法会将检测到的 BeanPostProcessor 注入到 ClassPathXmlApplicationContext 容器中。
+
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");  // TODO：构造函数
+        Object person = context.getBean("person");
+        System.out.println(person);
     }
 
 /**

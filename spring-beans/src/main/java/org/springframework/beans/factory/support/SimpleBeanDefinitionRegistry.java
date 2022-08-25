@@ -34,11 +34,11 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 2.5.2
  */
-public class SimpleBeanDefinitionRegistry extends SimpleAliasRegistry implements BeanDefinitionRegistry {
+public class SimpleBeanDefinitionRegistry extends SimpleAliasRegistry implements BeanDefinitionRegistry {	//
 
 	/** Map of bean definition objects, keyed by bean name. */
-	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(64);
-
+	/** TODO：{@link org.springframework.beans.factory.support.DefaultListableBeanFactory#beanDefinitionMap} ?? */
+	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(64);	//
 
 	@Override
 	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
