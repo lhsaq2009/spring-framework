@@ -12,8 +12,11 @@ import org.springframework.context.ApplicationContextAware;
 /**
  * 生命周期的一些方法，{@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#initializeBean(String, Object, RootBeanDefinition)}
  */
-public class Man implements InitializingBean, BeanPostProcessor,
-        MergedBeanDefinitionPostProcessor, BeanNameAware, ApplicationContextAware {
+public class Man {
+    /*implements
+} InitializingBean, BeanPostProcessor,
+        MergedBeanDefinitionPostProcessor, BeanNameAware, ApplicationContextAware {*/
+
     private Women women;
 
     public Man() {
@@ -33,15 +36,15 @@ public class Man implements InitializingBean, BeanPostProcessor,
 
     /**
      * {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#invokeCustomInitMethod}
-     */
+     *//*
     @Override
     public void afterPropertiesSet() throws Exception {
         System.out.println("Man implements InitializingBean --> afterPropertiesSet()");
     }
 
-    /**
+    *//**
      * {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#invokeCustomInitMethod}
-     */
+     *//*
     public void init() {
         System.out.println("init() --> Man.init");
     }
@@ -82,5 +85,5 @@ public class Man implements InitializingBean, BeanPostProcessor,
         System.out.println("spring init");
         // TODO：
         // context = applicationContext;
-    }
+    }*/
 }
