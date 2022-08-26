@@ -581,7 +581,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
-					// 若 Bean 实现了 MergedBeanDefinitionPostProcessor，则执行子类 postProcessMergedBeanDefinition
+					/**
+					 * 若 Bean 实现了 MergedBeanDefinitionPostProcessor，则执行子类 postProcessMergedBeanDefinition
+					 * 并且 beanFactory.addBeanPostProcessor(new Man());
+					 *
+					 * {@link org.springframework.beans.factory.support.AbstractBeanFactory#beanPostProcessors}
+					 * 		private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
+					 */
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
 				catch (Throwable ex) {
@@ -594,21 +600,26 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
+		// allowCircularReferences：默认为 true，在 Spring Boot 2.6.0 默认禁止循环引用
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
-				isSingletonCurrentlyInCreation(beanName));
+				isSingletonCurrentlyInCreation(beanName));	// 正在创建的 Bean
 		if (earlySingletonExposure) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
+			/** 回调匿名方法：{@link DefaultSingletonBeanRegistry#getSingleton(String, boolean)} */
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
-
-		// Initialize the bean instance.
+		// 实例已经 "暴露"，为何这么讲，是在 () -> getEarlyBeanReference(beanName, mbd, bean) 第三个参数将 bean 暴漏出去。
 		Object exposedObject = bean;
 		try {
-			populateBean(beanName, mbd, instanceWrapper);
-			exposedObject = initializeBean(beanName, exposedObject, mbd);
+			/*
+			 * ==> {@link AbstractAutowireCapableBeanFactory#applyPropertyValues}
+			 * 为 Bean 实例，赋上 XML 配置里的 <property name="sex" value="boy"/> 属性值
+			 */
+			populateBean(beanName, mbd, instanceWrapper);						// =>> 填充实例属性
+			exposedObject = initializeBean(beanName, exposedObject, mbd);		// =>> 执行生命周期相关的方法，比如 afterPropertiesSet() 和 init-method 等等
 		}
 		catch (Throwable ex) {
 			if (ex instanceof BeanCreationException && beanName.equals(((BeanCreationException) ex).getBeanName())) {
@@ -618,9 +629,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		if (earlySingletonExposure) {
+		if (earlySingletonExposure) {											// 单例，true
 			Object earlySingletonReference = getSingleton(beanName, false);
-			if (earlySingletonReference != null) {
+			if (earlySingletonReference != null) {								// TODO：???
 				if (exposedObject == bean) {
 					exposedObject = earlySingletonReference;
 				}
@@ -645,7 +656,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		// Register bean as disposable.
+		// 将 bean 注册为一次性的。Register bean as disposable.
 		try {
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
 		}
@@ -980,7 +991,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 		}
-		return exposedObject;
+		return exposedObject;		// 对象还未初始化完整，还没为属性赋配置值，没执行生命周期方法。
 	}
 
 
