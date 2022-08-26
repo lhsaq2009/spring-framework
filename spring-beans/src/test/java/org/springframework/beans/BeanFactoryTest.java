@@ -45,7 +45,7 @@ public class BeanFactoryTest {
         /** {@link org.springframework.beans.factory.support.AbstractBeanFactory#beanPostProcessors} */
         // beanFactory.addBeanPostProcessor(new Man());
 
-        Object man = beanFactory.getBean("man", IPerson.class);
+        Object man = beanFactory.getBean("man");
         System.out.println(man);
 
         // TODO：BeanPostProcessor 未生效？？--> https://juejin.cn/post/6963641851047837704
