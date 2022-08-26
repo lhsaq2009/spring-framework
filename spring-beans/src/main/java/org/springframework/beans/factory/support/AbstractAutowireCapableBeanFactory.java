@@ -1289,7 +1289,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		String currentlyCreatedBean = this.currentlyCreatedBean.get();
 		if (currentlyCreatedBean != null) {
-			registerDependentBean(beanName, currentlyCreatedBean);
+			registerDependentBean(beanName, currentlyCreatedBean);		// =>> 为 Bean 赋值时，被以来的 Bean 创建完毕
 		}
 
 		return super.getObjectForBeanInstance(beanInstance, name, beanName, mbd);
