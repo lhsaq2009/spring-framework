@@ -1972,7 +1972,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		else {
 			try {
 				ReflectionUtils.makeAccessible(methodToInvoke);
-				methodToInvoke.invoke(bean);
+				methodToInvoke.invoke(bean);							// 反射调用 init-method 方法
 			}
 			catch (InvocationTargetException ex) {
 				throw ex.getTargetException();
