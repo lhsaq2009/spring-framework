@@ -237,6 +237,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * with, if necessary
 	 * @return the registered singleton object
 	 */
+	/**
+	 * 检查 singletonObjects 缓存，若无缓存，则从 singletonFactory 创建
+	 */
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
 		synchronized (this.singletonObjects) {
@@ -252,15 +255,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
 				// Set singletonsCurrentlyInCreation 添加 BeanName，在容器里记录表示一下 Bean 正在创建
-				// 避免并发创建单例 Bean，
-				beforeSingletonCreation(beanName);
+				// 标识 BeanName 正在创建过程 ~
+				beforeSingletonCreation(beanName);							// 添加对象正在创建标识，创建完毕调用：afterSingletonCreation(beanName)
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
 				if (recordSuppressedExceptions) {
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
-					singletonObject = singletonFactory.getObject();			// 去创建 Bean
+					singletonObject = singletonFactory.getObject();			// 去创建 Bean 实例
 					newSingleton = true;
 				}
 				catch (IllegalStateException ex) {
@@ -284,10 +287,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 						this.suppressedExceptions = null;
 					}
 					// Set singletonsCurrentlyInCreation 移除 BeanName
-					afterSingletonCreation(beanName);
+					afterSingletonCreation(beanName);						// 移除对象正在创建标识
 				}
 				if (newSingleton) {
-					addSingleton(beanName, singletonObject);				// TODO：加入单例缓存
+					addSingleton(beanName, singletonObject);				// 实例完整初始化，加入单例缓存
 				}
 			}
 			return singletonObject;
@@ -366,8 +369,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
-	 * Return whether the specified singleton bean is currently in creation
-	 * (within the entire factory).
+	 * 返回指定的单例 bean 当前是否正在创建中（在整个工厂中）。
+	 * Return whether the specified singleton bean is currently in creation (within the entire factory).
 	 * @param beanName the name of the bean
 	 */
 	public boolean isSingletonCurrentlyInCreation(String beanName) {
