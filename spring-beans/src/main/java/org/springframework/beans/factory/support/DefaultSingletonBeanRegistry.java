@@ -442,10 +442,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * to be destroyed before the given bean is destroyed.
 	 * @param beanName the name of the bean
 	 * @param dependentBeanName the name of the dependent bean
+	 *
+	 * DefaultSingletonBeanRegistry#registerDependentBean(String, lang.String)
+	 * eg：dependentBeanName：当前创建的 Bean 实例，依赖 beanName
+	 *     this.dependentBeanMap 		= {ConcurrentHashMap@2254} "{man=[women]}"，beanName(man) 被哪些 Bean(women) 依赖
+	 *     this.dependenciesForBeanMap 	= {ConcurrentHashMap@2255} "{women=[man]}"，当前 Bean(women) 依赖哪些 BeanName(man)
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
 		String canonicalName = canonicalName(beanName);
-
+		// beanName 被哪些 Bean 依赖
 		synchronized (this.dependentBeanMap) {
 			Set<String> dependentBeans =
 					this.dependentBeanMap.computeIfAbsent(canonicalName, k -> new LinkedHashSet<>(8));
@@ -453,7 +458,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				return;
 			}
 		}
-
+		// 当前 Bean 依赖哪些 BeanName
 		synchronized (this.dependenciesForBeanMap) {
 			Set<String> dependenciesForBean =
 					this.dependenciesForBeanMap.computeIfAbsent(dependentBeanName, k -> new LinkedHashSet<>(8));
