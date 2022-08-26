@@ -1388,8 +1388,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
-	 * Populate the bean instance in the given BeanWrapper with the property values
-	 * from the bean definition.
+	 * populate：填充
+	 *
+	 * 使用 bean 定义中的属性值填充给定 BeanWrapper 中的 bean 实例
+	 * Populate the bean instance in the given BeanWrapper with the property values from the bean definition.
 	 * @param beanName the name of the bean
 	 * @param mbd the bean definition for the bean
 	 * @param bw the BeanWrapper with bean instance
@@ -1420,8 +1422,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 		}
-
-		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
+		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);	// 存在 <property> 属性
 
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
@@ -1469,8 +1470,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			checkDependencies(beanName, mbd, filteredPds, pvs);
 		}
 
-		if (pvs != null) {
-			applyPropertyValues(beanName, mbd, bw, pvs);
+		if (pvs != null) {	// 存在 <property> 属性
+			applyPropertyValues(beanName, mbd, bw, pvs);		// =>>
 		}
 	}
 
@@ -1696,6 +1697,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 							mbd.getResourceDescription(), beanName, "Error setting property values", ex);
 				}
 			}
+			/*
+			 * mpvs.getPropertyValueList() = {ArrayList@2331}  size = 1
+			 * 		0 = {PropertyValue@2333} "bean property 'women'"
+			 */
 			original = mpvs.getPropertyValueList();
 		}
 		else {
@@ -1725,7 +1730,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					}
 					originalValue = new DependencyDescriptor(new MethodParameter(writeMethod, 0), true);
 				}
-				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
+				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);	// =>> 根据配置为实例赋值属性
 				Object convertedValue = resolvedValue;
 				boolean convertible = bw.isWritableProperty(propertyName) &&
 						!PropertyAccessorUtils.isNestedOrIndexedProperty(propertyName);
@@ -1734,7 +1739,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 				// Possibly store converted value in merged bean definition,
 				// in order to avoid re-conversion for every created bean instance.
-				if (resolvedValue == originalValue) {
+				if (resolvedValue == originalValue) {		// resolvedValue = {Man@2279}，originalValue = {RuntimeBeanReference@2566} "<man>"
 					if (convertible) {
 						pv.setConvertedValue(convertedValue);
 					}
@@ -1758,6 +1763,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Set our (possibly massaged) deep copy.
 		try {
+			/**
+			 * BeanWrapper bw
+			 * =>> {@link org.springframework.beans.AbstractPropertyAccessor#setPropertyValues(PropertyValues)}
+			 * =>> {@link org.springframework.beans.AbstractPropertyAccessor#setPropertyValues(PropertyValues, boolean, boolean)}	=>> for (PropertyValue pv : propertyValues) {
+			 * =>> {@link org.springframework.beans.AbstractPropertyAccessor#setPropertyValue(PropertyValue)}
+			 * =>> {@link org.springframework.beans.AbstractNestablePropertyAccessor#setPropertyValue(org.springframework.beans.AbstractNestablePropertyAccessor.PropertyTokenHolder, PropertyValue)}
+			 * =>> {@link org.springframework.beans.AbstractNestablePropertyAccessor#processLocalProperty}							=>> ph.setValue(valueToApply);
+			 * =>> {@link org.springframework.beans.AbstractNestablePropertyAccessor.PropertyHandler#setValue} 						=>> 去反射赋值
+			 */
 			bw.setPropertyValues(new MutablePropertyValues(deepCopy));
 		}
 		catch (BeansException ex) {
