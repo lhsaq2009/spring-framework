@@ -131,7 +131,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	private ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
 	/** Whether to automatically try to resolve circular references between beans. */
-	private boolean allowCircularReferences = true;
+	/**
+	 * 方式一：
+	 * spring:
+	 *   main:
+	 *     allow-circular-references: true				 # 开启允许循环引用
+	 *
+	 * 方式二：
+	 * SpringApplication application = new SpringApplication(SpringDemoApplication.class);
+	 *         application.setAllowCircularReferences(Boolean.TRUE);
+	 */
+	private boolean allowCircularReferences = true;		// Spring Boot 2.6.0 新特性默认禁止循环引用
 
 	/**
 	 * Whether to resort to injecting a raw bean instance in case of circular reference,
@@ -543,6 +553,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #instantiateBean
 	 * @see #instantiateUsingFactoryMethod
 	 * @see #autowireConstructor
+	 */
+	/**
+	 * Spring 的单例对象的初始化主要分为三步：
+	 * 		1）createBeanInstance	：实例化，其实也就是调用对象的构造方法实例化对象
+	 *		2）populateBean			：填充属性，这一步主要是多 bean 的依赖属性进行填充
+	 *		3）initializeBean		：调用 spring xml 中的 init 方法
 	 */
 	protected Object doCreateBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
 			throws BeanCreationException {
