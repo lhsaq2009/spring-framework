@@ -569,7 +569,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			instanceWrapper = createBeanInstance(beanName, mbd, args);		// =>> 08、getBean
+			// =>> instantiateBean(beanName, mbd);											// ==> 09、通过无参构造函数创建对象
+			// =>> getInstantiationStrategy().instantiate(mbd, beanName, this);				// =>> 10、
+			//     eg：getInstantiationStrategy() = CglibSubclassingInstantiationStrategy
+			// =>> SimpleInstantiationStrategy#instantiate(..)
+			//     =>> BeanUtils.instantiateClass(constructorToUse);                        // =>> 11、
+			//	       =>> ctor.newInstance(argsWithDefaultValues);							// 反射创建对象
+			instanceWrapper = createBeanInstance(beanName, mbd, args);                      // =>> 08、后续略，基于注释展示后续调用
 		}
 		Object bean = instanceWrapper.getWrappedInstance();
 		Class<?> beanType = instanceWrapper.getWrappedClass();
@@ -1240,7 +1246,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// No special handling: simply use no-arg constructor.
-		return instantiateBean(beanName, mbd);
+		return instantiateBean(beanName, mbd);				// =>> 09、getBean
 	}
 
 	/**
