@@ -1,22 +1,21 @@
 package org.springframework.beans.model;
 
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.MergedBeanDefinitionPostProcessor;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * 生命周期的一些方法，{@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#initializeBean(String, Object, RootBeanDefinition)}
  */
-public class Man {
-    /*implements
-} InitializingBean, BeanPostProcessor,
-        MergedBeanDefinitionPostProcessor, BeanNameAware, ApplicationContextAware {*/
+public class Man implements InitializingBean, BeanPostProcessor,
+        MergedBeanDefinitionPostProcessor, BeanNameAware/*, ApplicationContextAware*/ {
 
+    private String beanName;
     private Women women;
 
     public Man() {
@@ -35,36 +34,43 @@ public class Man {
     }
 
     /**
-     * {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#invokeCustomInitMethod}
-     *//*
+     * ==> {@link AbstractAutowireCapableBeanFactory#invokeInitMethods(String, Object, RootBeanDefinition)} =>> ((InitializingBean) bean).afterPropertiesSet();
+     */
     @Override
     public void afterPropertiesSet() throws Exception {
         System.out.println("Man implements InitializingBean --> afterPropertiesSet()");
     }
 
-    *//**
-     * {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#invokeCustomInitMethod}
-     *//*
+    /**
+     * <bean id="man" class="org.springframework.beans.model.Man" init-method="init">
+     * ==> {@link AbstractAutowireCapableBeanFactory#invokeInitMethods(String, Object, RootBeanDefinition)} =>> invokeCustomInitMethod(beanName, bean, mbd);
+     * ==> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#invokeCustomInitMethod}
+     */
     public void init() {
         System.out.println("init() --> Man.init");
     }
 
-    // 在调用 init-method() 之前执行
+    // 在调用 init-method 之前执行
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         System.out.println("postProcessBeforeInitialization");
         return bean;
     }
 
-    // 在调用 init-method() 之后执行
+    // 在调用 init-method 之后执行
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         System.out.println("postProcessAfterInitialization");
         return bean;
     }
 
+    /**
+     * ==> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#doCreateBean}
+     * ==> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#applyMergedBeanDefinitionPostProcessors}
+     */
     @Override
     public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+        // 这个好像用处不是很多吧，先不关注它.
         System.out.println("postProcessMergedBeanDefinition from man");
     }
 
@@ -76,14 +82,19 @@ public class Man {
 
     @Override
     public void setBeanName(String name) {
-        // TODO：???? 我继承好像没用？？
-        // 会影响 IOC Bean 初始化时 Name 的设置吗，还是利用该接口，对外得到 Name 而已？？
+        this.beanName = name;                       // 回调传给我用
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        System.out.println("spring init");
-        // TODO：
-        // context = applicationContext;
-    }*/
+    /*
+     * private ApplicationContext context;
+     *
+     * 这个应该在 Web 环境下使用：
+     * import org.springframework.context.ApplicationContext;
+     * import org.springframework.context.ApplicationContextAware;
+     *
+     * @Override
+     * public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+     *     this.context = applicationContext;          // 回调传给我用
+     * }
+     */
 }

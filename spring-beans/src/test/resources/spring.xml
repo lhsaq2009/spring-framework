@@ -4,10 +4,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="man" class="org.springframework.beans.model.Man" init-method="init">
-        <!--<property name="women" ref="women"/>-->
+        <property name="women" ref="women"/>
     </bean>
-    <!--<bean id="women" class="org.springframework.beans.model.Women">
+    <bean id="women" class="org.springframework.beans.model.Women">
         <property name="man" ref="man"/>
-    </bean>-->
-
+    </bean>
 </beans>
