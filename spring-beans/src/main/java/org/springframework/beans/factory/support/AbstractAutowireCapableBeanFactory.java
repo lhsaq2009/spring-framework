@@ -1770,7 +1770,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #invokeInitMethods
 	 * @see #applyBeanPostProcessorsAfterInitialization
 	 */
+	// 调用 Bean 一些生命周期相关的方法
 	protected Object initializeBean(String beanName, Object bean, @Nullable RootBeanDefinition mbd) {
+		/*
+		 * 01、调用 invokeAwareMethods(..)，内部：
+		 * 		如果 bean 实现了 BeanNameAware 接口，			则将 beanName    回调传给你
+		 * 		如果 bean 实现了 BeanClassLoaderAware 接口，	则将 ClassLoader 回调传给你
+		 * 		如果 bean 实现了 BeanFactoryAware 接口，		则将 beanFactory 回调传给你
+		 */
 		if (System.getSecurityManager() != null) {
 			AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 				invokeAwareMethods(beanName, bean);
@@ -1783,10 +1790,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 02、调用 BeanPostProcessor.postProcessBeforeInitialization
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
+			// 03、调用 afterPropertiesSet() 和 init-method 方法
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {
@@ -1795,6 +1804,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					beanName, "Invocation of init method failed", ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 04、调用：BeanPostProcessor.postProcessAfterInitialization
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 
@@ -1850,7 +1860,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 			else {
-				((InitializingBean) bean).afterPropertiesSet();
+				((InitializingBean) bean).afterPropertiesSet();		// 01、调用 Bean 的 afterPropertiesSet()
 			}
 		}
 
@@ -1859,7 +1869,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (StringUtils.hasLength(initMethodName) &&
 					!(isInitializingBean && "afterPropertiesSet".equals(initMethodName)) &&
 					!mbd.isExternallyManagedInitMethod(initMethodName)) {
-				invokeCustomInitMethod(beanName, bean, mbd);
+				invokeCustomInitMethod(beanName, bean, mbd);		// 02、调用 init-method
 			}
 		}
 	}
