@@ -91,7 +91,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 
 	/** Package-visible field for caching the resolved constructor or factory method. */
 	@Nullable
-	Executable resolvedConstructorOrFactoryMethod;
+	Executable resolvedConstructorOrFactoryMethod;		// TODO：构造函数？？
 
 	/** Package-visible field that marks the constructor arguments as resolved. */
 	boolean constructorArgumentsResolved = false;
@@ -108,7 +108,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	final Object postProcessingLock = new Object();
 
 	/** Package-visible field that indicates MergedBeanDefinitionPostProcessor having been applied. */
-	boolean postProcessed = false;
+	boolean postProcessed = false;		// 标识：是否执行了 MergedBeanDefinitionPostProcessor.postProcessMergedBeanDefinition
 
 	/** Package-visible field that indicates a before-instantiation post-processor having kicked in. */
 	@Nullable

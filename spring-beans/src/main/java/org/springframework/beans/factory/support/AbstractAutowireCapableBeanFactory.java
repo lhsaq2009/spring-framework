@@ -579,6 +579,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// 允许后处理器修改合并的 bean 定义。Allow post-processors to modify the merged bean definition.
 		synchronized (mbd.postProcessingLock) {
+			/**
+			 * {@link org.springframework.beans.factory.support.RootBeanDefinition.postProcessed}
+			 * 标识：是否执行了 MergedBeanDefinitionPostProcessor.postProcessMergedBeanDefinition
+			 */
 			if (!mbd.postProcessed) {
 				try {
 					/**
