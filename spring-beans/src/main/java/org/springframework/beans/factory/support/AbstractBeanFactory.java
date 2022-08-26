@@ -336,7 +336,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							// Explicitly remove instance from singleton cache: It might have been put there
 							// eagerly by the creation process, to allow for circular reference resolution.
 							// Also remove any beans that received a temporary reference to the bean.
-							destroySingleton(beanName);
+							destroySingleton(beanName);                             // DefaultSingletonBeanRegistry.removeSingleton
 							throw ex;
 						}
 					});
