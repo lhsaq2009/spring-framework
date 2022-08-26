@@ -151,7 +151,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private final List<StringValueResolver> embeddedValueResolvers = new CopyOnWriteArrayList<>();
 
 	/** BeanPostProcessors to apply. */
-	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
+	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();        // TODO：结合 WebApplicationContext 再看
 
 	/** Indicates whether any InstantiationAwareBeanPostProcessors have been registered. */
 	private volatile boolean hasInstantiationAwareBeanPostProcessors;
@@ -254,7 +254,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
-        // TODO：从单例缓存中获取，或者 解决循环依赖
+        // 单例缓存，或 解决循环依赖提前得到未初始化的实例（① getBean(A) -> ② getBean(B) -> ③ getBean(A) -- 在此获取 ① 提前暴漏的未初始化完整的 A 实例）
 		Object sharedInstance = getSingleton(beanName);        // =>> 03、getBean
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
@@ -330,7 +330,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				if (mbd.isSingleton()) {
 					sharedInstance = getSingleton(beanName, () -> {                 // =>> 05、getBean
 						try {
-							return createBean(beanName, mbd, args);                 // =>> 06、getBean
+							return createBean(beanName, mbd, args);                 // =>> 06、
 						}
 						catch (BeansException ex) {
 							// Explicitly remove instance from singleton cache: It might have been put there
