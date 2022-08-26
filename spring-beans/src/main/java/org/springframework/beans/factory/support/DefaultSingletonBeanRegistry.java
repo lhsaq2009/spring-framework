@@ -74,21 +74,34 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
 	/**
-	 * IOC 容器只存放单例 Bean，所有的 单例 Bean 存在这个 Map 里
+	 * 一级缓存，存放完整创建的单例 bean 实例
+	 * Cache of singleton objects: bean name to bean instance.
 	 */
-	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
-	/** Cache of singleton factories: bean name to ObjectFactory. */
+	/**
+	 * 三级缓存，存放的是匿名函数，bean 实例仅仅创建后放入此，用于循环依赖从这里获取引用。
+	 * 调用位置：{@link DefaultSingletonBeanRegistry#getSingleton(String, boolean)}
+	 *
+	 * TODO：原始对象在 Spring 进行的 AOP 的时候需要原始对象，还需要 beanName & RootBeanDefinition，传递了 lambda 表达式，调用时不会执行
+	 * Cache of singleton factories: bean name to ObjectFactory.
+	 */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
-	/** Cache of early singleton objects: bean name to bean instance. */
+	/**
+	 * 二级缓存，存放未进行属性赋值的 bean 实例，提前曝光的单例对象的 Cache。
+	 * 根据 BeanName 从 singletonFactories 获取 ObjectFactory，得到未初始化完整的 Bean 实例。
+	 * Cache of early singleton objects: bean name to bean instance.
+	 */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
-	/** Names of beans that are currently in creation. */	// 记录哪些 Bean 正在创建中~
+	/**
+	 * {@link DefaultSingletonBeanRegistry#getSingleton(String,ObjectFactory<?>)} 在这个方法创建实例前后，进行添加和移除
+	 * 标识正在创建的 bean 的名称；Names of beans that are currently in creation.
+	 */
 	private final Set<String> singletonsCurrentlyInCreation = Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
 	/** Names of beans currently excluded from in creation checks. */
@@ -108,11 +121,17 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Map between containing bean names: bean name to Set of bean names that the bean contains. */
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
-	/** Map between dependent bean names: bean name to Set of dependent bean names. */  // dependentBeanMap = "{food=[student]}"
-	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);	// TODO：
+	/**
+	 * dependentBeanMap = "{food=[student]}"，beanName 被哪些实例依赖
+	 * Map between dependent bean names: bean name to Set of dependent bean names.
+	 */
+	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
-	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */  // dependenciesForBeanMap = "{student=[food]}"
-	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);	//
+	/**
+	 * dependenciesForBeanMap = "{student=[food]}"，Bean 依赖哪些 beanName s
+	 * Map between depending bean names: bean name to Set of bean names for the bean's dependencies.
+	 */
+	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
 
 	@Override
@@ -137,10 +156,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
-			this.singletonObjects.put(beanName, singletonObject);
+			this.singletonObjects.put(beanName, singletonObject);		// add
 			this.singletonFactories.remove(beanName);
 			this.earlySingletonObjects.remove(beanName);
-			this.registeredSingletons.add(beanName);
+			this.registeredSingletons.add(beanName);					// add
 		}
 	}
 
@@ -156,7 +175,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
 			if (!this.singletonObjects.containsKey(beanName)) {
-				this.singletonFactories.put(beanName, singletonFactory);
+				this.singletonFactories.put(beanName, singletonFactory);	// 用于循环依赖，提前获得未初始化完整的 Bean 实例
 				this.earlySingletonObjects.remove(beanName);
 				this.registeredSingletons.add(beanName);
 			}
