@@ -12,7 +12,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 /**
  * 生命周期的一些方法，{@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#initializeBean(String, Object, RootBeanDefinition)}
  */
-public class Man implements InitializingBean, BeanPostProcessor,
+public class Man implements IPerson, InitializingBean, BeanPostProcessor,
         MergedBeanDefinitionPostProcessor, BeanNameAware/*, ApplicationContextAware*/ {
 
     private String beanName;
