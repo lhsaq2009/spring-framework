@@ -91,6 +91,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/**
 	 * 二级缓存，存放未进行属性赋值的 bean 实例，提前曝光的单例对象的 Cache。
 	 * 根据 BeanName 从 singletonFactories 获取 ObjectFactory，得到未初始化完整的 Bean 实例。
+	 * 因为可能存在多个类之间的缓存，比如 A 以来 B、C，而 B 和 C 也依赖 A，那么这里在创建 B 时缓存一下提前暴漏的 A，等待初始化 C 时，就可以直接用
 	 * Cache of early singleton objects: bean name to bean instance.
 	 */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
@@ -207,6 +208,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		// 02、单例缓存中不存在该实例，判断是否该 beanName 是否正在创建过程
 		// eg：A 和 B 循环依赖，即 A -> B -> A：也就是 A 在创建的过程中，因为依赖的 B 需要创建 A，导致 A 再次进入本方法，此时 isSingletonCurrentlyInCreation = true
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+			// 比如 A 与 B、C 之间存在循环依赖
 			singletonObject = this.earlySingletonObjects.get(beanName);				// 判断是否位于提前暴露对象的 Map 里
 			if (singletonObject == null && allowEarlyReference) {					// 若允许解决循环依赖：allowEarlyReference = true
 				synchronized (this.singletonObjects) {
@@ -218,7 +220,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);	// 从工厂获取
 							if (singletonFactory != null) {
 								singletonObject = singletonFactory.getObject();		// =>> 04、getBean
-								this.earlySingletonObjects.put(beanName, singletonObject);				// 获取到则放到缓存中
+								// 如果对象涉及存在多个类的循环依赖，那么执行一次 singletonFactory.getObject() 就可以了，省的每次都执行
+								this.earlySingletonObjects.put(beanName, singletonObject);				// 临时缓存一下，以备还存在循环依赖需要去提前获取
 								this.singletonFactories.remove(beanName);								// 从工厂中移除
 							}
 						}
