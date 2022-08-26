@@ -266,7 +266,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}
-			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);    // =>> TODO：
+			bean = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
 		else {
@@ -1886,7 +1886,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected void registerDisposableBeanIfNecessary(String beanName, Object bean, RootBeanDefinition mbd) {
 		AccessControlContext acc = (System.getSecurityManager() != null ? getAccessControlContext() : null);
-		if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {
+		if (!mbd.isPrototype() && requiresDestruction(bean, mbd)) {		// TODO：？？
 			if (mbd.isSingleton()) {
 				// Register a DisposableBean implementation that performs all destruction
 				// work for the given bean: DestructionAwareBeanPostProcessors,
