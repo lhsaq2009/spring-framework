@@ -318,7 +318,7 @@ class BeanDefinitionValueResolver {
 					bean = parent.getBean(String.valueOf(doEvaluate(ref.getBeanName())));
 				}
 			}
-			else {
+			else {	// <<=
 				String resolvedName;
 				if (beanType != null) {
 					NamedBeanHolder<?> namedBean = this.beanFactory.resolveNamedBean(beanType);
@@ -327,9 +327,9 @@ class BeanDefinitionValueResolver {
 				}
 				else {
 					resolvedName = String.valueOf(doEvaluate(ref.getBeanName()));
-					bean = this.beanFactory.getBean(resolvedName);
+					bean = this.beanFactory.getBean(resolvedName);						// =>> 去加载依赖的 Bean，若循环依赖则涉及提前获取当前 Bean 暴漏的引用
 				}
-				this.beanFactory.registerDependentBean(resolvedName, this.beanName);
+				this.beanFactory.registerDependentBean(resolvedName, this.beanName);	// =>> 记录 Bean 依赖关系
 			}
 			if (bean instanceof NullBean) {
 				bean = null;
