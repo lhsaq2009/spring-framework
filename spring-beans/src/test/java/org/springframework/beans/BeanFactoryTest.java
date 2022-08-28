@@ -1,10 +1,16 @@
 package org.springframework.beans;
 
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.beans.model.Customer;
 import org.springframework.beans.model.IPerson;
+import org.springframework.beans.model.Man;
 import org.springframework.beans.model.Person;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 
 /**
@@ -43,25 +49,26 @@ public class BeanFactoryTest {
         // beanFactory.registerSingleton("student2", new Student());                       // 手动注册
 
         /** {@link org.springframework.beans.factory.support.AbstractBeanFactory#beanPostProcessors} */
-        // beanFactory.addBeanPostProcessor(new Man());
 
-        Object man = beanFactory.getBean("man");
+        AutowiredAnnotationBeanPostProcessor beanPostProcessor =
+                new AutowiredAnnotationBeanPostProcessor();
+        beanPostProcessor.setBeanFactory(beanFactory);
+        beanFactory.addBeanPostProcessor(beanPostProcessor);
+
+//        CommonAnnotationBeanPostProcessor beanPostProcessor2 = new CommonAnnotationBeanPostProcessor();
+//        beanPostProcessor2.setBeanFactory(beanFactory);
+//        beanFactory.addBeanPostProcessor(beanPostProcessor2);
+
+        Object man = beanFactory.getBean("CustomerBean");
         System.out.println(man);
 
         // TODO：BeanPostProcessor 未生效？？--> https://juejin.cn/post/6963641851047837704
         // https://www.jianshu.com/p/cb77412fde4d
-        // 构建 ClassPathXmlApplicationContext 实例对象的时候， 其中 refresh 方法会调用 registerBeanPostProcessors() 方法。这个方法会将检测到的 BeanPostProcessor 注入到 ClassPathXmlApplicationContext 容器中。
+        // 构建 ClassPathXmlApplicationContext 实例对象的时候， 其中 refresh() 会调用 registerBeanPostProcessors()。
+        // 这个方法会将检测到的 BeanPostProcessor 注入到 ClassPathXmlApplicationContext 容器中
 
-//        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");  // TODO：构造函数
-//        Object person = context.getBean("person");
+//        ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");  // TODO：=>> 构造函数
+//        Object person = context.getBean("CustomerBean");
 //        System.out.println(person);
     }
-
-/**
- *                   HttpSession    Session
- *                       ▲ ▲           ▲
- *           ┌───────────┘ └────┐ ┌────┘
- * StandardSessionFacade  StandardSession
- */
-
 }

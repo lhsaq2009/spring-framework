@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
     <!-- 循环依赖
     <bean id="man" class="org.springframework.beans.model.Man" init-method="init">
@@ -12,6 +16,19 @@
     </bean>-->
 
     <!-- @autowire -->
-    
+    <!-- <context:annotation-config/> --> <!-- TODO：如何解析的 -->
+    <!-- <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/> -->
+
+    <bean id="CustomerBean" class="org.springframework.beans.model.Customer">
+        <property name="action" value="buy"/>
+        <property name="type" value="1"/>
+    </bean>
+
+    <bean id="PersonBean" class="org.springframework.beans.model.Person">
+        <property name="name" value="yiibai"/>
+        <property name="address" value="address ABC"/>
+        <property name="age" value="29"/>
+    </bean>
+
 
 </beans>

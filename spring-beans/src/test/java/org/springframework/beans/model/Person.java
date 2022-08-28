@@ -1,16 +1,32 @@
 package org.springframework.beans.model;
 
-public class Person implements IPerson {
-    private String sex;
+public class Person {
 
-    public Person() {
+    private String name;
+    private String address;
+    private Integer age;
+
+    public String getName() {
+        return name;
     }
 
-    public Person(String sex) {
-        this.sex = sex;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setSex(String sex) {
-        this.sex = sex;
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 }

@@ -598,7 +598,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					 * {@link org.springframework.beans.factory.support.AbstractBeanFactory#beanPostProcessors}
 					 * 		private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 					 */
-					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
+					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);	// 执行部分后置处理器
 				}
 				catch (Throwable ex) {
 					throw new BeanCreationException(mbd.getResourceDescription(), beanName,
@@ -1422,7 +1422,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
-					if (!ibp.postProcessAfterInstantiation(bw.getWrappedInstance(), beanName)) {
+					if (!ibp.postProcessAfterInstantiation(bw.getWrappedInstance(), beanName)) {	//
 						return;
 					}
 				}
@@ -1448,14 +1448,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		boolean needsDepCheck = (mbd.getDependencyCheck() != AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
 
 		PropertyDescriptor[] filteredPds = null;
-		if (hasInstAwareBpps) {
+		if (hasInstAwareBpps) {				// 存在 注入类的后置处理器
 			if (pvs == null) {
 				pvs = mbd.getPropertyValues();
 			}
+			// AbstractBeanFactory.beanPostProcessors
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
+				/**
+				 * 部分支持的子类列表：
+				 * CommonAnnotationBeanPostProcessor		：@Resource
+				 * AutowiredAnnotationBeanPostProcessor		：@Autowired，@Value，@Inject
+				 */
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
-					PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
+					PropertyValues pvsToUse = ibp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);		// =>>
 					if (pvsToUse == null) {
 						if (filteredPds == null) {
 							filteredPds = filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);

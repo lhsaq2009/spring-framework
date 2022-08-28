@@ -1213,6 +1213,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {
 
 		descriptor.initParameterNameDiscovery(getParameterNameDiscoverer());
+		// descriptor.getDependencyType() = {Class@2472} "class org.springframework.beans.model.Person"
 		if (Optional.class == descriptor.getDependencyType()) {
 			return createOptionalDependency(descriptor, requestingBeanName);
 		}
@@ -1224,10 +1225,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			return new Jsr330Factory().createDependencyProvider(descriptor, requestingBeanName);
 		}
 		else {
+			// eg：result = null
 			Object result = getAutowireCandidateResolver().getLazyResolutionProxyIfNecessary(
 					descriptor, requestingBeanName);
 			if (result == null) {
-				result = doResolveDependency(descriptor, requestingBeanName, autowiredBeanNames, typeConverter);
+				result = doResolveDependency(descriptor, requestingBeanName, autowiredBeanNames, typeConverter);	// =>>
 			}
 			return result;
 		}
@@ -1243,7 +1245,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (shortcut != null) {
 				return shortcut;
 			}
-
+			// type = {Class@2824} "class org.springframework.beans.model.Person"
 			Class<?> type = descriptor.getDependencyType();
 			Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
 			if (value != null) {
@@ -1307,7 +1309,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				autowiredBeanNames.add(autowiredBeanName);
 			}
 			if (instanceCandidate instanceof Class) {
-				instanceCandidate = descriptor.resolveCandidate(autowiredBeanName, type, this);
+				instanceCandidate = descriptor.resolveCandidate(autowiredBeanName, type, this);		// 去获取 Bean
 			}
 			Object result = instanceCandidate;
 			if (result instanceof NullBean) {
@@ -1532,7 +1534,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 		else if (containsSingleton(candidateName) || (descriptor instanceof StreamDependencyDescriptor &&
 				((StreamDependencyDescriptor) descriptor).isOrdered())) {
-			Object beanInstance = descriptor.resolveCandidate(candidateName, requiredType, this);
+			Object beanInstance = descriptor.resolveCandidate(candidateName, requiredType, this);		// ==>
 			candidates.put(candidateName, (beanInstance instanceof NullBean ? null : beanInstance));
 		}
 		else {

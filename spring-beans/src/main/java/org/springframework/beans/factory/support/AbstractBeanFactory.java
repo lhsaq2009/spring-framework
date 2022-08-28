@@ -150,8 +150,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/** String resolvers to apply e.g. to annotation attribute values. */
 	private final List<StringValueResolver> embeddedValueResolvers = new CopyOnWriteArrayList<>();
 
-	/** BeanPostProcessors to apply. */
-	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();        // TODO：结合 WebApplicationContext 再看
+	/**
+	 * 后置处理器：{@link org.springframework.beans.factory.support.AbstractBeanFactory#addBeanPostProcessor}
+	 */
+	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 
 	/** Indicates whether any InstantiationAwareBeanPostProcessors have been registered. */
 	private volatile boolean hasInstantiationAwareBeanPostProcessors;
@@ -938,8 +940,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		return result;
 	}
 
+
 	@Override
-	public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+	public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {		// 手动添加 BeanPostProcessor
 		Assert.notNull(beanPostProcessor, "BeanPostProcessor must not be null");
 		// Remove from old position, if any
 		this.beanPostProcessors.remove(beanPostProcessor);

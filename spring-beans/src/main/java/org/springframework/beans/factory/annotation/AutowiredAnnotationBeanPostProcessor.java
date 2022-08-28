@@ -128,11 +128,12 @@ import org.springframework.util.StringUtils;
  * @see Autowired
  * @see Value
  */
-public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
+public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter	// @Autowired 自动装配原理 实现类
 		implements MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// @Autowired，@Value，@Inject
 	private final Set<Class<? extends Annotation>> autowiredAnnotationTypes = new LinkedHashSet<>(4);
 
 	private String requiredParameterName = "required";
@@ -148,7 +149,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	private final Map<Class<?>, Constructor<?>[]> candidateConstructorsCache = new ConcurrentHashMap<>(256);
 
-	private final Map<String, InjectionMetadata> injectionMetadataCache = new ConcurrentHashMap<>(256);
+	private final Map<String, InjectionMetadata> injectionMetadataCache = new ConcurrentHashMap<>(256);	//
 
 
 	/**
@@ -157,8 +158,15 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	 * <p>Also supports JSR-330's {@link javax.inject.Inject @Inject} annotation,
 	 * if available.
 	 */
+	/**
+	 * 该类支持的三种注入注解：@Autowired，@Value，@Inject
+	 * this.autowiredAnnotationTypes = {LinkedHashSet@2178}  size = 3
+	 * 		0 = {Class@2194} "interface org.springframework.beans.factory.annotation.Autowired"
+	 * 		1 = {Class@2200} "interface org.springframework.beans.factory.annotation.Value"
+	 * 		2 = {Class@2606} "interface javax.inject.Inject"
+	 */
 	@SuppressWarnings("unchecked")
-	public AutowiredAnnotationBeanPostProcessor() {
+	public AutowiredAnnotationBeanPostProcessor() {			//
 		this.autowiredAnnotationTypes.add(Autowired.class);
 		this.autowiredAnnotationTypes.add(Value.class);
 		try {
@@ -243,8 +251,8 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
-		InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType, null);
-		metadata.checkConfigMembers(beanDefinition);
+		InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType, null);	// =>>
+		metadata.checkConfigMembers(beanDefinition);									// =>>
 	}
 
 	@Override
@@ -394,9 +402,13 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	@Override
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+		/*
+		 * 在 AbstractAutowireCapableBeanFactory#doCreateBean 已经加入缓存
+		 * 		=>> applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
+		 */
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
 		try {
-			metadata.inject(bean, beanName, pvs);
+			metadata.inject(bean, beanName, pvs);			// =>>
 		}
 		catch (BeanCreationException ex) {
 			throw ex;
@@ -441,6 +453,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	private InjectionMetadata findAutowiringMetadata(String beanName, Class<?> clazz, @Nullable PropertyValues pvs) {
 		// Fall back to class name as cache key, for backwards compatibility with custom callers.
+		// eg：cacheKey = CustomerBean
 		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
 		// Quick check on the concurrent map first, with minimal locking.
 		InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
@@ -451,8 +464,16 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					if (metadata != null) {
 						metadata.clear(pvs);
 					}
-					metadata = buildAutowiringMetadata(clazz);
-					this.injectionMetadataCache.put(cacheKey, metadata);
+					metadata = buildAutowiringMetadata(clazz);					// 去解析
+					/**
+					 * metadata = {InjectionMetadata@2452}
+					 * 		checkedElements = null
+					 * 		targetClass = {Class@2188} "class org.springframework.beans.model.Customer"
+					 * 		injectedElements = {ArrayList@2435}  size = 2
+					 * 			0 = {AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement@2448}  ...
+					 * 			1 = {AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement@2449} ...
+					 */
+					this.injectionMetadataCache.put(cacheKey, metadata);		//
 				}
 			}
 		}
@@ -471,6 +492,25 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			final List<InjectionMetadata.InjectedElement> currElements = new ArrayList<>();
 
 			ReflectionUtils.doWithLocalFields(targetClass, field -> {
+				/**
+				 * 遍历 Field 上的注解，若存在于 autowiredAnnotationTypes(@Autowired，@Value，@Inject)，则收集这个 Field
+				 *
+				 * annotation = {TypeMappedAnnotation@2377}
+				 *  source = {Field@2343} "private org.springframework.beans.model.Person org.springframework.beans.model.Customer.person"
+				 *      clazz = {Class@2188} "class org.springframework.beans.model.Customer"
+				 *      name = "person"
+				 *      type = {Class@2389} "class org.springframework.beans.model.Person"
+				 *      root = {Field@2391} "private org.springframework.beans.model.Person org.springframework.beans.model.Customer.person"
+				 *      declaredAnnotations = {LinkedHashMap@2392}  size = 1
+				 *          {Class@2349} "interface org.springframework.beans.factory.annotation.Autowired"
+				 *                        -> {$Proxy19@2383} "@org.springframework.beans.factory.annotation.Autowired(required=true)"
+				 *      ...
+				 *  rootAttributes = {$Proxy19@2383} "@org.springframework.beans.factory.annotation.Autowired(required=true)"
+				 *      h = {AnnotationInvocationHandler@2401}
+				 *          type = {Class@2349} "interface org.springframework.beans.factory.annotation.Autowired"
+				 *          memberValues = {LinkedHashMap@2420}  size = 1
+				 *              "required" -> {Boolean@2425} true
+				 */
 				MergedAnnotation<?> ann = findAutowiredAnnotation(field);
 				if (ann != null) {
 					if (Modifier.isStatic(field.getModifiers())) {
@@ -479,7 +519,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 						}
 						return;
 					}
-					boolean required = determineRequiredStatus(ann);
+					boolean required = determineRequiredStatus(ann);		// 判断是否包含 required 是否为 true
 					currElements.add(new AutowiredFieldElement(field, required));
 				}
 			});
@@ -513,12 +553,16 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			targetClass = targetClass.getSuperclass();
 		}
 		while (targetClass != null && targetClass != Object.class);
-
+		/**
+		 * elements = {ArrayList@2435}  size = 2
+		 * 		0 = {AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement@2448} "AutowiredFieldElement for private org...Person org...Customer.person"
+		 * 		1 = {AutowiredAnnotationBeanPostProcessor$AutowiredMethodElement@2449} "AutowiredMethodElement for public void org...Customer.setPerson(org...Person)"
+		 */
 		return InjectionMetadata.forElements(elements, clazz);
 	}
 
 	@Nullable
-	private MergedAnnotation<?> findAutowiredAnnotation(AccessibleObject ao) {
+	private MergedAnnotation<?> findAutowiredAnnotation(AccessibleObject ao) {		//
 		MergedAnnotations annotations = MergedAnnotations.from(ao);
 		for (Class<? extends Annotation> type : this.autowiredAnnotationTypes) {
 			MergedAnnotation<?> annotation = annotations.get(type);
@@ -613,7 +657,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 		private final boolean required;
 
-		private volatile boolean cached;
+		private volatile boolean cached;		//
 
 		@Nullable
 		private volatile Object cachedFieldValue;
@@ -637,7 +681,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 				Assert.state(beanFactory != null, "No BeanFactory available");
 				TypeConverter typeConverter = beanFactory.getTypeConverter();
 				try {
-					value = beanFactory.resolveDependency(desc, beanName, autowiredBeanNames, typeConverter);
+					value = beanFactory.resolveDependency(desc, beanName, autowiredBeanNames, typeConverter);	// =>>
 				}
 				catch (BeansException ex) {
 					throw new UnsatisfiedDependencyException(null, beanName, new InjectionPoint(field), ex);
@@ -647,7 +691,8 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 						Object cachedFieldValue = null;
 						if (value != null || this.required) {
 							cachedFieldValue = desc;
-							registerDependentBeans(beanName, autowiredBeanNames);
+							// =>> ConfigurableBeanFactory.registerDependentBean
+							registerDependentBeans(beanName, autowiredBeanNames);	// 维护依赖关系到 Map
 							if (autowiredBeanNames.size() == 1) {
 								String autowiredBeanName = autowiredBeanNames.iterator().next();
 								if (beanFactory.containsBean(autowiredBeanName) &&
@@ -664,7 +709,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			}
 			if (value != null) {
 				ReflectionUtils.makeAccessible(field);
-				field.set(bean, value);
+				field.set(bean, value);		// =>> 赋值
 			}
 		}
 	}
@@ -751,7 +796,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			if (arguments != null) {
 				try {
 					ReflectionUtils.makeAccessible(method);
-					method.invoke(bean, arguments);
+					method.invoke(bean, arguments);			// setter 反射赋值
 				}
 				catch (InvocationTargetException ex) {
 					throw ex.getTargetException();

@@ -65,13 +65,15 @@ public class Man implements IPerson, InitializingBean, BeanPostProcessor,
     }
 
     /**
+     * 作用：比如 @Autowired 注解的实现，就是通过 AutowiredAnnotationBeanPostProcessor，它会在 applyMergedBeanDefinitionPostProcessors()
+     * 调用 AutowiredAnnotationBeanPostProcessor#postProcessMergedBeanDefinition(RootBeanDefinition, Class, String) 收集需要进行注入的 字段 和 方法
+     *
      * ==> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#doCreateBean}
      * ==> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#applyMergedBeanDefinitionPostProcessors}
      */
     @Override
     public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
-        // 这个好像用处不是很多吧，先不关注它.
-        System.out.println("postProcessMergedBeanDefinition from man");
+
     }
 
     @Override

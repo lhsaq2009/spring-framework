@@ -71,7 +71,7 @@ public class InjectionMetadata {
 	private final Collection<InjectedElement> injectedElements;
 
 	@Nullable
-	private volatile Set<InjectedElement> checkedElements;
+	private volatile Set<InjectedElement> checkedElements;			// 需要注入的字段或方法
 
 
 	/**
@@ -116,7 +116,9 @@ public class InjectionMetadata {
 				(checkedElements != null ? checkedElements : this.injectedElements);
 		if (!elementsToIterate.isEmpty()) {
 			for (InjectedElement element : elementsToIterate) {
-				element.inject(target, beanName, pvs);
+				/** {@link AutowiredAnnotationBeanPostProcessor.AutowiredFieldElement#inject}  */
+				/** {@link AutowiredAnnotationBeanPostProcessor.AutowiredMethodElement#inject} */
+				element.inject(target, beanName, pvs);			// =>>
 			}
 		}
 	}
