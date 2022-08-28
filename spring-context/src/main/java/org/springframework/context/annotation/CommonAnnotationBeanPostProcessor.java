@@ -143,7 +143,7 @@ import org.springframework.util.StringValueResolver;
  * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
  */
 @SuppressWarnings("serial")
-public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBeanPostProcessor
+public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBeanPostProcessor  // @Resource
 		implements InstantiationAwareBeanPostProcessor, BeanFactoryAware, Serializable {
 
 	@Nullable
@@ -152,8 +152,13 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	@Nullable
 	private static final Class<? extends Annotation> ejbClass;
 
-	private static final Set<Class<? extends Annotation>> resourceAnnotationTypes = new LinkedHashSet<>(4);
+	private static final Set<Class<? extends Annotation>> resourceAnnotationTypes = new LinkedHashSet<>(4);	//
 
+	/**
+	 * resourceAnnotationTypes = {LinkedHashSet@2173}  size = 2
+	 * 		0 = {Class@2179} "interface javax.annotation.Resource"
+	 * 		1 = {Class@2176} "interface javax.xml.ws.WebServiceRef"
+	 */
 	static {
 		webServiceRefClass = loadAnnotationType("javax.xml.ws.WebServiceRef");
 		ejbClass = loadAnnotationType("javax.ejb.EJB");
@@ -185,7 +190,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	@Nullable
 	private transient StringValueResolver embeddedValueResolver;
 
-	private final transient Map<String, InjectionMetadata> injectionMetadataCache = new ConcurrentHashMap<>(256);
+	private final transient Map<String, InjectionMetadata> injectionMetadataCache = new ConcurrentHashMap<>(256);	//
 
 
 	/**
@@ -196,8 +201,8 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	 */
 	public CommonAnnotationBeanPostProcessor() {
 		setOrder(Ordered.LOWEST_PRECEDENCE - 3);
-		setInitAnnotationType(PostConstruct.class);
-		setDestroyAnnotationType(PreDestroy.class);
+		setInitAnnotationType(PostConstruct.class);		// --> InitDestroyAnnotationBeanPostProcessor.initAnnotationType
+		setDestroyAnnotationType(PreDestroy.class);		// --> InitDestroyAnnotationBeanPostProcessor.destroyAnnotationType
 		ignoreResourceType("javax.xml.ws.WebServiceContext");
 	}
 
@@ -288,11 +293,26 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		}
 	}
 
-
+	/**
+	 * postProcessMergedBeanDefinition(RootBeanDefinition, Class, String)
+	 * applyMergedBeanDefinitionPostProcessors(RootBeanDefinition, Class, String)	--> 遍历执行注册的后置处理器的 postProcessMergedBeanDefinition(..)
+	 * doCreateBean(String, RootBeanDefinition, Object[])							--> 去创建 Bean 实例，返回一个完整的实例对象
+	 * createBean(String, RootBeanDefinition, Object[])
+	 * lambda$doGetBean$0(String, RootBeanDefinition, Object[])
+	 * getObject()
+	 * getSingleton(String, ObjectFactory)
+	 * doGetBean(String, Class, Object[], boolean)
+	 * getBean(String)
+	 * main(String[])
+	 */
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
-		super.postProcessMergedBeanDefinition(beanDefinition, beanType, beanName);
-		InjectionMetadata metadata = findResourceMetadata(beanName, beanType, null);
+		/**
+		 * 通过父类收集：@PostConstruct 和 @PreDestroy 的方法
+		 * 缓存进：InitDestroyAnnotationBeanPostProcessor#lifecycleMetadataCache
+ 		 */
+		super.postProcessMergedBeanDefinition(beanDefinition, beanType, beanName);		// ==>
+		InjectionMetadata metadata = findResourceMetadata(beanName, beanType, null);	// =>>
 		metadata.checkConfigMembers(beanDefinition);
 	}
 
@@ -344,7 +364,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 					if (metadata != null) {
 						metadata.clear(pvs);
 					}
-					metadata = buildResourceMetadata(clazz);
+					metadata = buildResourceMetadata(clazz);		// =>>
 					this.injectionMetadataCache.put(cacheKey, metadata);
 				}
 			}
@@ -352,7 +372,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		return metadata;
 	}
 
-	private InjectionMetadata buildResourceMetadata(final Class<?> clazz) {
+	private InjectionMetadata buildResourceMetadata(final Class<?> clazz) {		//
 		if (!AnnotationUtils.isCandidateClass(clazz, resourceAnnotationTypes)) {
 			return InjectionMetadata.EMPTY;
 		}

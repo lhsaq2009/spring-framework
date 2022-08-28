@@ -6,8 +6,8 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 
 public class Customer {
-    @Autowired
-    // @Resource
+//    @Autowired
+    @Resource
     private Person person;
 
     private int type;
@@ -18,7 +18,7 @@ public class Customer {
         this.person = person;
     }*/
 
-    @Autowired
+    // @Autowired
     public void setPerson(Person person) {
         this.person = person;
     }

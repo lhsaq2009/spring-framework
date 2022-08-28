@@ -68,7 +68,7 @@ public class InjectionMetadata {
 
 	private final Class<?> targetClass;
 
-	private final Collection<InjectedElement> injectedElements;
+	private final Collection<InjectedElement> injectedElements;		// @Resource、@Autowired 修饰的字段和方法
 
 	@Nullable
 	private volatile Set<InjectedElement> checkedElements;			// 需要注入的字段或方法

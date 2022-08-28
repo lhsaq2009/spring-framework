@@ -109,7 +109,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	@Nullable
-	private final transient Map<Class<?>, LifecycleMetadata> lifecycleMetadataCache = new ConcurrentHashMap<>(256);
+	private final transient Map<Class<?>, LifecycleMetadata> lifecycleMetadataCache = new ConcurrentHashMap<>(256); //
 
 
 	/**
@@ -146,7 +146,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
-		LifecycleMetadata metadata = findLifecycleMetadata(beanType);
+		LifecycleMetadata metadata = findLifecycleMetadata(beanType);		// =>>
 		metadata.checkConfigMembers(beanDefinition);
 	}
 
@@ -207,7 +207,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 			synchronized (this.lifecycleMetadataCache) {
 				metadata = this.lifecycleMetadataCache.get(clazz);
 				if (metadata == null) {
-					metadata = buildLifecycleMetadata(clazz);
+					metadata = buildLifecycleMetadata(clazz);		// =>>
 					this.lifecycleMetadataCache.put(clazz, metadata);
 				}
 				return metadata;
@@ -216,7 +216,16 @@ public class InitDestroyAnnotationBeanPostProcessor
 		return metadata;
 	}
 
+	/**
+	 * 收集添加了 @PostConstruct 和 @PreDestroy 的方法
+	 * @param clazz
+	 * @return
+	 */
 	private LifecycleMetadata buildLifecycleMetadata(final Class<?> clazz) {
+		/*
+		 * this.initAnnotationType 		= {Class@2216} "interface javax.annotation.PostConstruct"
+		 * this.destroyAnnotationType 	= {Class@2217} "interface javax.annotation.PreDestroy"
+ 		 */
 		if (!AnnotationUtils.isCandidateClass(clazz, Arrays.asList(this.initAnnotationType, this.destroyAnnotationType))) {
 			return this.emptyLifecycleMetadata;
 		}

@@ -50,14 +50,15 @@ public class BeanFactoryTest {
 
         /** {@link org.springframework.beans.factory.support.AbstractBeanFactory#beanPostProcessors} */
 
-        AutowiredAnnotationBeanPostProcessor beanPostProcessor =
-                new AutowiredAnnotationBeanPostProcessor();
-        beanPostProcessor.setBeanFactory(beanFactory);
-        beanFactory.addBeanPostProcessor(beanPostProcessor);
+//        AutowiredAnnotationBeanPostProcessor beanPostProcessor =
+//                new AutowiredAnnotationBeanPostProcessor();
+//        beanPostProcessor.setBeanFactory(beanFactory);
+//        beanFactory.addBeanPostProcessor(beanPostProcessor);
 
-//        CommonAnnotationBeanPostProcessor beanPostProcessor2 = new CommonAnnotationBeanPostProcessor();
-//        beanPostProcessor2.setBeanFactory(beanFactory);
-//        beanFactory.addBeanPostProcessor(beanPostProcessor2);
+CommonAnnotationBeanPostProcessor beanPostProcessor2 =
+        new CommonAnnotationBeanPostProcessor();
+beanPostProcessor2.setBeanFactory(beanFactory);
+beanFactory.addBeanPostProcessor(beanPostProcessor2);
 
         Object man = beanFactory.getBean("CustomerBean");
         System.out.println(man);
