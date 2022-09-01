@@ -91,8 +91,7 @@ public class ResourceBundleMessageSource extends AbstractResourceBasedMessageSou
 	 * This allows for very efficient hash lookups, significantly faster
 	 * than the ResourceBundle class's own cache.
 	 */
-	private final Map<String, Map<Locale, ResourceBundle>> cachedResourceBundles =
-			new ConcurrentHashMap<>();
+	private final Map<String, Map<Locale, ResourceBundle>> cachedResourceBundles = new ConcurrentHashMap<>();
 
 	/**
 	 * Cache to hold already generated MessageFormats.
@@ -146,8 +145,13 @@ public class ResourceBundleMessageSource extends AbstractResourceBasedMessageSou
 	 * Resolves the given message code as key in the registered resource bundles,
 	 * returning the value found in the bundle as-is (without MessageFormat parsing).
 	 */
-	@Override
+	@Override  // code = "user.name"，locale = {Locale@2313} "zh_CN"
 	protected String resolveCodeWithoutArguments(String code, Locale locale) {
+		/*
+		 * basenames = {LinkedHashSet@2300}  size = 2
+		 * 		0 = "message"
+		 * 		1 = "message_en"
+		 */
 		Set<String> basenames = getBasenameSet();
 		for (String basename : basenames) {
 			ResourceBundle bundle = getResourceBundle(basename, locale);
@@ -199,6 +203,14 @@ public class ResourceBundleMessageSource extends AbstractResourceBasedMessageSou
 		}
 		else {
 			// Cache forever: prefer locale cache over repeated getBundle calls.
+		/*
+		 * this.cachedResourceBundles = {ConcurrentHashMap@2295} "{
+		 * 		message={
+		 * 			zh_CN=PropertyResourceBundle@1e636ea3,
+		 * 			en=PropertyResourceBundle@736caf7a
+		 * 		}
+		 * 	}"
+		 */
 			Map<Locale, ResourceBundle> localeMap = this.cachedResourceBundles.get(basename);
 			if (localeMap != null) {
 				ResourceBundle bundle = localeMap.get(locale);
@@ -207,6 +219,14 @@ public class ResourceBundleMessageSource extends AbstractResourceBasedMessageSou
 				}
 			}
 			try {
+				/*
+				 * bundle = {PropertyResourceBundle@2450}
+				 * 		lookup = {HashMap@2483}  size = 1
+				 * 			"user.name" -> "H艾森"
+				 * 			"user.sex"  -> "男"
+				 * 		locale = {Locale@2438} ""
+				 * 		name = "message"
+				 */
 				ResourceBundle bundle = doGetBundle(basename, locale);
 				if (localeMap == null) {
 					localeMap = new ConcurrentHashMap<>();
@@ -215,6 +235,12 @@ public class ResourceBundleMessageSource extends AbstractResourceBasedMessageSou
 						localeMap = existing;
 					}
 				}
+		/**
+		 * localeMap = {ConcurrentHashMap@2381} "{
+		 * 		zh_CN	= java.util.PropertyResourceBundle@1e636ea3,
+		 * 		en		= java.util.PropertyResourceBundle@736caf7a
+		 * }"
+		 */
 				localeMap.put(locale, bundle);
 				return bundle;
 			}
@@ -245,6 +271,7 @@ public class ResourceBundleMessageSource extends AbstractResourceBasedMessageSou
 		MessageSourceControl control = this.control;
 		if (control != null) {
 			try {
+				// ResourceBundle.getBundle(basename, locale, classLoader, control) = {PropertyResourceBundle@2450}
 				return ResourceBundle.getBundle(basename, locale, classLoader, control);
 			}
 			catch (UnsupportedOperationException ex) {

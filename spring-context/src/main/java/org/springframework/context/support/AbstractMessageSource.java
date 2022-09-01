@@ -137,8 +137,8 @@ public abstract class AbstractMessageSource extends MessageSourceSupport impleme
 
 
 	@Override
-	public final String getMessage(String code, @Nullable Object[] args, @Nullable String defaultMessage, Locale locale) {
-		String msg = getMessageInternal(code, args, locale);
+	public final String getMessage(String code, @Nullable Object[] args, @Nullable String defaultMessage, Locale locale) {  //
+		String msg = getMessageInternal(code, args, locale);		// =>>
 		if (msg != null) {
 			return msg;
 		}
@@ -200,7 +200,7 @@ public abstract class AbstractMessageSource extends MessageSourceSupport impleme
 			return null;
 		}
 		if (locale == null) {
-			locale = Locale.getDefault();
+			locale = Locale.getDefault();		// defaultLocale = {Locale@2634} "zh_CN"
 		}
 		Object[] argsToUse = args;
 
@@ -209,7 +209,7 @@ public abstract class AbstractMessageSource extends MessageSourceSupport impleme
 			// therefore no MessageFormat needs to be involved.
 			// Note that the default implementation still uses MessageFormat;
 			// this can be overridden in specific subclasses.
-			String message = resolveCodeWithoutArguments(code, locale);
+			String message = resolveCodeWithoutArguments(code, locale);		// =>>
 			if (message != null) {
 				return message;
 			}

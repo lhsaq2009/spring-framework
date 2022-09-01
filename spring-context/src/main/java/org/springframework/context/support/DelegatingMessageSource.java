@@ -35,7 +35,7 @@ import org.springframework.lang.Nullable;
  * @since 1.1.5
  * @see AbstractApplicationContext
  */
-public class DelegatingMessageSource extends MessageSourceSupport implements HierarchicalMessageSource {
+public class DelegatingMessageSource extends MessageSourceSupport implements HierarchicalMessageSource {		//
 
 	@Nullable
 	private MessageSource parentMessageSource;
