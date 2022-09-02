@@ -59,7 +59,7 @@ import org.springframework.util.StringValueResolver;
  * @see org.springframework.context.ApplicationContextAware
  * @see org.springframework.context.support.AbstractApplicationContext#refresh()
  */
-class ApplicationContextAwareProcessor implements BeanPostProcessor {
+class ApplicationContextAwareProcessor implements BeanPostProcessor {		// TODO：做什么的后置处理器？？
 
 	private final ConfigurableApplicationContext applicationContext;
 
@@ -75,6 +75,10 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	}
 
 
+	/**
+	 * 1、判断当前 bean 是否实现了某个指定的 Aware 接口
+	 * 2、调用 Aware 接口对应的方法
+	 */
 	@Override
 	@Nullable
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
