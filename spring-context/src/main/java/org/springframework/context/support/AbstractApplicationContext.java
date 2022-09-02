@@ -126,8 +126,7 @@ import org.springframework.util.ReflectionUtils;
  * @see org.springframework.context.ApplicationListener
  * @see org.springframework.context.MessageSource
  */
-public abstract class AbstractApplicationContext extends DefaultResourceLoader
-		implements ConfigurableApplicationContext {
+public abstract class AbstractApplicationContext extends DefaultResourceLoader implements ConfigurableApplicationContext {
 
 	/**
 	 * Name of the MessageSource bean in the factory.
