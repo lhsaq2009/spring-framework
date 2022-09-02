@@ -37,6 +37,8 @@ import org.springframework.lang.Nullable;
  * @see #registerPrototype
  * @see #registerBeanDefinition
  * @see #refresh
+ *
+ * 总结：用于编程式的注册 Bean，而不是从外部的配置源读取 Bean 的定义。主要用于测试
  */
 public class StaticApplicationContext extends GenericApplicationContext {
 
