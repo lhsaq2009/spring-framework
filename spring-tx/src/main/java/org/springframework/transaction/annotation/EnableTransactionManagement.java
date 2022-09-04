@@ -159,6 +159,11 @@ import org.springframework.core.Ordered;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+/**
+ * 导入 TransactionManagementConfigurationSelector，进而引入两个 Bean：
+ * 		> AutoProxyRegistrar
+ * 		> ProxyTransactionManagementConfiguration
+ */
 @Import(TransactionManagementConfigurationSelector.class)
 public @interface EnableTransactionManagement {
 
@@ -174,6 +179,7 @@ public @interface EnableTransactionManagement {
 	 * time. This approach has no negative impact in practice unless one is explicitly
 	 * expecting one type of proxy vs another, e.g. in tests.
 	 */
+	// 使用 JDK 动态代理，还是 Cglib 动态代理，默认是 false，但前提是 AdviceMode 必须是 PROXY 才适用
 	boolean proxyTargetClass() default false;
 
 	/**
@@ -186,6 +192,7 @@ public @interface EnableTransactionManagement {
 	 * scenario. For a more advanced mode of interception, consider switching this to
 	 * {@link AdviceMode#ASPECTJ}.
 	 */
+	// 通知的模式，默认是 PROXY，还有一种是 ASPECTJ
 	AdviceMode mode() default AdviceMode.PROXY;
 
 	/**
