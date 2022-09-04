@@ -2,7 +2,10 @@ package org.springframework.beans.bean.listener;
 
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.SmartApplicationListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 /*
  * ApplicationEvent      EventListener
@@ -29,11 +32,11 @@ public class EmailServiceListener implements SmartApplicationListener {
     public boolean supportsSourceType(Class<?> sourceType) {                                // 事件支持的目标类
         return true;
     }
-
+    
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
         if (event instanceof UserRegisterEvent) {
-            System.out.println("[onApplicationEvent][给用户" + ((UserRegisterEvent) event).username + " 发送邮件]");
+            System.out.println("方式四：[onApplicationEvent][给用户" + ((UserRegisterEvent) event).username + " 发送邮件]");
         }
     }
 

@@ -1,19 +1,28 @@
 package org.springframework.beans.bean.listener;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 public class EmailServiceListener0 implements Ordered {
 
     // 方式一：通过 @EventListener 来监听，届时被收集的 Listerer 是当前类 EmailServiceListener0 哦
     @EventListener(classes = UserRegisterEvent.class)
-    public void emailServiceListener1(UserRegisterEvent event) {
-        System.out.println("使用注解的方式，收到事件：" + event.username);
+    public void emailServiceListener1(UserRegisterEvent event) throws InterruptedException {
+        System.out.println("方式一：使用注解的方式，收到事件：" + event.username);
     }
 
     @Override
@@ -27,7 +36,7 @@ public class EmailServiceListener0 implements Ordered {
         return new ApplicationListener<UserRegisterEvent>() {
             @Override
             public void onApplicationEvent(UserRegisterEvent event) {
-                System.out.println("收到消息：" + event.username);
+                System.out.println("方式二：收到消息：" + event.username);
             }
         };
     }
@@ -37,7 +46,7 @@ public class EmailServiceListener0 implements Ordered {
         context.addApplicationListener(new ApplicationListener<UserRegisterEvent>() {
             @Override
             public void onApplicationEvent(UserRegisterEvent event) {
-                System.out.println("context.addApplicationListener(...)：" + event.username);
+                System.out.println("方式三：context.addApplicationListener(...)：" + event.username);
             }
         });
     }
