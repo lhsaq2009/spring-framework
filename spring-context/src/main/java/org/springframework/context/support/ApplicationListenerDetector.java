@@ -42,8 +42,11 @@ import org.springframework.util.ObjectUtils;
  *
  * @author Juergen Hoeller
  * @since 4.3.4
+ *
+ * 检测那些实现了接口 ApplicationListener 的 bean，在它们创建时初始化之后，将它们添加到应用上下文的事件多播器上；
+ * 并在这些 ApplicationListener bean 销毁之前，将它们从应用上下文的事件多播器上移除。
  */
-class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, MergedBeanDefinitionPostProcessor {
+class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, MergedBeanDefinitionPostProcessor {		//
 
 	private static final Log logger = LogFactory.getLog(ApplicationListenerDetector.class);
 

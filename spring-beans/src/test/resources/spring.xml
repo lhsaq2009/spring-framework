@@ -17,7 +17,13 @@
 
     <!-- @autowire -->
     <!-- <context:annotation-config/> --> <!-- TODO：如何解析的 -->
-    <!-- <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/> -->
+
+    <!-- @Autowired 的处理类 -->
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+    <!-- @Resource  的处理类 -->
+    <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+
+    <bean id="messageSource" class="org.springframework.context.MessageSource"/>
 
     <bean id="CustomerBean" class="org.springframework.beans.model.Customer">
         <property name="action" value="buy"/>

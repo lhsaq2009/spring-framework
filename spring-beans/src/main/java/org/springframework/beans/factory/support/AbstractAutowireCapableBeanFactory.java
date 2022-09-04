@@ -436,6 +436,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeansException {
 
 		Object result = existingBean;
+		/*
+		 * getBeanPostProcessors() = {CopyOnWriteArrayList@2456}  size = 6
+		 * 		0 = {ApplicationContextAwareProcessor@2730}
+		 * 		1 = {ConfigurationClassPostProcessor$ImportAwareBeanPostProcessor@2731}
+		 * 		2 = {PostProcessorRegistrationDelegate$BeanPostProcessorChecker@2732}
+		 *
+		 * 		3 = {CommonAnnotationBeanPostProcessor@2733}
+		 * 		4 = {AutowiredAnnotationBeanPostProcessor@2734}
+		 * 		5 = {ApplicationListenerDetector@2508}
+		 */
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
 			Object current = processor.postProcessAfterInitialization(result, beanName);
 			if (current == null) {

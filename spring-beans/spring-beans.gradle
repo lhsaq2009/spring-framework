@@ -12,8 +12,16 @@ dependencies {
 	optional("org.jetbrains.kotlin:kotlin-stdlib")
 	testCompile(testFixtures(project(":spring-core")))
 	testCompile("javax.annotation:javax.annotation-api")
+	testCompile(project(":spring-context"))
+	testCompile(project(":spring-tx"))
+	testCompile(project(":spring-aop"))
+	testCompile(project(":spring-jdbc"))
 	testFixturesApi("org.junit.jupiter:junit-jupiter-api")
 	testFixturesImplementation("org.assertj:assertj-core")
+	testCompile("javax.annotation:javax.annotation-api")
+
+	implementation 'mysql:mysql-connector-java:8.0.11'
+
 }
 
 // This module does joint compilation for Java and Groovy code with the compileGroovy task.

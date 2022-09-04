@@ -65,6 +65,19 @@ public abstract class AbstractApplicationEventMulticaster
 
 	private final DefaultListenerRetriever defaultRetriever = new DefaultListenerRetriever();
 
+	/**
+	 * 按事件类型，分组记录需要通知的监听者：
+	 *
+	 * retrieverCache = {ConcurrentHashMap@2518}
+	 * 		table = {ConcurrentHashMap$Node[128]@3030}
+	 * 			key = {AbstractApplicationEventMulticaster$ListenerCacheKey@3032}
+	 * 				eventType = {ResolvableType@2539} "org.springframework.beans.bean.MyApplicationEvent"
+	 * 			value = {AbstractApplicationEventMulticaster$CachedListenerRetriever@3033}
+	 * 				applicationListeners = {LinkedHashSet@3038}  size = 3
+	 * 					0 = {ApplicationListenerMethodAdapter@2630} "public void org.springframework.beans.bean.MyApplicationListener0.myApplicationListener1(org.springframework.beans.bean.MyApplicationEvent)"
+	 * 					1 = {MyApplicationListener0$1@2812}
+	 * 					2 = {BeanFactoryTest$1@2813}
+	 */
 	final Map<ListenerCacheKey, CachedListenerRetriever> retrieverCache = new ConcurrentHashMap<>(64);
 
 	@Nullable
@@ -437,7 +450,7 @@ public abstract class AbstractApplicationEventMulticaster
 			Set<String> applicationListenerBeans = this.applicationListenerBeans;
 			if (applicationListeners == null || applicationListenerBeans == null) {
 				// Not fully populated yet
-				return null;
+				return null;			// 如果是新建的就这就返回 Null
 			}
 
 			List<ApplicationListener<?>> allListeners = new ArrayList<>(
@@ -469,7 +482,13 @@ public abstract class AbstractApplicationEventMulticaster
 	private class DefaultListenerRetriever {
 
 		public final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
-
+		/**
+		 * ==> {@link org.springframework.context.support.AbstractApplicationContext#refresh}
+		 * 	   ==> {@link org.springframework.context.support.AbstractApplicationContext#registerListeners}
+		 * 	       getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
+		 *
+		 * 在 Spring refresh()，收集监听器(范围：ApplicationListener 实现类) BeanName 到事件广播器
+ 		 */
 		public final Set<String> applicationListenerBeans = new LinkedHashSet<>();
 
 		public Collection<ApplicationListener<?>> getApplicationListeners() {

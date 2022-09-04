@@ -133,7 +133,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * If none is supplied, message resolution is delegated to the parent.
 	 * @see MessageSource
 	 */
-	public static final String MESSAGE_SOURCE_BEAN_NAME = "messageSource";
+	public static final String MESSAGE_SOURCE_BEAN_NAME = "messageSource";			// 国际化 Bean 必须这个名字
 
 	/**
 	 * Name of the LifecycleProcessor bean in the factory.
@@ -203,14 +203,24 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	private LifecycleProcessor lifecycleProcessor;
 
 	/** MessageSource we delegate our implementation of this interface to. */
-	@Nullable
+	@Nullable	// 国际化相关
 	private MessageSource messageSource;
 
 	/** Helper class used in event publishing. */
 	@Nullable
 	private ApplicationEventMulticaster applicationEventMulticaster;
 
-	/** Statically specified listeners. */
+	/**
+	 * 静态注册的监听器
+	 *
+	 * 示例：{@link AbstractApplicationContext#addApplicationListener}
+	 * context.addApplicationListener(new ApplicationListener<MyApplicationEvent>() {
+	 *     @Override
+	 *     public void onApplicationEvent(MyApplicationEvent event) {
+	 *         System.out.println("context.addApplicationListener(...)");
+	 *     }
+	 * });
+	 */
 	private final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
 	/** Local listeners registered before refresh. */
@@ -356,7 +366,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * standard framework event)
 	 */
 	@Override
-	public void publishEvent(ApplicationEvent event) {
+	public void publishEvent(ApplicationEvent event) {							// 发布事件
 		publishEvent(event, null);
 	}
 
@@ -762,6 +772,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 */
 	protected void initApplicationEventMulticaster() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+		// 是否包含 applicationEventMulticaster Bean，比如自定义实现 ApplicationEventMulticaster
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
 			this.applicationEventMulticaster =
 					beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
@@ -770,6 +781,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 			}
 		}
 		else {
+			// 使用 SimpleApplicationEventMulticaster 创建一个 事件发布器
 			this.applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
 			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
 			if (logger.isTraceEnabled()) {
@@ -820,20 +832,26 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	 * Add beans that implement ApplicationListener as listeners.
 	 * Doesn't affect other listeners, which can be added without being beans.
 	 */
-	protected void registerListeners() {
-		// Register statically specified listeners first.
+	protected void registerListeners() {		// TODO：怎么全是空的 ？？
+		// TODO：先注册静态指定的监听器，Register statically specified listeners first.
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}
 
-		// Do not initialize FactoryBeans here: We need to leave all regular beans
-		// uninitialized to let post-processors apply to them!
+		// Do not initialize FactoryBeans here: We need to leave all regular beans uninitialized to let post-processors apply to them!
+		/*
+		 * 收集监听器 BeanName 到事件广播器，范围：通过实现 ApplicationListener 注册的监听器
+		 * listenerBeanNames = {String[2]@2436} ["emailServiceLis...", "emailServiceLis..."]
+		 * 		0 = "emailServiceListener"
+		 * 		1 = "emailServiceListener2"
+		 */
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
 		}
 
 		// Publish early application events now that we finally have a multicaster...
+		// TODO：发布早期的时间,并且将 earlyApplicationEvents 设置为空
 		Set<ApplicationEvent> earlyEventsToProcess = this.earlyApplicationEvents;
 		this.earlyApplicationEvents = null;
 		if (!CollectionUtils.isEmpty(earlyEventsToProcess)) {
