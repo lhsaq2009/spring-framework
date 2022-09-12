@@ -1,3 +1,4 @@
+// 必须是文件中的第一个块，或者出现在初始化脚本中
 pluginManagement {
 	repositories {
 		gradlePluginPortal()
@@ -31,6 +32,7 @@ include "spring-webflux"
 include "spring-websocket"
 include "framework-bom"
 include "integration-tests"
+include "spring-boot-study"
 
 rootProject.name = "spring"
 rootProject.children.each {project ->

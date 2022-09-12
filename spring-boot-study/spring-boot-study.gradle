@@ -1,0 +1,33 @@
+plugins {
+    id "java"        // 会自动在构建时打包成可执行的 jar
+    id 'idea'        // 指定代码编辑工具
+
+    // id "org.springframework.boot.conventions"
+    id 'org.springframework.boot' version '2.3.8.RELEASE'               // 使用 spring boot
+
+    // 自动地从使用的 Spring Boot 版本里导入 spring-boot-dependencies bom，
+    // 允许你在声明依赖的时候忽略掉版本号，使用这项功能，只需要正常的声明依赖，不用写版本号
+    // id 'io.spring.dependency-management' version '1.0.10.RELEASE'    	// 使用 spring boot 的自动依赖管理
+}
+
+description = "spring-boot-study"
+
+dependencies {
+    // implementation：将依赖添加到编译路径，并打包到输出。依赖当前模块 的 其它模块在运行时，才可以访问这个库的实现
+    implementation 'org.jodd:jodd-bean:5.1.6'
+
+    implementation 'org.springframework.boot:spring-boot:2.3.8.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure:2.3.8.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-logging:2.3.8.RELEASE'
+    implementation 'jakarta.annotation:jakarta.annotation-api:1.3.5'
+
+    compile(project(":spring-core"))
+    compile(project(":spring-jcl"))
+    implementation 'org.yaml:snakeyaml:1.26'
+
+    compile(project(":spring-aop"))
+    compile(project(":spring-context"))
+
+    implementation 'org.aspectj:aspectjweaver:1.9.6'
+    implementation 'org.aspectj:aspectjrt:1.9.6'
+}
