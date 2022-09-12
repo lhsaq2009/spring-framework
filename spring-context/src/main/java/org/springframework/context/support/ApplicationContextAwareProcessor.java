@@ -58,8 +58,11 @@ import org.springframework.util.StringValueResolver;
  * @see org.springframework.context.MessageSourceAware
  * @see org.springframework.context.ApplicationContextAware
  * @see org.springframework.context.support.AbstractApplicationContext#refresh()
+ *
+ * 总结：判断当前 bean 是否实现了某个指定的 Aware 接口，并调用对应 Aware 的接口方法
+ *      =>> ApplicationContextAwareProcessor#invokeAwareInterfaces(Object)
  */
-class ApplicationContextAwareProcessor implements BeanPostProcessor {		// TODO：做什么的后置处理器？？
+class ApplicationContextAwareProcessor implements BeanPostProcessor {
 
 	private final ConfigurableApplicationContext applicationContext;
 
@@ -67,6 +70,8 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {		// TODO�
 
 
 	/**
+	 * 总结：判断当前 bean 是否实现了某个指定的 Aware 接口，并调用对应 Aware 的接口方法
+	 *      =>> ApplicationContextAwareProcessor#invokeAwareInterfaces(Object)
 	 * Create a new ApplicationContextAwareProcessor for the given context.
 	 */
 	public ApplicationContextAwareProcessor(ConfigurableApplicationContext applicationContext) {
