@@ -70,7 +70,7 @@ public interface BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 */
-	@Nullable  // 在 afterPropertiesSet() 和 init-method 之前，
+	@Nullable  // populated 之后，afterPropertiesSet、custom init-method 之前执行
 	default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
