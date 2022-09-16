@@ -16,13 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-@Component
+// @Component
 public class EmailServiceListener0 implements Ordered {
 
     // 方式一：通过 @EventListener 来监听，届时被收集的 Listerer 是当前类 EmailServiceListener0 哦
-    @EventListener(classes = UserRegisterEvent.class)
+    // @EventListener(classes = UserRegisterEvent.class)
     public void emailServiceListener1(UserRegisterEvent event) throws InterruptedException {
-        System.out.println("方式一：使用注解的方式，收到事件：" + event.username);
+        // System.out.println("方式一：使用注解的方式，收到事件：" + event.username);
     }
 
     @Override
@@ -31,12 +31,12 @@ public class EmailServiceListener0 implements Ordered {
     }
 
     // 方式二：通过实现 ApplicationListener<?> 来监听
-    @Bean
+    // @Bean
     public ApplicationListener<UserRegisterEvent> emailServiceListener2() {
         return new ApplicationListener<UserRegisterEvent>() {
             @Override
             public void onApplicationEvent(UserRegisterEvent event) {
-                System.out.println("方式二：收到消息：" + event.username);
+                // System.out.println("方式二：收到消息：" + event.username);
             }
         };
     }
@@ -46,7 +46,7 @@ public class EmailServiceListener0 implements Ordered {
         context.addApplicationListener(new ApplicationListener<UserRegisterEvent>() {
             @Override
             public void onApplicationEvent(UserRegisterEvent event) {
-                System.out.println("方式三：context.addApplicationListener(...)：" + event.username);
+                // System.out.println("方式三：context.addApplicationListener(...)：" + event.username);
             }
         });
     }

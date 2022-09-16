@@ -4,6 +4,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -13,7 +14,9 @@ import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@EnableAsync
+@EnableTransactionManagement
+@EnableAspectJAutoProxy
+// @EnableAsync
 public class JavaConfig {
 
     @Bean(name = "messageSource")
@@ -29,5 +32,15 @@ public class JavaConfig {
                 "message_en"                // resources/message_en.properties
         );
         return messageSource;
+    }
+
+    @Bean
+    public TransactionManager transactionManager() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setUrl("jdbc:mysql://rm-bp150s48920cjevsweo.mysql.rds.aliyuncs.com:3306/test");
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setUsername("haisen");
+        dataSource.setPassword("Haisen123");
+        return new DataSourceTransactionManager(dataSource);
     }
 }

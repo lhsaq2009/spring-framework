@@ -1,5 +1,6 @@
 package org.springframework.beans.bean.listener;
 
+import jodd.util.ThreadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.Date;
 
@@ -23,32 +26,28 @@ import java.util.Date;
  * @author haisen /20229/4
  */
 @Service
-@EnableTransactionManagement
-public class UserRegisterService {
+public class UserRegisterService implements IUserRegisterService {
 
     @Autowired
     private ApplicationEventPublisher publisher;
 
     @Transactional
-    public void publishEventWithTransactional(String username) throws InterruptedException {
+    @Override
+    public void publishEventWithTransactional(String username) {
+
+        System.out.println(TransactionAspectSupport.currentTransactionStatus());
+        System.out.println(TransactionSynchronizationManager.isSynchronizationActive());
+        System.out.println(TransactionSynchronizationManager.isActualTransactionActive());
+
+
         publisher.publishEvent(new UserRegisterEvent(publisher, username));
-        Thread.sleep(10000);
+        // ThreadUtil.sleep(10_000);
         System.out.println("publishEvent " + new Date());
         // throw new RuntimeException();       // 如果取消注释，造成本事务失败，那么 toSendEmail() 也就不执行了。
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    // @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void userRegisterWithTransactional(UserRegisterEvent event) throws InterruptedException {
-        System.out.println("方式五：事务事件：" + event.username);
-    }
-
-    @Bean
-    public TransactionManager transactionManager() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl("jdbc:mysql://rm-bp150s48920cjevsweo.mysql.rds.aliyuncs.com:3306/test");
-        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUsername("haisen");
-        dataSource.setPassword("Haisen123");
-        return new DataSourceTransactionManager(dataSource);
+        // System.out.println("方式五：事务事件：" + event.username);
     }
 }

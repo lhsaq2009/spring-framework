@@ -17,10 +17,10 @@ import org.springframework.transaction.event.TransactionalEventListener;
  *            SmartApplicationListener
  *          GenericApplicationListener
  */
-@Service
-public class EmailServiceListener implements SmartApplicationListener {
+// @Service
+public class EmailServiceListener /*implements SmartApplicationListener*/ {
 
-    @Override
+    /*@Override
     public boolean supportsEventType(Class<? extends ApplicationEvent> eventType) {         // 指定支持哪些类型的事件
         if (eventType == UserRegisterEvent.class) {
             return true;
@@ -36,12 +36,12 @@ public class EmailServiceListener implements SmartApplicationListener {
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
         if (event instanceof UserRegisterEvent) {
-            System.out.println("方式四：[onApplicationEvent][给用户" + ((UserRegisterEvent) event).username + " 发送邮件]");
+            // System.out.println("方式四：[onApplicationEvent][给用户" + ((UserRegisterEvent) event).username + " 发送邮件]");
         }
     }
 
     @Override
     public int getOrder() {
         return 0;
-    }
+    }*/
 }
