@@ -2,39 +2,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 	http://www.springframework.org/schema/context
-	http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd
+	http://www.springframework.org/schema/aop
+    https://www.springframework.org/schema/aop/spring-aop.xsd"
+>
 
-    <!-- 循环依赖
-    <bean id="man" class="org.springframework.beans.model.Man" init-method="init">
-        <property name="women" ref="women"/>
-    </bean>
-    <bean id="women" class="org.springframework.beans.model.Women">
-        <property name="man" ref="man"/>
-    </bean>-->
-
-    <!-- @autowire -->
-    <!-- <context:annotation-config/> --> <!-- TODO：如何解析的 -->
-
-    <!-- @Autowired 的处理类 -->
-    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
-    <!-- @Resource  的处理类 -->
-    <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
-
-    <bean id="messageSource" class="org.springframework.context.MessageSource"/>
-
-    <bean id="CustomerBean" class="org.springframework.beans.model.Customer">
-        <property name="action" value="buy"/>
-        <property name="type" value="1"/>
-    </bean>
-
-    <bean id="PersonBean" class="org.springframework.beans.model.Person">
-        <property name="name" value="yiibai"/>
-        <property name="address" value="address ABC"/>
-        <property name="age" value="29"/>
-    </bean>
-
+    <context:component-scan base-package="org.springframework.beans.bean.aop2"/>
 
 </beans>

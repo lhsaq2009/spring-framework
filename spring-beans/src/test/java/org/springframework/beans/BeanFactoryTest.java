@@ -1,21 +1,11 @@
 package org.springframework.beans;
 
-import org.springframework.beans.bean.JavaConfig;
-import org.springframework.beans.bean.listener.EmailServiceListener0;
-import org.springframework.beans.bean.listener.UserRegisterEvent;
-import org.springframework.beans.bean.listener.UserRegisterService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
+import org.springframework.beans.bean.aop2.LtwBean;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public class BeanFactoryTest {
+
     public static void main(String[] args) throws InterruptedException {
 
         // DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();      // 注册中心
@@ -63,28 +53,48 @@ public class BeanFactoryTest {
         // 构建 ClassPathXmlApplicationContext 实例对象的时候，其中 refresh() 会调用 registerBeanPostProcessors()。
         // 这个方法会将检测到的 BeanPostProcessor 注入到 ClassPathXmlApplicationContext 容器中
 
-        // ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
-        // Object person = context.getBean("CustomerBean");
-        // System.out.println(person);
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext();
+        ctx.setAllowBeanDefinitionOverriding(true);
+        ctx.setConfigLocation("spring.xml");
+        ctx.refresh();
 
-        String basePackages = "org.springframework.beans.bean";
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(basePackages), ctx = context;
-        EmailServiceListener0.addApplicationListener(context);
+        // Object person = ctx.getBean("CustomerBean");
+        // System.out.println(person);
+        /*
+         * calculator = {$Proxy23@2942} "org.springframework.beans.bean.aop.ArithmeticCalculatorImpl@631e06ab"
+         *      h = {JdkDynamicAopProxy@3163}
+         */
+        // ArithmeticCalculator calculator = (ArithmeticCalculator) ctx.getBean("arithmeticCalculator");
+        /**
+         * =>> JdkDynamicAopProxy#invoke(Object, Method,Object[])
+         */
+        // if (calculator != null) {
+        //     System.out.println(calculator.add(1, 2));
+        // }
+
+        test_LoadTimeWeaving(ctx);
+
+        // String basePackages = "org.springframework.beans.bean";
+        // AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(basePackages), ctx = context;
+        // context.register(JavaConfig.class);
+
+        // EmailServiceListener0.addApplicationListener(context);
         // context.register(JavaConfig.class);
 
         // 演示事务事件
-        UserRegisterService userRegisterService = context.getBean(UserRegisterService.class);
-        new Thread(() -> {      // 防止吧
-            System.out.println("发布事务事件开始" + new Date());
-            try {
-                userRegisterService.publishEventWithTransactional("Haisen");
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            System.out.println("发布事务事件结束" + new Date());
-        }).start();
+        // IUserRegisterService userRegisterService = context.getBean(IUserRegisterService.class);
+        // new Thread(() -> {      // 防止吧
+        //     System.out.println("发布事务事件开始" + new Date());
+        //     userRegisterService.publishEventWithTransactional("Haisen");
+        //     System.out.println("发布事务事件结束" + new Date());
+        // }).start();
 
         // Thread.sleep(10000);
+    }
+
+    private static void test_LoadTimeWeaving(ClassPathXmlApplicationContext ctx) {
+        LtwBean bean = (LtwBean) ctx.getBean("ltwBean");
+        bean.test();
     }
 
     public static void messageSourceDemo() {
