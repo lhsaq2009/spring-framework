@@ -57,7 +57,7 @@ public class ConfigurableWebBindingInitializer implements WebBindingInitializer 
 	private ConversionService conversionService;
 
 	@Nullable
-	private PropertyEditorRegistrar[] propertyEditorRegistrars;
+	private PropertyEditorRegistrar[] propertyEditorRegistrars;		// ???
 
 
 	/**
