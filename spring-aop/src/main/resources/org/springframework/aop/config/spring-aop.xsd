@@ -140,9 +140,7 @@
 			</xsd:element>
 			<xsd:element name="declare-parents" type="declareParentsType">
 				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-	Allows this aspect to introduce additional interfaces that the advised
-	object will transparently implement.
+					<xsd:documentation><![CDATA[ Allows this aspect to introduce additional interfaces that the advised object will transparently implement.
 					]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
@@ -361,9 +359,7 @@
 		<xsd:attribute name="id" type="xsd:string"/>
 		<xsd:attribute name="advice-ref" type="xsd:string" use="required">
 			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-	A reference to an advice bean.
-				]]></xsd:documentation>
+				<xsd:documentation><![CDATA[ A reference to an advice bean.]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
 						<tool:expected-type type="org.aopalliance.aop.Advice"/>
