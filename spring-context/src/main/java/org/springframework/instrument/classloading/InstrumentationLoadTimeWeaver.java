@@ -78,10 +78,22 @@ public class InstrumentationLoadTimeWeaver implements LoadTimeWeaver {
 	 */
 	public InstrumentationLoadTimeWeaver(@Nullable ClassLoader classLoader) {
 		this.classLoader = classLoader;
+
+		/**
+		 * =>> InstrumentationSavingAgent#instrumentation
+		 *     通过 -javaagent，在 JVM 调用 Main() 之前调用 premain() 传入 JVM 的 Instrumentation 实例引用
+		 *
+		 * 	   public final class InstrumentationSavingAgent {
+		 * 	       private static volatile Instrumentation instrumentation;
+		 *
+		 * 	   	   public static void premain(String agentArgs, Instrumentation inst) {
+		 * 	   	       instrumentation = inst;
+		 * 	       }
+		 */
 		this.instrumentation = getInstrumentation();
 	}
 
-
+	// transformer = {AspectJWeavingEnabler$AspectJClassBypassingClassFileTransformer@3439}
 	@Override
 	public void addTransformer(ClassFileTransformer transformer) {
 		Assert.notNull(transformer, "Transformer must not be null");
@@ -189,6 +201,7 @@ public class InstrumentationLoadTimeWeaver implements LoadTimeWeaver {
 			if (this.targetClassLoader != loader) {
 				return null;
 			}
+
 			return this.targetTransformer.transform(
 					loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
 		}
