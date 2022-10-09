@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ServletContextAwareProcessorTests {
 
-	@Test
+	/*@Test
 	public void servletContextAwareWithServletContext() {
 		ServletContext servletContext = new MockServletContext();
 		ServletContextAwareProcessor processor = new ServletContextAwareProcessor(servletContext);
@@ -165,6 +165,6 @@ public class ServletContextAwareProcessorTests {
 		assertThat(bean.getServletConfig()).isNull();
 		processor.postProcessBeforeInitialization(bean, "testBean");
 		assertThat(bean.getServletConfig()).isNull();
-	}
+	}*/
 
 }
