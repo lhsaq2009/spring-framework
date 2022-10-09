@@ -16,6 +16,9 @@
 
 package smoketest.aop;
 
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import smoketest.aop.service.HelloWorldService;
 
@@ -24,8 +27,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import javax.swing.*;
+
 @SpringBootApplication
-// @ComponentScan()
 public class SampleAopApplication implements CommandLineRunner {
 
     @Autowired
@@ -37,7 +41,12 @@ public class SampleAopApplication implements CommandLineRunner {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(SampleAopApplication.class, args);
-    }
 
+        SpringApplication springApplication = new SpringApplication(SampleAopApplication.class);
+        springApplication.addInitializers(new MyApplicationContextInitializer());
+        springApplication.setAllowBeanDefinitionOverriding(true);
+        springApplication.run(args);
+
+        // System.out.println(ctx.getClass().getSimpleName());
+    }
 }

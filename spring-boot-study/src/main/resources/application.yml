@@ -1,6 +1,6 @@
 name: Phil
+MYSQL_HOST: 127.0.0.1
 
 spring:
   server:
     port: 8080
-
