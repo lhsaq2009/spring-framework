@@ -102,7 +102,7 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 	private Map<Class<?>, PropertyEditor> defaultEditors;
 
 	@Nullable
-	private Map<Class<?>, PropertyEditor> overriddenDefaultEditors;
+	private Map<Class<?>, PropertyEditor> overriddenDefaultEditors;		//
 
 	@Nullable
 	private Map<Class<?>, PropertyEditor> customEditors;

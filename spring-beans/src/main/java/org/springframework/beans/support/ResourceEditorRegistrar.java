@@ -75,7 +75,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see org.springframework.context.ApplicationContext
 	 */
-	public ResourceEditorRegistrar(ResourceLoader resourceLoader, PropertyResolver propertyResolver) {
+	public ResourceEditorRegistrar(ResourceLoader resourceLoader, PropertyResolver propertyResolver) {	//
 		this.resourceLoader = resourceLoader;
 		this.propertyResolver = propertyResolver;
 	}
@@ -97,8 +97,8 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	 * @see org.springframework.beans.propertyeditors.ClassArrayEditor
 	 * @see org.springframework.core.io.support.ResourceArrayPropertyEditor
 	 */
-	@Override
-	public void registerCustomEditors(PropertyEditorRegistry registry) {
+	@Override // 回调位置：org.springframework.beans.factory.support.AbstractBeanFactory.registerCustomEditors
+	public void registerCustomEditors(PropertyEditorRegistry registry) {  		// TTODO：主要是提前注册简单通用常用类型的属性编辑器
 		ResourceEditor baseEditor = new ResourceEditor(this.resourceLoader, this.propertyResolver);
 		doRegisterEditor(registry, Resource.class, baseEditor);
 		doRegisterEditor(registry, ContextResource.class, baseEditor);
@@ -124,7 +124,7 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	 * Override default editor, if possible (since that's what we really mean to do here);
 	 * otherwise register as a custom editor.
 	 */
-	private void doRegisterEditor(PropertyEditorRegistry registry, Class<?> requiredType, PropertyEditor editor) {
+	private void doRegisterEditor(PropertyEditorRegistry registry, Class<?> requiredType, PropertyEditor editor) {	//
 		if (registry instanceof PropertyEditorRegistrySupport) {
 			((PropertyEditorRegistrySupport) registry).overrideDefaultEditor(requiredType, editor);
 		}

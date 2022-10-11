@@ -61,7 +61,7 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	@Nullable
 	private String valueSeparator = SystemPropertyUtils.VALUE_SEPARATOR;
 
-	private final Set<String> requiredProperties = new LinkedHashSet<>();
+	private final Set<String> requiredProperties = new LinkedHashSet<>();		// TODO：如何添加？？
 
 
 	@Override

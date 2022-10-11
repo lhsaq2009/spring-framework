@@ -52,7 +52,7 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 2.5
  */
-public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
+public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {		//
 
 	private static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
 
@@ -80,7 +80,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 	@Override
 	@Nullable
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		String basePackage = element.getAttribute(BASE_PACKAGE_ATTRIBUTE);
+		String basePackage = element.getAttribute(BASE_PACKAGE_ATTRIBUTE);	// org.springframework.beans.bean.aop
 		basePackage = parserContext.getReaderContext().getEnvironment().resolvePlaceholders(basePackage);
 		String[] basePackages = StringUtils.tokenizeToStringArray(basePackage,
 				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
@@ -148,6 +148,14 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			annotationConfig = Boolean.parseBoolean(element.getAttribute(ANNOTATION_CONFIG_ATTRIBUTE));
 		}
 		if (annotationConfig) {
+			/*
+			 * processorDefinitions = {LinkedHashSet@8544}  size = 5
+			 * 		0 = {BeanDefinitionHolder@6614} "org.springframework.context.annotation.ConfigurationClassPostProcessor"
+			 * 		1 = {BeanDefinitionHolder@7200} "org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"	-- @Autowired
+			 * 		2 = {BeanDefinitionHolder@7637} "org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"			-- @Resource
+			 * 		3 = {BeanDefinitionHolder@8150} "org.springframework.context.event.EventListenerMethodProcessor"
+			 * 		4 = {BeanDefinitionHolder@8539} "org.springframework.context.event.DefaultEventListenerFactory"
+			 */
 			Set<BeanDefinitionHolder> processorDefinitions =
 					AnnotationConfigUtils.registerAnnotationConfigProcessors(readerContext.getRegistry(), source);
 			for (BeanDefinitionHolder processorDefinition : processorDefinitions) {

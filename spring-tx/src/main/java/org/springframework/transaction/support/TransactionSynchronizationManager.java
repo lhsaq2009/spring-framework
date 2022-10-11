@@ -74,7 +74,7 @@ import org.springframework.util.Assert;
  * @see org.springframework.jdbc.datasource.DataSourceTransactionManager
  * @see org.springframework.jdbc.datasource.DataSourceUtils#getConnection
  */
-public abstract class TransactionSynchronizationManager {
+public abstract class TransactionSynchronizationManager {		// 事务同步管理器
 
 	private static final Log logger = LogFactory.getLog(TransactionSynchronizationManager.class);
 
@@ -261,7 +261,7 @@ public abstract class TransactionSynchronizationManager {
 	 * Can be called before register to avoid unnecessary instance creation.
 	 * @see #registerSynchronization
 	 */
-	public static boolean isSynchronizationActive() {
+	public static boolean isSynchronizationActive() {		// 获取到当前是否存在事务
 		return (synchronizations.get() != null);
 	}
 

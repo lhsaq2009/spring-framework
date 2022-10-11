@@ -72,7 +72,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 
 	/** Bean factory for this context. */
 	@Nullable
-	private volatile DefaultListableBeanFactory beanFactory;
+	private volatile DefaultListableBeanFactory beanFactory;		//
 
 
 	/**
@@ -86,7 +86,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @param parent the parent context
 	 */
 	public AbstractRefreshableApplicationContext(@Nullable ApplicationContext parent) {
-		super(parent);
+		super(parent);		// =>>
 	}
 
 
@@ -111,23 +111,27 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		this.allowCircularReferences = allowCircularReferences;
 	}
 
-
-	/**
+ 	/**
 	 * This implementation performs an actual refresh of this context's underlying
 	 * bean factory, shutting down the previous bean factory (if any) and
 	 * initializing a fresh bean factory for the next phase of the context's lifecycle.
+	 * <br>
+	 * 01、创建：DefaultListableBeanFactory => this.beanFactory
+	 * 02、设置：① 是否允许 Bean 覆盖，② 是否允许循环引用
+	 * 03、读取 Bean 定义
+	 * 		XmlWebApplicationContext#loadBeanDefinitions(DefaultListableBeanFactory)
 	 */
 	@Override
-	protected final void refreshBeanFactory() throws BeansException {
+	protected final void refreshBeanFactory() throws BeansException {		// FOR XML 启动方式
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
 		}
 		try {
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
-			beanFactory.setSerializationId(getId());
-			customizeBeanFactory(beanFactory);
-			loadBeanDefinitions(beanFactory);
+			beanFactory.setSerializationId(getId());	// org.springframework.context.support.ClassPathXmlApplicationContext@2794eab6
+			customizeBeanFactory(beanFactory);			// 配置是否允许 Bean 覆盖、是否支持循环引用
+			loadBeanDefinitions(beanFactory);			// =>> XML Bean 标签解析
 			this.beanFactory = beanFactory;
 		}
 		catch (IOException ex) {
@@ -212,10 +216,10 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see DefaultListableBeanFactory#setAllowEagerClassLoading
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
-		if (this.allowBeanDefinitionOverriding != null) {
+		if (this.allowBeanDefinitionOverriding != null) {		// 是否允许 Bean 覆盖
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
-		if (this.allowCircularReferences != null) {
+		if (this.allowCircularReferences != null) {				// 是否允许循环引用
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
 	}

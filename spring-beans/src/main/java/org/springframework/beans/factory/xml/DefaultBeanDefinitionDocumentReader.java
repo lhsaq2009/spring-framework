@@ -81,7 +81,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	private XmlReaderContext readerContext;
 
 	@Nullable
-	private BeanDefinitionParserDelegate delegate;
+	private BeanDefinitionParserDelegate delegate;	//
 
 
 	/**
@@ -93,7 +93,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	@Override
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
 		this.readerContext = readerContext;
-		doRegisterBeanDefinitions(doc.getDocumentElement());
+		doRegisterBeanDefinitions(doc.getDocumentElement());		// =>>
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// then ultimately reset this.delegate back to its original (parent) reference.
 		// this behavior emulates a stack of delegates without actually necessitating one.
 		BeanDefinitionParserDelegate parent = this.delegate;
-		this.delegate = createDelegate(getReaderContext(), root, parent);
+		this.delegate = createDelegate(getReaderContext(), root, parent);		// TODO：
 
 		if (this.delegate.isDefaultNamespace(root)) {
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
@@ -145,9 +145,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			}
 		}
 
-		preProcessXml(root);
-		parseBeanDefinitions(root, this.delegate);
-		postProcessXml(root);
+		preProcessXml(root);							//
+		parseBeanDefinitions(root, this.delegate);		//
+		postProcessXml(root);							//
 
 		this.delegate = parent;
 	}
@@ -155,7 +155,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	protected BeanDefinitionParserDelegate createDelegate(
 			XmlReaderContext readerContext, Element root, @Nullable BeanDefinitionParserDelegate parentDelegate) {
 
-		BeanDefinitionParserDelegate delegate = new BeanDefinitionParserDelegate(readerContext);
+		BeanDefinitionParserDelegate delegate = new BeanDefinitionParserDelegate(readerContext);		//
 		delegate.initDefaults(root, parentDelegate);
 		return delegate;
 	}
@@ -172,11 +172,13 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				Node node = nl.item(i);
 				if (node instanceof Element) {
 					Element ele = (Element) node;
+					// "http://www.springframework.org/schema/beans";
 					if (delegate.isDefaultNamespace(ele)) {
-						parseDefaultElement(ele, delegate);
+						parseDefaultElement(ele, delegate);			// =>> <bean>
 					}
+					// "http://www.springframework.org/schema/aop" 等非 <bean> 命名空间的
 					else {
-						delegate.parseCustomElement(ele);
+						delegate.parseCustomElement(ele);			// =>> <aop:config>
 					}
 				}
 			}

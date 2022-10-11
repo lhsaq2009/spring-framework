@@ -138,7 +138,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private ConversionService conversionService;
 
 	/** Custom PropertyEditorRegistrars to apply to the beans of this factory. */
-	private final Set<PropertyEditorRegistrar> propertyEditorRegistrars = new LinkedHashSet<>(4);
+	private final Set<PropertyEditorRegistrar> propertyEditorRegistrars = new LinkedHashSet<>(4);  //
 
 	/** Custom PropertyEditors to apply to the beans of this factory. */
 	private final Map<Class<?>, Class<? extends PropertyEditor>> customEditors = new HashMap<>(4);
@@ -151,7 +151,18 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private final List<StringValueResolver> embeddedValueResolvers = new CopyOnWriteArrayList<>();
 
 	/**
-	 * 后置处理器：{@link org.springframework.beans.factory.support.AbstractBeanFactory#addBeanPostProcessor}
+	 * 后置处理器：{@link AbstractBeanFactory#addBeanPostProcessor}
+	 *
+	 * CASE 1：
+	 *  =>> org.springframework.context.support.AbstractApplicationContext#refresh
+	 *      =>> AbstractApplicationContext#prepareBeanFactory(...)
+	 *			beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
+	 *			...
+	 *         	beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
+	 *
+	 * this.beanPostProcessors = {CopyOnWriteArrayList@3221}  size = 2
+	 * 		0 = {ApplicationContextAwareProcessor@3251}
+	 * 		1 = {ApplicationListenerDetector@3198}
 	 */
 	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
 
@@ -948,13 +959,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		this.beanPostProcessors.remove(beanPostProcessor);
 		// Track whether it is instantiation/destruction aware
 		if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
-			this.hasInstantiationAwareBeanPostProcessors = true;
+			this.hasInstantiationAwareBeanPostProcessors = true;				//
 		}
 		if (beanPostProcessor instanceof DestructionAwareBeanPostProcessor) {
-			this.hasDestructionAwareBeanPostProcessors = true;
+			this.hasDestructionAwareBeanPostProcessors = true;					//
 		}
 		// Add to end of list
-		this.beanPostProcessors.add(beanPostProcessor);
+		this.beanPostProcessors.add(beanPostProcessor);							//
 	}
 
 	@Override
@@ -1239,12 +1250,17 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * Can be overridden in subclasses.
 	 * @param bw the BeanWrapper to initialize
 	 */
-	protected void initBeanWrapper(BeanWrapper bw) {
+	protected void initBeanWrapper(BeanWrapper bw) {		//
 		bw.setConversionService(getConversionService());
 		registerCustomEditors(bw);
 	}
 
 	/**
+	 * =>> {@link org.springframework.context.support.AbstractApplicationContext#prepareBeanFactory}
+	 *     beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
+	 *
+	 * =>> {@link org.springframework.beans.support.ResourceEditorRegistrar#registerCustomEditors}
+	 *
 	 * Initialize the given PropertyEditorRegistry with the custom editors
 	 * that have been registered with this BeanFactory.
 	 * <p>To be called for BeanWrappers that will create and populate bean
@@ -1260,7 +1276,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 		if (!this.propertyEditorRegistrars.isEmpty()) {
 			for (PropertyEditorRegistrar registrar : this.propertyEditorRegistrars) {
-				try {
+				try {  // org.springframework.beans.support.ResourceEditorRegistrar.registerCustomEditors
 					registrar.registerCustomEditors(registry);
 				}
 				catch (BeanCreationException ex) {

@@ -179,7 +179,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private ConstructorArgumentValues constructorArgumentValues;	// constructor-arg
 
 	@Nullable
-	private MutablePropertyValues propertyValues;					// property
+	private MutablePropertyValues propertyValues;					// property，每种 BeanDefinition 都有自己的一些需要缓存的 property
 
 	private MethodOverrides methodOverrides = new MethodOverrides();
 
@@ -193,7 +193,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean enforceDestroyMethod = true;
 
-	private boolean synthetic = false;
+	private boolean synthetic = false;								// TODO：用于标识非开发者注册的？
 
 	private int role = BeanDefinition.ROLE_APPLICATION;
 
@@ -1018,7 +1018,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * not defined by the application itself.
 	 */
 	public boolean isSynthetic() {
-		return this.synthetic;		// 合成的，还不清楚细节
+		return this.synthetic;												// Spring 框架自用的，不是 程序开发者的 类
 	}
 
 	/**

@@ -1,6 +1,8 @@
 package org.springframework.beans;
 
+import org.springframework.beans.bean.aop.ArithmeticCalculator;
 import org.springframework.beans.bean.aop2.LtwBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
@@ -53,10 +55,8 @@ public class BeanFactoryTest {
         // 构建 ClassPathXmlApplicationContext 实例对象的时候，其中 refresh() 会调用 registerBeanPostProcessors()。
         // 这个方法会将检测到的 BeanPostProcessor 注入到 ClassPathXmlApplicationContext 容器中
 
-        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext();
-        ctx.setAllowBeanDefinitionOverriding(true);
-        ctx.setConfigLocation("spring.xml");
-        ctx.refresh();
+        // ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext();
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
 
         // Object person = ctx.getBean("CustomerBean");
         // System.out.println(person);
@@ -64,15 +64,15 @@ public class BeanFactoryTest {
          * calculator = {$Proxy23@2942} "org.springframework.beans.bean.aop.ArithmeticCalculatorImpl@631e06ab"
          *      h = {JdkDynamicAopProxy@3163}
          */
-        // ArithmeticCalculator calculator = (ArithmeticCalculator) ctx.getBean("arithmeticCalculator");
+        ArithmeticCalculator calculator = (ArithmeticCalculator) ctx.getBean("arithmeticCalculator");
         /**
          * =>> JdkDynamicAopProxy#invoke(Object, Method,Object[])
          */
-        // if (calculator != null) {
-        //     System.out.println(calculator.add(1, 2));
-        // }
+        if (calculator != null) {
+            System.out.println(calculator.add(1, 2));
+        }
 
-        test_LoadTimeWeaving(ctx);
+        // test_LoadTimeWeaving(ctx);
 
         // String basePackages = "org.springframework.beans.bean";
         // AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(basePackages), ctx = context;
@@ -92,8 +92,8 @@ public class BeanFactoryTest {
         // Thread.sleep(10000);
     }
 
-    private static void test_LoadTimeWeaving(ClassPathXmlApplicationContext ctx) {
-        LtwBean bean = (LtwBean) ctx.getBean("ltwBean");
+    private static void test_LoadTimeWeaving(ApplicationContext ctx) {
+        LtwBean bean = ctx.getBean(LtwBean.class);
         bean.test();
     }
 

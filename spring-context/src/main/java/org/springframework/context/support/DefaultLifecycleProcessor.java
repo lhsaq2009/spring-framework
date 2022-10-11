@@ -49,6 +49,15 @@ import org.springframework.util.Assert;
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @since 3.0
+ *
+ *           Aware    Lifecycle
+ *             ▲           ▲
+ *             │           │
+ * BeanFactoryAware   LifecycleProcessor
+ *             ▲           ▲
+ *             └─────────┐ │
+ *                       │ │
+ *             DefaultLifecycleProcessor
  */
 public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactoryAware {
 

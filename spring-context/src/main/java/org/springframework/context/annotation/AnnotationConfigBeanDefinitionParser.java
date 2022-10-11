@@ -37,7 +37,7 @@ import org.springframework.lang.Nullable;
  * @since 2.5
  * @see AnnotationConfigUtils
  */
-public class AnnotationConfigBeanDefinitionParser implements BeanDefinitionParser {
+public class AnnotationConfigBeanDefinitionParser implements BeanDefinitionParser {		//
 
 	@Override
 	@Nullable

@@ -130,13 +130,13 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 
 	@Nullable
 	private BeanFactory beanFactory;
-
+	// TODO：
 	private final Set<String> targetSourcedBeans = Collections.newSetFromMap(new ConcurrentHashMap<>(16));
-
-	private final Map<Object, Object> earlyProxyReferences = new ConcurrentHashMap<>(16);
-
+	// TODO：
+	private final Map<Object, Object> earlyProxyReferences = new ConcurrentHashMap<>(16);	//
+	// TODO："arithmeticCalculator" -> {Class@3578} "class com.sun.proxy.$Proxy23"
 	private final Map<Object, Class<?>> proxyTypes = new ConcurrentHashMap<>(16);
-
+	// TODO：何时加入数据，Bean 定义扫描的时候吗
 	private final Map<Object, Boolean> advisedBeans = new ConcurrentHashMap<>(256);
 
 
@@ -294,9 +294,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	@Override
 	public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
 		if (bean != null) {
-			Object cacheKey = getCacheKey(bean.getClass(), beanName);
+			Object cacheKey = getCacheKey(bean.getClass(), beanName);		// "arithmeticCalculator"
 			if (this.earlyProxyReferences.remove(cacheKey) != bean) {
-				return wrapIfNecessary(bean, beanName, cacheKey);
+				return wrapIfNecessary(bean, beanName, cacheKey);					// =>> AOP 创建代理对象
 			}
 		}
 		return bean;
@@ -347,7 +347,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
-			Object proxy = createProxy(
+			Object proxy = createProxy(		// =>> AOP 创建代理对象
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
 			this.proxyTypes.put(cacheKey, proxy.getClass());
 			return proxy;
@@ -446,7 +446,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);
 		}
 
-		ProxyFactory proxyFactory = new ProxyFactory();
+		ProxyFactory proxyFactory = new ProxyFactory();		//
 		proxyFactory.copyFrom(this);
 
 		if (!proxyFactory.isProxyTargetClass()) {
@@ -454,10 +454,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 				proxyFactory.setProxyTargetClass(true);
 			}
 			else {
-				evaluateProxyInterfaces(beanClass, proxyFactory);
+				evaluateProxyInterfaces(beanClass, proxyFactory);	// =>> AOP 创建代理对象
 			}
 		}
-
+		// 前面还是只是收集代理相关的数据，比如有哪些接口
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
 		proxyFactory.addAdvisors(advisors);
 		proxyFactory.setTargetSource(targetSource);

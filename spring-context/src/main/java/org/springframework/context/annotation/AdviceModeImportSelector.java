@@ -73,8 +73,13 @@ public abstract class AdviceModeImportSelector<A extends Annotation> implements 
 					"@%s is not present on importing class '%s' as expected",
 					annType.getSimpleName(), importingClassMetadata.getClassName()));
 		}
-
+		// adviceMode = {AdviceMode@2318} "PROXY"
 		AdviceMode adviceMode = attributes.getEnum(getAdviceModeAttributeName());
+		/*
+		 * imports = {String[2]@2364} ["org.springframe...", "org.springframe..."]
+		 * 		0 = "org.springframework.context.annotation.AutoProxyRegistrar"
+		 * 		1 = "org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration"
+		 */
 		String[] imports = selectImports(adviceMode);
 		if (imports == null) {
 			throw new IllegalArgumentException("Unknown AdviceMode: " + adviceMode);

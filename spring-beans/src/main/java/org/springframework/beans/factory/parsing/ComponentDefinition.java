@@ -73,6 +73,19 @@ import org.springframework.beans.factory.config.BeanReference;
  * @see CompositeComponentDefinition
  * @see BeanComponentDefinition
  * @see ReaderEventListener#componentRegistered(ComponentDefinition)
+ *
+ * 实现类：
+ *
+ * spring.spring-aop.main
+ * 		org.springframework.aop.config
+ * 			AdvisorComponentDefinition.java
+ * 			AspectComponentDefinition.java
+ * 			PointcutComponentDefinition.java
+ * spring.spring-beans.main
+ * 		org.springframework.beans.factory.parsing
+ * 			AbstractComponentDefinition.java
+ * 			BeanComponentDefinition.java
+ * 			CompositeComponentDefinition.java
  */
 public interface ComponentDefinition extends BeanMetadataElement {
 

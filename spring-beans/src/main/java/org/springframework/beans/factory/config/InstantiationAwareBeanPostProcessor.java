@@ -43,7 +43,10 @@ import org.springframework.lang.Nullable;
  * @since 1.2
  * @see org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator#setCustomTargetSourceCreators
  * @see org.springframework.aop.framework.autoproxy.target.LazyInitTargetSourceCreator
- */
+ *
+ * =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#populateBean}
+ *     for getBeanPostProcessors() -> if (bp instanceof InstantiationAwareBeanPostProcessor)
+ */ // 关于对象实例化前后，以及实例化后，设置 propertyValues 的回调
 public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 
 	/**
@@ -76,6 +79,8 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	}
 
 	/**
+	 * 在对象实例化完毕执行 populateBean 之前，如果返回 false 则 Spring 不再对对应的 bean 实例进行自动依赖注入。
+	 *
 	 * Perform operations after the bean has been instantiated, via a constructor or factory method,
 	 * but before Spring property population (from explicit properties or autowiring) occurs.
 	 * <p>This is the ideal callback for performing custom field injection on the given bean

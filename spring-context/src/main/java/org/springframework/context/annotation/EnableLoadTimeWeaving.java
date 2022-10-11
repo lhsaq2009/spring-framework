@@ -135,7 +135,7 @@ import org.springframework.instrument.classloading.LoadTimeWeaver;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(LoadTimeWeavingConfiguration.class)
+@Import(LoadTimeWeavingConfiguration.class)		// =>> 01、LTW
 public @interface EnableLoadTimeWeaving {
 
 	/**

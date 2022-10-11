@@ -233,7 +233,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 		this.registriesPostProcessed.add(registryId);
 
-		processConfigBeanDefinitions(registry);
+		processConfigBeanDefinitions(registry);	// ^xd!TCRk$t42
 	}
 
 	/**
@@ -251,7 +251,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		if (!this.registriesPostProcessed.contains(factoryId)) {
 			// BeanDefinitionRegistryPostProcessor hook apparently not supported...
 			// Simply call processConfigurationClasses lazily at this point then.
-			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
+			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);	// ^xd!TCRk$t42
 		}
 
 		enhanceConfigurationClasses(beanFactory);
@@ -328,7 +328,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 						registry, this.sourceExtractor, this.resourceLoader, this.environment,
 						this.importBeanNameGenerator, parser.getImportRegistry());
 			}
-			this.reader.loadBeanDefinitions(configClasses);
+			this.reader.loadBeanDefinitions(configClasses);		// ^xd!TCRk$t42
 			alreadyParsed.addAll(configClasses);
 
 			candidates.clear();
@@ -432,7 +432,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	}
 
 
-	private static class ImportAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter {
+	private static class ImportAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter {  //
 
 		private final BeanFactory beanFactory;
 

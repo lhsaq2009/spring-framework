@@ -46,8 +46,8 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see org.springframework.aop.aspectj.annotation.AspectJAdvisorFactory
  */
-@SuppressWarnings("serial")
-public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorAutoProxyCreator {
+@SuppressWarnings("serial")  // 也是个后置处理器，=>> 父类的 AbstractAutoProxyCreator.createProxy(..)
+public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorAutoProxyCreator {	// 处理 @Aspect ？？
 
 	@Nullable
 	private List<Pattern> includePatterns;

@@ -51,7 +51,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	/** Logger available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private final BeanDefinitionRegistry registry;		//
+	private final BeanDefinitionRegistry registry;		// Bean 工厂：parserContext.getRegistry() = {DefaultListableBeanFactory@2195}
 
 	@Nullable
 	private ResourceLoader resourceLoader;
@@ -192,7 +192,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 
 	@Override		// eg："spring.xml"
 	public int loadBeanDefinitions(String location) throws BeanDefinitionStoreException {
-		return loadBeanDefinitions(location, null);
+		return loadBeanDefinitions(location, null);		// =>>
 	}
 
 	/**
@@ -222,7 +222,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 			// Resource pattern matching available.
 			try {
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
-				int count = loadBeanDefinitions(resources);
+				int count = loadBeanDefinitions(resources);			// =>>
 				if (actualResources != null) {
 					Collections.addAll(actualResources, resources);
 				}
@@ -255,7 +255,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 		Assert.notNull(locations, "Location array must not be null");
 		int count = 0;
 		for (String location : locations) {
-			count += loadBeanDefinitions(location);
+			count += loadBeanDefinitions(location);		// 去解析 XML 配置文件
 		}
 		return count;
 	}

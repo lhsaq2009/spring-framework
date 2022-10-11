@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
  * @since 3.0
  * @see AnnotationConfigApplicationContext#register
  */
-public class AnnotatedBeanDefinitionReader {
+public class AnnotatedBeanDefinitionReader {		// aop-1
 
 	private final BeanDefinitionRegistry registry;
 

@@ -233,7 +233,7 @@ public abstract class AnnotationConfigUtils {
 	public static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd) {
 		processCommonDefinitionAnnotations(abd, abd.getMetadata());
 	}
-
+	// 收集定义信息：@Lazy，@Primary，@DependsOn，@Role，@Description，到 AnnotatedBeanDefinition
 	static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd, AnnotatedTypeMetadata metadata) {
 		AnnotationAttributes lazy = attributesFor(metadata, Lazy.class);
 		if (lazy != null) {
@@ -272,7 +272,7 @@ public abstract class AnnotationConfigUtils {
 			return definition;
 		}
 		boolean proxyTargetClass = scopedProxyMode.equals(ScopedProxyMode.TARGET_CLASS);
-		return ScopedProxyCreator.createScopedProxy(definition, registry, proxyTargetClass);
+		return ScopedProxyCreator.createScopedProxy(definition, registry, proxyTargetClass);		// =>> TODO：AOP ？？
 	}
 
 	@Nullable

@@ -100,7 +100,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 
 	private boolean customClassLoader = false;
 
-	private final AtomicBoolean refreshed = new AtomicBoolean();
+	private final AtomicBoolean refreshed = new AtomicBoolean();		//
 
 
 	/**
@@ -266,7 +266,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 			throw new IllegalStateException(
 					"GenericApplicationContext does not support multiple refresh attempts: just call 'refresh' once");
 		}
-		this.beanFactory.setSerializationId(getId());
+		this.beanFactory.setSerializationId(getId());		// eg：getId() = "application"
 	}
 
 	@Override

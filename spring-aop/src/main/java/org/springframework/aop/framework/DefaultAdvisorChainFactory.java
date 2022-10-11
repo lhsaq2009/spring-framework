@@ -60,7 +60,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 		Boolean hasIntroductions = null;
 
 		for (Advisor advisor : advisors) {
-			if (advisor instanceof PointcutAdvisor) {
+			if (advisor instanceof PointcutAdvisor) {  //
 				// Add it conditionally.
 				PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
 				if (config.isPreFiltered() || pointcutAdvisor.getPointcut().getClassFilter().matches(actualClass)) {

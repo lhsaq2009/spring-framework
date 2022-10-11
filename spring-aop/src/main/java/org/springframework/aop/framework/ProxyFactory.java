@@ -33,7 +33,7 @@ import org.springframework.util.ClassUtils;
  * @since 14.03.2003
  */
 @SuppressWarnings("serial")
-public class ProxyFactory extends ProxyCreatorSupport {
+public class ProxyFactory extends ProxyCreatorSupport {		// TODO： + 类继承
 
 	/**
 	 * Create a new ProxyFactory.

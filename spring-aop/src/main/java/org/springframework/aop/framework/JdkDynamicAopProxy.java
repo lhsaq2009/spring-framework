@@ -61,7 +61,7 @@ import org.springframework.util.ClassUtils;
  * @see AdvisedSupport
  * @see ProxyFactory
  */
-final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializable {
+final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializable {	//
 
 	/** use serialVersionUID from Spring 1.2 for interoperability. */
 	private static final long serialVersionUID = 5531744639992436476L;
@@ -80,7 +80,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	private static final Log logger = LogFactory.getLog(JdkDynamicAopProxy.class);
 
 	/** Config used to configure this proxy. */
-	private final AdvisedSupport advised;
+	private final AdvisedSupport advised;		//
 
 	/**
 	 * Is the {@link #equals} method defined on the proxied interfaces?
@@ -114,13 +114,13 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	}
 
 	@Override
-	public Object getProxy(@Nullable ClassLoader classLoader) {
+	public Object getProxy(@Nullable ClassLoader classLoader) {		//
 		if (logger.isTraceEnabled()) {
 			logger.trace("Creating JDK dynamic proxy: " + this.advised.getTargetSource());
 		}
 		Class<?>[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised, true);
 		findDefinedEqualsAndHashCodeMethods(proxiedInterfaces);
-		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);
+		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);	// =>>
 	}
 
 	/**
@@ -157,7 +157,7 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 		Object oldProxy = null;
 		boolean setProxyContext = false;
 
-		TargetSource targetSource = this.advised.targetSource;
+		TargetSource targetSource = this.advised.targetSource;		//
 		Object target = null;
 
 		try {
@@ -189,11 +189,11 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 			// Get as late as possible to minimize the time we "own" the target,
 			// in case it comes from a pool.
-			target = targetSource.getTarget();
+			target = targetSource.getTarget();	//
 			Class<?> targetClass = (target != null ? target.getClass() : null);
 
 			// Get the interception chain for this method.
-			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
+			List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);  // <==
 
 			// Check whether we have any advice. If we don't, we can fallback on direct
 			// reflective invocation of the target, and avoid creating a MethodInvocation.
@@ -206,10 +206,10 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 			}
 			else {
 				// We need to create a method invocation...
-				MethodInvocation invocation =
-						new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);
-				// Proceed to the joinpoint through the interceptor chain.
-				retVal = invocation.proceed();
+				MethodInvocation invocation =  // =>>
+						new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);	// =>>
+				// 通过拦截器链前往连接点。Proceed to the joinpoint through the interceptor chain.
+				retVal = invocation.proceed();  // =>> 调用 代理对象 的 代理方法
 			}
 
 			// Massage return value if necessary.

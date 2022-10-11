@@ -63,14 +63,14 @@ public class AutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 			AnnotationAttributes candidate = AnnotationConfigUtils.attributesFor(importingClassMetadata, annType);
 			if (candidate == null) {
 				continue;
-			}
+			}	// TODO：举例？？@EnableTransactionManagement(proxyTargetClass = true)
 			Object mode = candidate.get("mode");
 			Object proxyTargetClass = candidate.get("proxyTargetClass");
 			if (mode != null && proxyTargetClass != null && AdviceMode.class == mode.getClass() &&
 					Boolean.class == proxyTargetClass.getClass()) {
 				candidateFound = true;
 				if (mode == AdviceMode.PROXY) {
-					AopConfigUtils.registerAutoProxyCreatorIfNecessary(registry);
+					AopConfigUtils.registerAutoProxyCreatorIfNecessary(registry);	// ^xd!TCRk$t42
 					if ((Boolean) proxyTargetClass) {
 						AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 						return;

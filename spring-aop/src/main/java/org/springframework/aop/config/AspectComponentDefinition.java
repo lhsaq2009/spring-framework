@@ -33,9 +33,9 @@ import org.springframework.lang.Nullable;
  */
 public class AspectComponentDefinition extends CompositeComponentDefinition {
 
-	private final BeanDefinition[] beanDefinitions;
+	private final BeanDefinition[] beanDefinitions;		//
 
-	private final BeanReference[] beanReferences;
+	private final BeanReference[] beanReferences;		//
 
 
 	public AspectComponentDefinition(String aspectName, @Nullable BeanDefinition[] beanDefinitions,

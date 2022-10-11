@@ -56,7 +56,7 @@ import org.springframework.util.Assert;
  * @since 2.5
  * @see org.springframework.context.ConfigurableApplicationContext#LOAD_TIME_WEAVER_BEAN_NAME
  */
-public class DefaultContextLoadTimeWeaver implements LoadTimeWeaver, BeanClassLoaderAware, DisposableBean {
+public class DefaultContextLoadTimeWeaver implements LoadTimeWeaver, BeanClassLoaderAware, DisposableBean {		//
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -84,7 +84,7 @@ public class DefaultContextLoadTimeWeaver implements LoadTimeWeaver, BeanClassLo
 		}
 		else if (InstrumentationLoadTimeWeaver.isInstrumentationAvailable()) {
 			logger.debug("Found Spring's JVM agent for instrumentation");
-			this.loadTimeWeaver = new InstrumentationLoadTimeWeaver(classLoader);
+			this.loadTimeWeaver = new InstrumentationLoadTimeWeaver(classLoader);		// LTW
 		}
 		else {
 			try {

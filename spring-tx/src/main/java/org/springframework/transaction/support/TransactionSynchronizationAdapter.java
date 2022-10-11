@@ -58,11 +58,11 @@ public abstract class TransactionSynchronizationAdapter implements TransactionSy
 	}
 
 	@Override
-	public void afterCommit() {
+	public void afterCommit() {							// 事务后提交
 	}
 
 	@Override
-	public void afterCompletion(int status) {
+	public void afterCompletion(int status) {			// 事务完成后执行（不会区分他是提交还是回滚操作）
 	}
 
 }

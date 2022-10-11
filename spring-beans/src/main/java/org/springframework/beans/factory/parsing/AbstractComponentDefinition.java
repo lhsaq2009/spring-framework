@@ -29,8 +29,17 @@ import org.springframework.beans.factory.config.BeanReference;
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 2.0
+ *
+ * spring.spring-aop.main
+ * 		org.springframework.aop.config
+ * 			AdvisorComponentDefinition.java
+ * 			AspectComponentDefinition.java
+ * 			PointcutComponentDefinition.java
+ * spring.spring-beans.main
+ * 		org.springframework.beans.factory.parsing
+ * 			CompositeComponentDefinition.java
  */
-public abstract class AbstractComponentDefinition implements ComponentDefinition {
+public abstract class AbstractComponentDefinition implements ComponentDefinition {		//
 
 	/**
 	 * Delegates to {@link #getName}.

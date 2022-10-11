@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
  * @see AnnotatedGenericBeanDefinition
  */
 @SuppressWarnings("serial")
-public class ScannedGenericBeanDefinition extends GenericBeanDefinition implements AnnotatedBeanDefinition {
+public class ScannedGenericBeanDefinition extends GenericBeanDefinition implements AnnotatedBeanDefinition {	//
 
 	private final AnnotationMetadata metadata;
 

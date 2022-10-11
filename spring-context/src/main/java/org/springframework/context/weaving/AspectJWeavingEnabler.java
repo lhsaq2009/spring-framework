@@ -98,7 +98,6 @@ public class AspectJWeavingEnabler
 				new AspectJClassBypassingClassFileTransformer(new ClassPreProcessorAgentAdapter()));
 	}
 
-
 	/**
 	 * ClassFileTransformer decorator that suppresses processing of AspectJ
 	 * classes in order to avoid potential LinkageErrors.
@@ -119,6 +118,7 @@ public class AspectJWeavingEnabler
 			if (className.startsWith("org.aspectj") || className.startsWith("org/aspectj")) {
 				return classfileBuffer;
 			}
+
 			return this.delegate.transform(loader, className, classBeingRedefined, protectionDomain, classfileBuffer);
 		}
 	}

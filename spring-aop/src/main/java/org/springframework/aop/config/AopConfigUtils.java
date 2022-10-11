@@ -46,58 +46,119 @@ import org.springframework.util.Assert;
 public abstract class AopConfigUtils {
 
 	/**
-	 * The bean name of the internally managed auto-proxy creator.
+	 * 内部管理的自动代理 创建者的 bean 名称
+	 * CASE 1：Bean 注册：{@link AopConfigUtils#registerOrEscalateApcAsRequired(Class, BeanDefinitionRegistry, Object)}
 	 */
 	public static final String AUTO_PROXY_CREATOR_BEAN_NAME =
-			"org.springframework.aop.config.internalAutoProxyCreator";
+			"org.springframework.aop.config.internalAutoProxyCreator";		// 可能对应 3种 不同的类，所以并非某个具体的类名
 
 	/**
 	 * Stores the auto proxy creator classes in escalation order.
 	 */
 	private static final List<Class<?>> APC_PRIORITY_LIST = new ArrayList<>(3);
 
+	/**
+	 * 定义顺序，起到优先级的作用，何时奏效：AopConfigUtils.registerOrEscalateApcAsRequired
+	 * 本来扫描到：<aop:config/> 先注册了个 AspectJAwareAdvisorAutoProxyCreator 处理类
+	 * 后来发现又同时启用了 @EnableAspectJAutoProxy 或 <aop:aspectj-autoproxy，那么 AopConfigUtils#AUTO_PROXY_CREATOR_BEAN_NAME
+	 * 对应的 BeanClass 就会升级为 AnnotationAwareAspectJAutoProxyCreator
+	 */
 	static {
 		// Set up the escalation list...
-		APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);
+		APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);		// 优先级最低
 		APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);
-		APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);
+		APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);	// 优先级最高
 	}
 
+	// region InfrastructureAdvisorAutoProxyCreator
 
+	/**
+	 * TODO：@EnableTransactionManagement(proxyTargetClass = true)
+	 * =>> {@link org.springframework.context.annotation.AutoProxyRegistrar#registerBeanDefinitions}
+	 */
 	@Nullable
-	public static BeanDefinition registerAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry) {
+	public static BeanDefinition registerAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry) {		// ^xd!TCRk$t42
+		// InfrastructureAdvisorAutoProxyCreator
 		return registerAutoProxyCreatorIfNecessary(registry, null);
 	}
 
+	/**
+	 * CASE 1：<cache:annotation-driven>
+	 * =>> {@link org.springframework.cache.config.AnnotationDrivenCacheBeanDefinitionParser#parse}
+	 * 	   =>> {@link org.springframework.aop.config.AopNamespaceUtils#registerAutoProxyCreatorIfNecessary}  相同
+	 * CASE 2：<tx:annotation-driven/>
+	 * =>> {@link org.springframework.transaction.config.AnnotationDrivenBeanDefinitionParser#parse}
+	 * 	   =>> {@link org.springframework.aop.config.AopNamespaceUtils#registerAutoProxyCreatorIfNecessary}  相同
+	 *
+	 * internalAutoProxyCreator = "InfrastructureAdvisorAutoProxyCreator"
+	 */
 	@Nullable
-	public static BeanDefinition registerAutoProxyCreatorIfNecessary(
+	public static BeanDefinition registerAutoProxyCreatorIfNecessary(		// PPArf8u7^Nbw
 			BeanDefinitionRegistry registry, @Nullable Object source) {
-
 		return registerOrEscalateApcAsRequired(InfrastructureAdvisorAutoProxyCreator.class, registry, source);
 	}
 
-	@Nullable
-	public static BeanDefinition registerAspectJAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry) {
-		return registerAspectJAutoProxyCreatorIfNecessary(registry, null);
-	}
+	// endregion
 
+	// region AspectJAwareAdvisorAutoProxyCreator 解析 <aop:config>
+
+	/**
+	 * 解析 <aop:config>
+	 * internalAutoProxyCreator = "AspectJAwareAdvisorAutoProxyCreator"
+	 *
+	 * =>> {@link AopNamespaceHandler#init()}
+	 * 	   =>> {@link ConfigBeanDefinitionParser#parse}
+	 * 	       =>> {@link AopNamespaceUtils#registerAspectJAutoProxyCreatorIfNecessary}
+	 * 	   	       =>> {@link AopConfigUtils#registerAspectJAutoProxyCreatorIfNecessary(BeanDefinitionRegistry, Object)}
+	 */
 	@Nullable
 	public static BeanDefinition registerAspectJAutoProxyCreatorIfNecessary(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
-
 		return registerOrEscalateApcAsRequired(AspectJAwareAdvisorAutoProxyCreator.class, registry, source);
 	}
 
+	// endregion
+
+	// region AnnotationAwareAspectJAutoProxyCreator 解析：<aop:aspectj-autoproxy> + @EnableAspectJAutoProxy
+
+	/**
+	 * 解析：<aop:aspectj-autoproxy>
+	 * internalAutoProxyCreator = "AnnotationAwareAspectJAutoProxyCreator"
+	 *
+	 * =>> {@link AopNamespaceHandler#init()}	-- <aop:aspectj-autoproxy>
+	 * 	   =>> {@link org.springframework.aop.config.AspectJAutoProxyBeanDefinitionParser#parse}
+	 * 	   	  =>> {@link AopNamespaceUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary}
+	 */
+	@Nullable
+	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(					// 04、Sz^Rbp$g2#vU
+			BeanDefinitionRegistry registry, @Nullable Object source) {
+		return registerOrEscalateApcAsRequired(AnnotationAwareAspectJAutoProxyCreator.class, registry, source);
+	}
+
+	/**
+	 * @EnableAspectJAutoProxy
+	 *
+	 * =>> {@link org.springframework.context.annotation.ConfigurationClassPostProcessor#processConfigBeanDefinitions}
+	 * 	   =>> {@link org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader#loadBeanDefinitions}
+	 *         =>> {@link org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader#loadBeanDefinitionsForConfigurationClass}
+	 *             =>> {@link org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader#loadBeanDefinitionsFromRegistrars}
+	 *         		   =>> {@link org.springframework.context.annotation.ImportBeanDefinitionRegistrar#registerBeanDefinitions(org.springframework.core.type.AnnotationMetadata, org.springframework.beans.factory.support.BeanDefinitionRegistry, org.springframework.beans.factory.support.BeanNameGenerator)}
+	 *     	       		   =>> {@link org.springframework.context.annotation.AspectJAutoProxyRegistrar#registerBeanDefinitions}
+	 */
 	@Nullable
 	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry) {
+		// AnnotationAwareAspectJAutoProxyCreator
 		return registerAspectJAnnotationAutoProxyCreatorIfNecessary(registry, null);
 	}
 
-	@Nullable
-	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(
-			BeanDefinitionRegistry registry, @Nullable Object source) {
+	// endregion
 
-		return registerOrEscalateApcAsRequired(AnnotationAwareAspectJAutoProxyCreator.class, registry, source);
+	// 忽略，无调用者
+	@Nullable
+	@Deprecated
+	public static BeanDefinition registerAspectJAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry) {
+		// AspectJAwareAdvisorAutoProxyCreator
+		return registerAspectJAutoProxyCreatorIfNecessary(registry, null);  // 忽略
 	}
 
 	public static void forceAutoProxyCreatorToUseClassProxying(BeanDefinitionRegistry registry) {
@@ -114,13 +175,24 @@ public abstract class AopConfigUtils {
 		}
 	}
 
+	/**
+	 * {@link AopConfigUtils#APC_PRIORITY_LIST}
+	 * 		CASE 1：{@link AopConfigUtils#registerAutoProxyCreatorIfNecessary(BeanDefinitionRegistry, Object)}
+	 * 				cls = InfrastructureAdvisorAutoProxyCreator.class
+	 *
+	 * 		CASE 2：{@link AopConfigUtils#registerAspectJAutoProxyCreatorIfNecessary(BeanDefinitionRegistry, Object)}
+	 * 				cls = AspectJAwareAdvisorAutoProxyCreator.class  		<aop:config>
+	 *
+	 * 		CASE 3：{@link AopConfigUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary(BeanDefinitionRegistry, Object)}
+	 * 				cls = AnnotationAwareAspectJAutoProxyCreator.class		@EnableAspectJAutoProxy
+	 */
 	@Nullable
-	private static BeanDefinition registerOrEscalateApcAsRequired(
+	private static BeanDefinition registerOrEscalateApcAsRequired(		// Escalate：逐步升级
 			Class<?> cls, BeanDefinitionRegistry registry, @Nullable Object source) {
 
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 
-		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
+		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {	// TODO：
 			BeanDefinition apcDefinition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
 			if (!cls.getName().equals(apcDefinition.getBeanClassName())) {
 				int currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());

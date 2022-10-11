@@ -3,11 +3,12 @@
 <aspectj>
     <!-- 01、限制要织入切面的目标类 -->
     <!-- <weaver options="-Xset:weaveJavaxPackages=true -Xlint:ignore -verbose -debug"> -->
-    <weaver options="-Xset:weaveJavaxPackages=true -showWeaveInfo">
+    <weaver options="-Xset:weaveJavaxPackages=false -showWeaveInfo">
         <!-- 输出日志：[AppClassLoader@18b4aac2] weaveinfo Join point 'method-execution(void com.example.aop2.LtwBean.test())'
                      in Type 'com.example.aop2.LtwBean' (LtwBean.java:9) advised by around advice from 'com.example.aop2.LogAspect' (LogAspect.java) -->
         <!-- 配合 <aspect> 配置的切面类，限制仅对指定路径下的类，进行增强 -->
-        <include within="org.springframework.beans.bean.aop2.*"/>
+        <!--<include within="org.springframework.beans.bean.aop2.*"/>-->
+        <!-- <exclude within="..." -->
     </weaver>
 
     <!-- 02、切面类 -->

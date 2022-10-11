@@ -71,7 +71,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		else {
 			// mode="proxy"
-			AopAutoProxyConfigurer.configureAutoProxyCreator(element, parserContext);
+			AopAutoProxyConfigurer.configureAutoProxyCreator(element, parserContext);	// PPArf8u7^Nbw
 		}
 		return null;
 	}
@@ -119,7 +119,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 	private static class AopAutoProxyConfigurer {
 
 		public static void configureAutoProxyCreator(Element element, ParserContext parserContext) {
-			AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
+			AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);	// PPArf8u7^Nbw
 
 			String txAdvisorBeanName = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME;
 			if (!parserContext.getRegistry().containsBeanDefinition(txAdvisorBeanName)) {

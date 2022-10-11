@@ -19,6 +19,9 @@ package org.springframework.beans.factory.parsing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -38,6 +41,27 @@ public class CompositeComponentDefinition extends AbstractComponentDefinition {
 	@Nullable
 	private final Object source;
 
+	/**
+	 * CASE 1：{@link org.springframework.aop.config.AopNamespaceUtils#registerComponentIfNecessary)}
+	 *
+	 * this.nestedComponents = {ArrayList@2217}  size = 2
+	 * 		0 = {BeanComponentDefinition@2209} "Bean definition with name 'internalAutoProxyCreator'"
+	 * 			beanDefinition = {RootBeanDefinition @2196} "Root bean: class [AspectJAwareAdvisorAutoProxyCreator]; "
+	 * 			beanName = "org.springframework.aop.config.internalAutoProxyCreator"
+	 *
+	 * 		1 = {PointcutComponentDefinition@2219}
+	 * 			pointcutBeanName = "pointcut"
+	 * 			pointcutDefinition = {RootBeanDefinition@2211} "Root bean: class [org.springframework.aop.aspectj.AspectJExpressionPointcut];"
+	 * 			description = "Pointcut <name='pointcut', expression=[execution(* org.springframework.beans.bean.aop.ArithmeticCalculator.*(int, int))]>"
+	 *
+	 * 		2 = {AdvisorComponentDefinition@2263} "Advisor <advice(ref)='loggingAdvisor', pointcut(ref)='pointcut'>"
+	 * 			advisorBeanName = "advisor"
+	 * 			advisorDefinition = {RootBeanDefinition@2201} "Root bean: class [org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor]; "
+	 * 			description = "Advisor <advice(ref)='loggingAdvisor', pointcut(ref)='pointcut'>"
+	 * 			beanReferences = {BeanReference[2]@2274}
+	 * 				0 = {RuntimeBeanNameReference@2279} "<loggingAdvisor>"
+	 * 				1 = {RuntimeBeanReference@2280} "<pointcut>"
+	 */
 	private final List<ComponentDefinition> nestedComponents = new ArrayList<>();
 
 

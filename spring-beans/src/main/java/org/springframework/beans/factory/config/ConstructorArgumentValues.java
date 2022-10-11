@@ -45,7 +45,7 @@ public class ConstructorArgumentValues {
 
 	private final Map<Integer, ValueHolder> indexedArgumentValues = new LinkedHashMap<>();
 
-	private final List<ValueHolder> genericArgumentValues = new ArrayList<>();
+	private final List<ValueHolder> genericArgumentValues = new ArrayList<>();		//
 
 
 	/**

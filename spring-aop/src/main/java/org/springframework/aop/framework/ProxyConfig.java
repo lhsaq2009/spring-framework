@@ -34,7 +34,7 @@ public class ProxyConfig implements Serializable {
 	private static final long serialVersionUID = -8409359707199703185L;
 
 
-	private boolean proxyTargetClass = false;
+	private boolean proxyTargetClass = false;		// TODO：false JDK 接口代理，否则 CGlib 子类 ？？
 
 	private boolean optimize = false;
 
@@ -62,7 +62,7 @@ public class ProxyConfig implements Serializable {
 	}
 
 	/**
-	 * Return whether to proxy the target class directly as well as any interfaces.
+	 * 返回是否直接代理目标类以及任何接口。 Return whether to proxy the target class directly as well as any interfaces.
 	 */
 	public boolean isProxyTargetClass() {
 		return this.proxyTargetClass;
@@ -151,7 +151,7 @@ public class ProxyConfig implements Serializable {
 	 * Copy configuration from the other config object.
 	 * @param other object to copy configuration from
 	 */
-	public void copyFrom(ProxyConfig other) {
+	public void copyFrom(ProxyConfig other) {		//
 		Assert.notNull(other, "Other ProxyConfig object must not be null");
 		this.proxyTargetClass = other.proxyTargetClass;
 		this.optimize = other.optimize;

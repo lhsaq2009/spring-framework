@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-2.5.xsd
+	http://www.springframework.org/schema/aop
+    https://www.springframework.org/schema/aop/spring-aop.xsd"
+>
+    <aop:config/>
+
+    <context:component-scan annotation-config="true" base-package="org.springframework.beans.bean.aop"/>
+
+    <!-- <context:component-scan 包含 <context:annotation-config/> 依赖注入的功能-->
+
+    <!-- 配置被代理的 Bean -->
+    <bean id="arithmeticCalculator" class="org.springframework.beans.bean.aop.ArithmeticCalculatorImpl"/>
+
+    <!-- 代理 Bean -->
+    <!--<bean id="loggingAdvisor" class="org.springframework.beans.bean.aop.LoggingAdvisor2"/>-->
+
+    <aop:aspectj-autoproxy proxy-target-class="false">
+        <!--<aop:include name="loggingAdvisor"></aop:include>-->
+    </aop:aspectj-autoproxy>
+</beans>

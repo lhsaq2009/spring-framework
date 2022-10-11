@@ -49,7 +49,7 @@ import org.springframework.util.ErrorHandler;
 public class SimpleApplicationEventMulticaster extends AbstractApplicationEventMulticaster {
 
 	@Nullable
-	private Executor taskExecutor;
+	private Executor taskExecutor;			// TODO：自定义的话，异步调用，岂不是速度更快
 
 	@Nullable
 	private ErrorHandler errorHandler;
@@ -133,10 +133,10 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 		Executor executor = getTaskExecutor();
 		for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {
 			if (executor != null) {
-				executor.execute(() -> invokeListener(listener, event));
+				executor.execute(() -> invokeListener(listener, event));	// 异步调用
 			}
 			else {
-				invokeListener(listener, event);
+				invokeListener(listener, event);									// 同步调用
 			}
 		}
 	}

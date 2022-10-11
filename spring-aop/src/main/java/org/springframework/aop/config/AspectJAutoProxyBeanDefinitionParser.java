@@ -40,15 +40,17 @@ class AspectJAutoProxyBeanDefinitionParser implements BeanDefinitionParser {
 
 	@Override
 	@Nullable
-	public BeanDefinition parse(Element element, ParserContext parserContext) {
-		AopNamespaceUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(parserContext, element);
+	public BeanDefinition parse(Element element, ParserContext parserContext) {		// <aop:aspectj-autoproxy>
+		// 1、注册 AnnotationAwareAspectJAutoProxyCreator
+		AopNamespaceUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(parserContext, element);		// 02、Sz^Rbp$g2#vU
 		extendBeanDefinition(element, parserContext);
 		return null;
 	}
 
 	private void extendBeanDefinition(Element element, ParserContext parserContext) {
-		BeanDefinition beanDef =
-				parserContext.getRegistry().getBeanDefinition(AopConfigUtils.AUTO_PROXY_CREATOR_BEAN_NAME);
+		// 01、beanDef = {RootBeanDefinition@2217} "Root bean: class [org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator]"
+		BeanDefinition beanDef = parserContext.getRegistry().getBeanDefinition(AopConfigUtils.AUTO_PROXY_CREATOR_BEAN_NAME);
+		// 02、处理子标签 <aop:include/>，指定 @Aspect 类，支持正则表达式，符合该表达式的切面类才会被应用
 		if (element.hasChildNodes()) {
 			addIncludePatterns(element, parserContext, beanDef);
 		}

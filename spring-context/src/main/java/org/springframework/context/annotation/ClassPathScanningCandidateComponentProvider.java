@@ -312,7 +312,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 			return addCandidateComponentsFromIndex(this.componentsIndex, basePackage);
 		}
 		else {
-			return scanCandidateComponents(basePackage);
+			return scanCandidateComponents(basePackage);	// =>>
 		}
 	}
 
@@ -414,19 +414,36 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 
 	private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
-		try {
+		try {	// packageSearchPath = "classpath*:org/springframework/beans/bean/aop/**/*.class"
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
 			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
-			for (Resource resource : resources) {
+			for (Resource resource : resources) { //
 				if (traceEnabled) {
 					logger.trace("Scanning " + resource);
 				}
 				if (resource.isReadable()) {
-					try {
+					try { // metadataReader = {SimpleMetadataReader@2670}，记录了标注了哪些注解
 						MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
+						/*
+						 * 通过 excludeFilters 和 includeFilters 过滤判断一下，是否需要扫描
+						 * this.includeFilters = {LinkedList@2350}  size = 3
+						 * 		0 = {AnnotationTypeFilter@3158}  --- "interface org.springframework.stereotype.Component"
+						 * 			注意：@Component 的子类注解有：
+						 * 				@Configuration
+						 * 				@Controller
+						 * 					@RestController
+						 * 				@Service
+						 * 				@Repository
+						 *
+						 * 				其它 ...
+						 *
+						 * 	    // 下面这两种不关注
+						 * 		1 = {AnnotationTypeFilter@3159}  --- "interface javax.annotation.ManagedBean"
+						 * 		2 = {AnnotationTypeFilter@3160}  --- "interface javax.inject.Named"
+						 */
 						if (isCandidateComponent(metadataReader)) {
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 							sbd.setSource(resource);

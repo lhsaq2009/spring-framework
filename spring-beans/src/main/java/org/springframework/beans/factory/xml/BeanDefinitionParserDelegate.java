@@ -234,9 +234,17 @@ public class BeanDefinitionParserDelegate {
 	private final ParseState parseState = new ParseState();
 
 	/**
-	 * Stores all used bean names so we can enforce uniqueness on a per
-	 * beans-element basis. Duplicate bean ids/names may not exist within the
-	 * same level of beans element nesting, but may be duplicated across levels.
+	 * Stores all used bean names so we can enforce uniqueness on a per beans-element basis.
+	 * Duplicate bean ids/names may not exist within the same level of beans element nesting, but may be duplicated across levels.
+	 *
+	 * CASE：<bean> 标签被解析时，会将 BeanName 收集起来：
+	 *
+	 * 			   BeanDefinitionParserDelegate.checkNameUniqueness(String, List, Element)
+	 * 			   BeanDefinitionParserDelegate.parseBeanDefinitionElement(Element, BeanDefinition)
+	 * 			   BeanDefinitionParserDelegate.parseBeanDefinitionElement(Element)
+	 * 		DefaultBeanDefinitionDocumentReader.processBeanDefinition(Element, BeanDefinitionParserDelegate)
+	 * 		DefaultBeanDefinitionDocumentReader.parseDefaultElement(Element, BeanDefinitionParserDelegate)
+	 * 		DefaultBeanDefinitionDocumentReader.parseBeanDefinitions(Element, BeanDefinitionParserDelegate)
 	 */
 	private final Set<String> usedNames = new HashSet<>();
 
@@ -245,7 +253,7 @@ public class BeanDefinitionParserDelegate {
 	 * Create a new BeanDefinitionParserDelegate associated with the supplied
 	 * {@link XmlReaderContext}.
 	 */
-	public BeanDefinitionParserDelegate(XmlReaderContext readerContext) {
+	public BeanDefinitionParserDelegate(XmlReaderContext readerContext) {		//
 		Assert.notNull(readerContext, "XmlReaderContext must not be null");
 		this.readerContext = readerContext;
 	}
@@ -421,7 +429,7 @@ public class BeanDefinitionParserDelegate {
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {  // N5m!Qut@8ARA
 		String id = ele.getAttribute(ID_ATTRIBUTE);							// 解析 id=""，beanName
-		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);					// 解析 name=""，别名
+		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);							// 解析 name=""，别名
 
 		List<String> aliases = new ArrayList<>();
 		if (StringUtils.hasLength(nameAttr)) {
@@ -438,7 +446,7 @@ public class BeanDefinitionParserDelegate {
 		}
 		// 只有处于 <beans> 下面的 <bean> 才会被解析
 		if (containingBean == null) {
-			checkNameUniqueness(beanName, aliases, ele);					// 通过 set 判重
+			checkNameUniqueness(beanName, aliases, ele);					// 注册名字；其次通过 Set 判重，单例不允许重复
 		}
 
 		/*
@@ -454,7 +462,7 @@ public class BeanDefinitionParserDelegate {
 		 *                 ...
 		 *     ...
 		 */
-		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
+		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);	// =>>
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {							// <bean ...> 没有 id，也没有 name ..
 				try {
@@ -1424,17 +1432,45 @@ public class BeanDefinitionParserDelegate {
 	 * @param containingBd the containing bean definition (if any)
 	 * @return the resulting bean definition
 	 */
+	/**
+	 * ele = {DeferredElementNSImpl@2199} "[aop:config: null]"
+	 * 		namespaceURI = "http://www.springframework.org/schema/aop"
+	 * 		name = "aop:config"
+	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
+		// 01、根据标签，获取所属命名空间 URL
 		String namespaceUri = getNamespaceURI(ele);
 		if (namespaceUri == null) {
 			return null;
 		}
-		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
+		/**
+		 * 02、根据命名空间 URL，去获取 handler 解析器
+		 * this.readerContext = {XmlReaderContext@2201}
+		 * 		reader = {XmlBeanDefinitionReader@2249}
+		 * 		namespaceHandlerResolver = {DefaultNamespaceHandlerResolver@2186}
+		 * 			handlerMappingsLocation = "META-INF/spring.handlers"
+		 * 			handlerMappings = {ConcurrentHashMap@2190}
+		 * 				"http://www.springframework.org/schema/aop" 	-> "org.springframework.aop.config.AopNamespaceHandler"
+		 * 				"http://www.springframework.org/schema/task" 	-> "org.springframework.scheduling.config.TaskNamespaceHandler"
+		 * 				"http://www.springframework.org/schema/lang" 	-> "org.springframework.scripting.config.LangNamespaceHandler"
+		 * 				"http://www.springframework.org/schema/c" 		-> "org.springframework.beans.factory.xml.SimpleConstructorNamespaceHandler"
+		 * 				"http://www.springframework.org/schema/jee" 	-> "org.springframework.ejb.config.JeeNamespaceHandler"
+		 * 				"http://www.springframework.org/schema/cache" 	-> "org.springframework.cache.config.CacheNamespaceHandler"
+		 * 				"http://www.springframework.org/schema/jdbc" 	-> "org.springframework.jdbc.config.JdbcNamespaceHandler"
+		 * 				"http://www.springframework.org/schema/p" 		-> "org.springframework.beans.factory.xml.SimplePropertyNamespaceHandler"
+		 * 				"http://www.springframework.org/schema/util" 	-> "org.springframework.beans.factory.xml.UtilNamespaceHandler"
+		 * 				"http://www.springframework.org/schema/tx" 		-> "org.springframework.transaction.config.TxNamespaceHandler"
+		 * 				"http://www.springframework.org/schema/context" -> "org.springframework.context.config.ContextNamespaceHandler"
+		 * 		resource = {DefaultResourceLoader$ClassPathContextResource@2755}
+		 * 			path = "spring.xml"
+		 */
+		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);	// =>>
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
 			return null;
 		}
+		// 3、使用 解析器 解析 标签
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 

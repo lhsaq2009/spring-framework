@@ -102,8 +102,8 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 	 * @param proxyFactory the ProxyFactory for the bean
 	 */
 	protected void evaluateProxyInterfaces(Class<?> beanClass, ProxyFactory proxyFactory) {
-		Class<?>[] targetInterfaces = ClassUtils.getAllInterfacesForClass(beanClass, getProxyClassLoader());
-		boolean hasReasonableProxyInterface = false;
+		Class<?>[] targetInterfaces = ClassUtils.getAllInterfacesForClass(beanClass, getProxyClassLoader());	// 0 = {Class@2586} "interface org.springframework.beans.bean.aop.ArithmeticCalculator"
+		boolean hasReasonableProxyInterface = false;		// 检查是否存在可以 代理的 接口
 		for (Class<?> ifc : targetInterfaces) {
 			if (!isConfigurationCallbackInterface(ifc) && !isInternalLanguageInterface(ifc) &&
 					ifc.getMethods().length > 0) {
@@ -113,7 +113,7 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 		}
 		if (hasReasonableProxyInterface) {
 			// Must allow for introductions; can't just set interfaces to the target's interfaces only.
-			for (Class<?> ifc : targetInterfaces) {
+			for (Class<?> ifc : targetInterfaces) {		// 遍历接口
 				proxyFactory.addInterface(ifc);
 			}
 		}
@@ -130,7 +130,7 @@ public class ProxyProcessorSupport extends ProxyConfig implements Ordered, BeanC
 	 * @param ifc the interface to check
 	 * @return whether the given interface is just a container callback
 	 */
-	protected boolean isConfigurationCallbackInterface(Class<?> ifc) {
+	protected boolean isConfigurationCallbackInterface(Class<?> ifc) {		// 得使你自己的写接口，不能用这些这些特殊接口
 		return (InitializingBean.class == ifc || DisposableBean.class == ifc || Closeable.class == ifc ||
 				AutoCloseable.class == ifc || ObjectUtils.containsElement(ifc.getInterfaces(), Aware.class));
 	}

@@ -71,7 +71,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 
 	/**
 	 * 总结：判断当前 bean 是否实现了某个指定的 Aware 接口，并调用对应 Aware 的接口方法
-	 *      =>> ApplicationContextAwareProcessor#invokeAwareInterfaces(Object)
+	 *      =>> {@link ApplicationContextAwareProcessor#invokeAwareInterfaces(Object)}
 	 * Create a new ApplicationContextAwareProcessor for the given context.
 	 */
 	public ApplicationContextAwareProcessor(ConfigurableApplicationContext applicationContext) {

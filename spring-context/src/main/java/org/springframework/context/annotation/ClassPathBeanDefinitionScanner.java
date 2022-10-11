@@ -249,15 +249,35 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @return number of beans registered
 	 */
 	public int scan(String... basePackages) {
+		/*
+		 * beanCountAtScanStart = 5
+		 *
+		 * =>> AbstractApplicationContext.getBeanDefinitionCount
+		 * =>> AbstractRefreshableApplicationContext.getBeanFactory
+		 * 	   DefaultListableBeanFactory beanFactory = this.beanFactory;
+		 * =>> DefaultListableBeanFactory.beanDefinitionMap
+		 *
+		 * DefaultListableBeanFactory.beanDefinitionNames = {ArrayList@1961}  size = 5
+		 * 		0 = "org.springframework.context.annotation.internalConfigurationAnnotationProcessor"
+		 * 		1 = "org.springframework.context.annotation.internalAutowiredAnnotationProcessor"
+		 * 		2 = "org.springframework.context.annotation.internalCommonAnnotationProcessor"
+		 * 		3 = "org.springframework.context.event.internalEventListenerProcessor"
+		 * 		4 = "org.springframework.context.event.internalEventListenerFactory"
+		 */
 		int beanCountAtScanStart = this.registry.getBeanDefinitionCount();
 
+		// basePackages =>> "classpath*:org/springframework/beans/bean/**/*.class"
+		/*
+		 * =>> ClassPathScanningCandidateComponentProvider.findCandidateComponents，遍历每个 basePackage
+		 * =>> ClassPathScanningCandidateComponentProvider.scanCandidateComponents，根据 basePackage 找到对应的编译后的 .class 文件
+		 */
 		doScan(basePackages);
 
-		// Register annotation config processors, if necessary.
+		// 如有必要，请注册 注释配置处理器。Register annotation config processors, if necessary.
 		if (this.includeAnnotationConfig) {
-			AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
+			AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);		// TODO：本次例子，发现执行了什么内容
 		}
-
+		// 得到实际开发者注册的 Bean，不包含框架注册的 Bean
 		return (this.registry.getBeanDefinitionCount() - beanCountAtScanStart);
 	}
 
@@ -269,19 +289,21 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @param basePackages the packages to check for annotated classes
 	 * @return set of beans registered if any for tooling registration purposes (never {@code null})
 	 */
-	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
+	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {	//
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
 		for (String basePackage : basePackages) {
-			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);		// =>>
 			for (BeanDefinition candidate : candidates) {
+				// 解析：@Scope 获取作用于，默认单例
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
-				if (candidate instanceof AbstractBeanDefinition) {
+				if (candidate instanceof AbstractBeanDefinition) {			//
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
 				if (candidate instanceof AnnotatedBeanDefinition) {
+					// 收集定义信息：@Lazy，@Primary，@DependsOn，@Role，@Description，到 AnnotatedBeanDefinition
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
 				if (checkCandidate(beanName, candidate)) {
@@ -289,6 +311,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 					definitionHolder =
 							AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 					beanDefinitions.add(definitionHolder);
+					// 将 BeanDefinition 等 Bean 定义信息缓存到 BeanFactory
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}

@@ -120,6 +120,12 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 		if (handlerOrClassName == null) {
 			return null;
 		}
+		/**
+		 * 如果 value 是 String 的全类名则去实例化，第二次进来判断是 NamespaceHandler 实例就直接返回
+		 * handlerMappings = {ConcurrentHashMap@2178}
+		 * 		table = {ConcurrentHashMap$Node[32]@2710}
+		 * 			"http://www.springframework.org/schema/aop" -> {AopNamespaceHandler@2249}
+		 */
 		else if (handlerOrClassName instanceof NamespaceHandler) {
 			return (NamespaceHandler) handlerOrClassName;
 		}
@@ -132,7 +138,7 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 							"] does not implement the [" + NamespaceHandler.class.getName() + "] interface");
 				}
 				NamespaceHandler namespaceHandler = (NamespaceHandler) BeanUtils.instantiateClass(handlerClass);
-				namespaceHandler.init();
+				namespaceHandler.init();	// =>>
 				handlerMappings.put(namespaceUri, namespaceHandler);
 				return namespaceHandler;
 			}

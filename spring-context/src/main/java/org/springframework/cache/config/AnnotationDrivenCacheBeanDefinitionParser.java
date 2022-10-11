@@ -102,7 +102,7 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 	}
 
 	private void registerCacheAdvisor(Element element, ParserContext parserContext) {
-		AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
+		AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);	// PPArf8u7^Nbw
 		SpringCachingConfigurer.registerCacheAdvisor(element, parserContext);
 		if (jsr107Present && jcacheImplPresent) {
 			JCacheCachingConfigurer.registerCacheAdvisor(element, parserContext);

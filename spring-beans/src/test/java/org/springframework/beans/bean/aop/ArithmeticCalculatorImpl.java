@@ -1,5 +1,7 @@
 package org.springframework.beans.bean.aop;
 
+import org.springframework.stereotype.Service;
+
 /**
  * <p>〈功能概述〉.
  *

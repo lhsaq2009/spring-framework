@@ -83,7 +83,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	 * List of MethodInterceptor and InterceptorAndDynamicMethodMatcher
 	 * that need dynamic checks.
 	 */
-	protected final List<?> interceptorsAndDynamicMethodMatchers;
+	protected final List<?> interceptorsAndDynamicMethodMatchers;	//
 
 	/**
 	 * Index from 0 of the current interceptor we're invoking.
@@ -105,7 +105,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 	 * as far as was possibly statically. Passing an array might be about 10% faster,
 	 * but would complicate the code. And it would work only for static pointcuts.
 	 */
-	protected ReflectiveMethodInvocation(
+	protected ReflectiveMethodInvocation(    //
 			Object proxy, @Nullable Object target, Method method, @Nullable Object[] arguments,
 			@Nullable Class<?> targetClass, List<Object> interceptorsAndDynamicMethodMatchers) {
 
@@ -157,7 +157,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 
 	@Override
 	@Nullable
-	public Object proceed() throws Throwable {
+	public Object proceed() throws Throwable {   //
 		// We start with an index of -1 and increment early.
 		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
 			return invokeJoinpoint();
@@ -183,7 +183,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		else {
 			// It's an interceptor, so we just invoke it: The pointcut will have
 			// been evaluated statically before this object was constructed.
-			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
+			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this); // =>>
 		}
 	}
 

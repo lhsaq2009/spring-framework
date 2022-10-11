@@ -80,9 +80,9 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * from the given XML file and automatically refreshing the context.
 	 * @param configLocation resource location
 	 * @throws BeansException if context creation failed
-	 */
+	 */ // configLocation = "spring.xml"
 	public ClassPathXmlApplicationContext(String configLocation) throws BeansException {
-		this(new String[] {configLocation}, true, null);
+		this(new String[] {configLocation}, true, null);	//
 	}
 
 	/**
@@ -134,18 +134,17 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * @throws BeansException if context creation failed
 	 * @see #refresh()
 	 */
-	// eg：refresh = true，parent = null
+	// eg：refresh = true，parent = null，refresh = true，parent = null
 	public ClassPathXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
 
-		super(parent);
+		super(parent);		// =>>
 		setConfigLocations(configLocations);
 		if (refresh) {
 			refresh();		// TODO：=>> 又是一个重点，2022-08-25
 		}
 	}
-
 
 	/**
 	 * Create a new ClassPathXmlApplicationContext, loading the definitions

@@ -42,6 +42,24 @@ public interface PropertyEditorRegistrar {
 	 * method (since {@code PropertyEditors} are not threadsafe).
 	 * @param registry the {@code PropertyEditorRegistry} to register the
 	 * custom {@code PropertyEditors} with
+	 *
+	 * <br><p></p>
+	 *
+	 * 添加数据：
+	 * =>> {@link org.springframework.context.support.AbstractApplicationContext#refresh}
+	 *     =>> {@link org.springframework.context.support.AbstractApplicationContext#prepareBeanFactory}
+	 *         // ConfigurableBeanFactory#addPropertyEditorRegistrar(PropertyEditorRegistrar) --> AbstractBeanFactory#propertyEditorRegistrars 集合
+	 * 		   beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
+	 *
+	 * getBean(..) 反射创建实例后，回调开始注册：
+	 * =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#doCreateBean}
+	 *     =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#createBeanInstance}
+	 *         =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#instantiateBean}
+	 *             =>> {@link org.springframework.beans.factory.support.AbstractBeanFactory#initBeanWrapper}
+	 *                 =>> {@link org.springframework.beans.factory.support.AbstractBeanFactory#registerCustomEditors}
+	 *                         // public class ResourceEditorRegistrar implements PropertyEditorRegistrar
+	 *                     =>> {@link org.springframework.beans.support.ResourceEditorRegistrar#registerCustomEditors}
+	 *                         =>> 注册 editors 收集到 {@link PropertyEditorRegistrySupport#overriddenDefaultEditors}
 	 */
 	void registerCustomEditors(PropertyEditorRegistry registry);
 

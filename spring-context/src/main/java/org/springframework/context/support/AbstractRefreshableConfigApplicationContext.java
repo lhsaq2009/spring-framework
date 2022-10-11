@@ -40,7 +40,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 		implements BeanNameAware, InitializingBean {
 
 	@Nullable
-	private String[] configLocations;
+	private String[] configLocations;			// ["spring.xml"]
 
 	private boolean setIdCalled = false;
 
@@ -56,7 +56,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * @param parent the parent context
 	 */
 	public AbstractRefreshableConfigApplicationContext(@Nullable ApplicationContext parent) {
-		super(parent);
+		super(parent);				// =>>
 	}
 
 
@@ -78,7 +78,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 			Assert.noNullElements(locations, "Config locations must not be null");
 			this.configLocations = new String[locations.length];
 			for (int i = 0; i < locations.length; i++) {
-				this.configLocations[i] = resolvePath(locations[i]).trim();
+				this.configLocations[i] = resolvePath(locations[i]).trim();		// this.configLocations = {String[1]@1889} ["spring.xml"]
 			}
 		}
 		else {

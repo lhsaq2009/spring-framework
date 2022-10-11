@@ -65,7 +65,7 @@ public abstract class AutoProxyUtils {
 	 * @param beanName the name of the bean
 	 * @return whether the given bean should be proxied with its target class
 	 */
-	public static boolean shouldProxyTargetClass(
+	public static boolean shouldProxyTargetClass(		//
 			ConfigurableListableBeanFactory beanFactory, @Nullable String beanName) {
 
 		if (beanName != null && beanFactory.containsBeanDefinition(beanName)) {

@@ -31,6 +31,15 @@ import org.springframework.core.type.AnnotationMetadata;
 public interface ImportAware extends Aware {
 
 	/**
+	 * =>> AbstractAutowireCapableBeanFactory#initializeBean(..)
+	 *     =>> BeanPostProcessor#postProcessBeforeInitialization
+	 *         =>> ConfigurationClassPostProcessor.ImportAwareBeanPostProcessor#postProcessBeforeInitialization
+	 *             if (bean instanceof ImportAware) {
+	 *                 // ir = {ConfigurationClassParser$ImportStack@3421}  size = 0
+	 *                 ImportRegistry ir = this.beanFactory.getBean(IMPORT_REGISTRY_BEAN_NAME, ImportRegistry.class);
+	 *                 // importingClass = {SimpleAnnotationMetadata@3410}：标注了具有 @Import(..) 的注解的类
+	 *                 // 若该 Import Bean 未注册，则注册 -> bean.setImportMetadata(importingClass)
+	 *
 	 * Set the annotation metadata of the importing @{@code Configuration} class.
 	 */
 	void setImportMetadata(AnnotationMetadata importMetadata);

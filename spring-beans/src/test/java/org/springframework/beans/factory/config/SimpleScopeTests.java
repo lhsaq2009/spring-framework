@@ -39,7 +39,7 @@ import static org.springframework.core.testfixture.io.ResourceTestUtils.qualifie
  */
 public class SimpleScopeTests {
 
-	private DefaultListableBeanFactory beanFactory;
+	/*private DefaultListableBeanFactory beanFactory;
 
 
 	@BeforeEach
@@ -79,6 +79,6 @@ public class SimpleScopeTests {
 		assertThat(tb2).isNotSameAs(tb1);
 		TestBean tb3 = (TestBean) beanFactory.getBean("usesScope");
 		assertThat(tb1).isSameAs(tb3);
-	}
+	}*/
 
 }

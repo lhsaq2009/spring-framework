@@ -48,7 +48,7 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 * Stores the {@link BeanDefinitionParser} implementations keyed by the
 	 * local name of the {@link Element Elements} they handle.
 	 */
-	private final Map<String, BeanDefinitionParser> parsers = new HashMap<>();
+	private final Map<String, BeanDefinitionParser> parsers = new HashMap<>();	//
 
 	/**
 	 * Stores the {@link BeanDefinitionDecorator} implementations keyed by the
@@ -66,6 +66,10 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	/**
 	 * Parses the supplied {@link Element} by delegating to the {@link BeanDefinitionParser} that is
 	 * registered for that {@link Element}.
+	 *
+	 * element = {DeferredElementNSImpl@2194} "[aop:config: null]"
+	 * 		localName = "config"
+	 * 		name = "aop:config"
 	 */
 	@Override
 	@Nullable
@@ -81,7 +85,7 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	@Nullable
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
 		String localName = parserContext.getDelegate().getLocalName(element);
-		BeanDefinitionParser parser = this.parsers.get(localName);
+		BeanDefinitionParser parser = this.parsers.get(localName);		// localName = "config"
 		if (parser == null) {
 			parserContext.getReaderContext().fatal(
 					"Cannot locate BeanDefinitionParser for element [" + localName + "]", element);

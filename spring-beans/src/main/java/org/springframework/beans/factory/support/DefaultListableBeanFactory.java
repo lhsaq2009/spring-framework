@@ -157,7 +157,23 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	/** Resolver to use for checking if a bean definition is an autowire candidate. */
 	private AutowireCandidateResolver autowireCandidateResolver = SimpleAutowireCandidateResolver.INSTANCE;
 
-	/** Map from dependency type to corresponding autowired value. */
+	/**
+	 * 当依赖注入的期望类型是 Key，直接使用 Value 指定的实例；
+	 *
+	 * CASE 1：在 IOC refresh() -> prepareBeanFactory()，会添加 4个：
+	 *  =>> org.springframework.context.support.AbstractApplicationContext#refresh
+	 *      =>> AbstractApplicationContext#prepareBeanFactory(...)
+	 *      	beanFactory.registerResolvableDependency(BeanFactory.class, beanFactory);
+	 *          beanFactory.registerResolvableDependency(ResourceLoader.class, this);
+	 *          beanFactory.registerResolvableDependency(ApplicationEventPublisher.class, this);
+	 *          beanFactory.registerResolvableDependency(ApplicationContext.class, this);
+	 *
+	 *  this.resolvableDependencies = {ConcurrentHashMap@2745}
+	 * 		{Class@2709} "interface org.springframework.beans.factory.BeanFactory"			-> {DefaultListableBeanFactory@2744}
+	 * 		{Class@2179} "interface org.springframework.core.io.ResourceLoader" 			-> {AnnotationConfigApplicationContext@3159}
+	 * 		{Class@2713} "interface org.springframework.context.ApplicationEventPublisher" 	-> {AnnotationConfigApplicationContext@3159}
+	 * 		{Class@2714} "interface org.springframework.context.ApplicationContext" 		-> {AnnotationConfigApplicationContext@3159}
+	 */
 	private final Map<Class<?>, Object> resolvableDependencies = new ConcurrentHashMap<>(16);
 
 	/** Map of bean definition objects, keyed by bean name. */  // 存储 BeanName 和 Bean 的定义信息
@@ -181,7 +197,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	/** Cached array of bean definition names in case of frozen configuration. */
 	@Nullable
-	private volatile String[] frozenBeanDefinitionNames;
+	private volatile String[] frozenBeanDefinitionNames;		//
 
 	/** Whether bean definition metadata may be cached for all beans. */
 	private volatile boolean configurationFrozen;
@@ -913,7 +929,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}, getAccessControlContext());
 				}
 				else {
-					smartSingleton.afterSingletonsInstantiated();
+					smartSingleton.afterSingletonsInstantiated();		// =>
 				}
 			}
 		}
@@ -925,7 +941,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	//---------------------------------------------------------------------
 
 	@Override
-	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)	// <<= 14
+	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)	// <<= 14 Core
 			throws BeanDefinitionStoreException {
 
 		Assert.hasText(beanName, "Bean name must not be empty");
@@ -1553,11 +1569,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Nullable
 	protected String determineAutowireCandidate(Map<String, Object> candidates, DependencyDescriptor descriptor) {
 		Class<?> requiredType = descriptor.getDependencyType();
-		String primaryCandidate = determinePrimaryCandidate(candidates, requiredType);
+		String primaryCandidate = determinePrimaryCandidate(candidates, requiredType);				// primary 属性？
 		if (primaryCandidate != null) {
 			return primaryCandidate;
 		}
-		String priorityCandidate = determineHighestPriorityCandidate(candidates, requiredType);
+		String priorityCandidate = determineHighestPriorityCandidate(candidates, requiredType);		// @order(1)??
 		if (priorityCandidate != null) {
 			return priorityCandidate;
 		}

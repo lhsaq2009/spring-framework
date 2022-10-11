@@ -31,7 +31,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * @since 3.1
  * @see EnableAspectJAutoProxy
  */
-class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
+class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {		//
 
 	/**
 	 * Register, escalate, and configure the AspectJ auto proxy creator based on the value
@@ -41,16 +41,18 @@ class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 	@Override
 	public void registerBeanDefinitions(
 			AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-
+		// 向容器注册 AspectJAnnotationAutoProxyCreator
 		AopConfigUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(registry);
 
 		AnnotationAttributes enableAspectJAutoProxy =
 				AnnotationConfigUtils.attributesFor(importingClassMetadata, EnableAspectJAutoProxy.class);
+		// 如果 @EnableAspectJAutoProxy 上存在标签内容
 		if (enableAspectJAutoProxy != null) {
-			if (enableAspectJAutoProxy.getBoolean("proxyTargetClass")) {
+			// 如果 proxyTargetClass 为 true，则强制指定 AutoProxyCreator 使用 CGLIB 进行代理
+			if (enableAspectJAutoProxy.getBoolean("proxyTargetClass")) {		//
 				AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 			}
-			if (enableAspectJAutoProxy.getBoolean("exposeProxy")) {
+			if (enableAspectJAutoProxy.getBoolean("exposeProxy")) {			// 是否开启 exposeProxy 特性
 				AopConfigUtils.forceAutoProxyCreatorToExposeProxy(registry);
 			}
 		}

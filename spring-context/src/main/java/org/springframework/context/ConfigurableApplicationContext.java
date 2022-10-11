@@ -66,8 +66,9 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * to allow the LoadTimeWeaver to process all actual bean classes.
 	 * @since 2.5
 	 * @see org.springframework.instrument.classloading.LoadTimeWeaver
+	 * {@link org.springframework.context.annotation.LoadTimeWeavingConfiguration#loadTimeWeaver}
 	 */
-	String LOAD_TIME_WEAVER_BEAN_NAME = "loadTimeWeaver";
+	String LOAD_TIME_WEAVER_BEAN_NAME = "loadTimeWeaver";			// AOP 启用标志？
 
 	/**
 	 * Name of the {@link Environment} bean in the factory.
@@ -128,9 +129,9 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	ConfigurableEnvironment getEnvironment();
 
 	/**
-	 * Add a new BeanFactoryPostProcessor that will get applied to the internal
-	 * bean factory of this application context on refresh, before any of the
-	 * bean definitions get evaluated. To be invoked during context configuration.
+	 * 添加一个新的 BeanFactoryPostProcessor，它将在刷新时应用于此应用程序上下文的内部 bean 工厂，
+	 * 然后再评估任何 bean 定义。在上下文配置期间调用。
+	 * Add a new BeanFactoryPostProcessor that will get applied to the internal bean factory of this application context on refresh, before any of the bean definitions get evaluated. To be invoked during context configuration.
 	 * @param postProcessor the factory processor to register
 	 */
 	void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor);

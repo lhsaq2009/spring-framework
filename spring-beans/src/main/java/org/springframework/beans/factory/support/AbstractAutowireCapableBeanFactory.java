@@ -156,10 +156,30 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	private final Set<Class<?>> ignoredDependencyTypes = new HashSet<>();
 
 	/**
+	 * CASE 1：实例化注解上下文类，初始化 DefaultListableBeanFactory 会添加 3个：
+	 * 	=>> AnnotationConfigApplicationContext#AnnotationConfigApplicationContext()
+	 * 	    =>> GenericApplicationContext#GenericApplicationContext()
+	 * 	        this.beanFactory = new DefaultListableBeanFactory();
+	 * 	        =>> DefaultListableBeanFactory#DefaultListableBeanFactory()
+	 * 	            =>> AbstractAutowireCapableBeanFactory#AbstractAutowireCapableBeanFactory()
+	 * 	                ignoreDependencyInterface(BeanNameAware.class);
+	 *         			ignoreDependencyInterface(BeanFactoryAware.class);
+	 *         			ignoreDependencyInterface(BeanClassLoaderAware.class);
+	 *
+	 * CASE 2：在 IOC refresh() -> prepareBeanFactory()，会添加 6个：
+	 *  =>> org.springframework.context.support.AbstractApplicationContext#refresh
+	 *      =>> AbstractApplicationContext#prepareBeanFactory(...)
+	 * 			beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
+	 * 			beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
+	 * 			beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
+	 * 			beanFactory.ignoreDependencyInterface(ApplicationEventPublisherAware.class);
+	 * 			beanFactory.ignoreDependencyInterface(MessageSourceAware.class);
+	 * 			beanFactory.ignoreDependencyInterface(ApplicationContextAware.class);
+
 	 * Dependency interfaces to ignore on dependency check and autowire, as Set of
 	 * Class objects. By default, only the BeanFactory interface is ignored.
 	 */
-	private final Set<Class<?>> ignoredDependencyInterfaces = new HashSet<>();
+	private final Set<Class<?>> ignoredDependencyInterfaces = new HashSet<>();		// TODO：何时用到，实例化，看看装配
 
 	/**
 	 * The name of the currently created bean, for implicit dependency registration
@@ -416,7 +436,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return initializeBean(beanName, existingBean, null);
 	}
 
-	@Override
+	@Override  // AbstractAutowireCapableBeanFactory.initializeBean(..)
 	public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName)
 			throws BeansException {
 
@@ -444,10 +464,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		 *
 		 * 		3 = {CommonAnnotationBeanPostProcessor@2733}
 		 * 		4 = {AutowiredAnnotationBeanPostProcessor@2734}
-		 * 		5 = {ApplicationListenerDetector@2508}
+		 * 		5 = {AnnotationAwareAspectJAutoProxyCreator@2300}	------> AOP 动态代理
+		 * 		6 = {ApplicationListenerDetector@2508}
 		 */
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
-			Object current = processor.postProcessAfterInitialization(result, beanName);
+			Object current = processor.postProcessAfterInitialization(result, beanName);	// AnnotationAwareAspectJAutoProxyCreator 返回代理对象
 			if (current == null) {
 				return result;
 			}
@@ -535,7 +556,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 			Object beanInstance = doCreateBean(beanName, mbdToUse, args);		// =>> 07、getBean
 			if (logger.isTraceEnabled()) {
-				logger.trace("Finished creating instance of bean '" + beanName + "'");
+				logger.trace("Finished creati ng instance of bean '" + beanName + "'");
 			}
 			return beanInstance;
 		}
@@ -545,8 +566,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throw ex;
 		}
 		catch (Throwable ex) {
-			throw new BeanCreationException(
-					mbdToUse.getResourceDescription(), beanName, "Unexpected exception during bean creation", ex);
+			throw new BeanCreationException(mbdToUse.getResourceDescription(), beanName, "Unexpected exception during bean creation", ex);
 		}
 	}
 
@@ -579,14 +599,33 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			// =>> instantiateBean(beanName, mbd);											// ==> 09、通过无参构造函数创建对象
-			// =>> getInstantiationStrategy().instantiate(mbd, beanName, this);				// =>> 10、
-			//     eg：getInstantiationStrategy() = CglibSubclassingInstantiationStrategy
-			// =>> SimpleInstantiationStrategy#instantiate(..)
-			//     =>> BeanUtils.instantiateClass(constructorToUse);                        // =>> 11、
-			//	       =>> ctor.newInstance(argsWithDefaultValues);							// 反射创建对象
+			/*
+			 * instanceWrapper = {BeanWrapperImpl@3732} "org.springframework.beans.BeanWrapperImpl: wrapping object [org.springframework.beans.bean.aop.LoggingAdvisor2@346a361]"
+			 * 		wrappedObject = {LoggingAdvisor2@3731}
+			 * 		overriddenDefaultEditors = {HashMap@3929}  size = 12
+			 * 			{Class@54} "class java.io.Reader" 		-> {ReaderEditor@4198}
+			 * 			{Class@1943} "interface org.springframework.core.io.ContextResource" -> {ResourceEditor@3908}
+			 * 			{Class@271} "class java.io.File" 		-> {FileEditor@4199}
+			 * 			{Class@269} "class java.net.URL" 		-> {URLEditor@4200}
+			 * 			{Class@1224} "class java.net.URI" 		-> {URIEditor@4201}
+			 * 			{Class@321} "class java.lang.Class" 	-> {ClassEditor@4202}
+			 * 			{Class@273} "class java.io.InputStream" -> {InputStreamEditor@4203}
+			 * 			{Class@1229} "class org.xml.sax.InputSource" 	-> {InputSourceEditor@4204}
+			 * 			{Class@249} "class [Ljava.lang.Class;" 			-> {ClassArrayEditor@4205}
+			 * 			{Class@4206} "class [Lorg.springframework.core.io.Resource;" 	-> {ResourceArrayPropertyEditor@4207}
+			 * 			{Class@4208} "interface java.nio.file.Path" 	-> {PathEditor@4209}
+			 * 			{Class@1939} "interface org.springframework.core.io.Resource" 	-> {ResourceEditor@3908}
+			 *
+			 * =>> instantiateBean(beanName, mbd);											// ==> 09、通过无参构造函数创建对象
+			 * =>> getInstantiationStrategy().instantiate(mbd, beanName, this);				// =>> 10、
+			 *     eg：getInstantiationStrategy() = CglibSubclassingInstantiationStrategy
+			 * =>> SimpleInstantiationStrategy#instantiate(..)
+			 *     =>> BeanUtils.instantiateClass(constructorToUse);                        // =>> 11、
+			 *	       =>> ctor.newInstance(argsWithDefaultValues);							// 反射创建对象
+			 */
 			instanceWrapper = createBeanInstance(beanName, mbd, args);                      // =>> 08、后续略，基于注释展示后续调用
 		}
+		// 反射创建的原始对象
 		Object bean = instanceWrapper.getWrappedInstance();
 		Class<?> beanType = instanceWrapper.getWrappedClass();
 		if (beanType != NullBean.class) {
@@ -639,7 +678,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 * 为 Bean 实例，赋上 XML 配置里的 <property name="sex" value="boy"/> 属性值
 			 */
 			populateBean(beanName, mbd, instanceWrapper);						// =>> 填充实例属性
-			exposedObject = initializeBean(beanName, exposedObject, mbd);		// =>> 执行生命周期相关的方法，比如 afterPropertiesSet() 和 init-method 等等
+
+			/*
+			 * 01. this.invokeAwareMethods(..)
+			 * 	   	   BeanNameAware               --> bean.setBeanName(beanName)
+			 *         BeanClassLoaderAware        --> bean.setBeanClassLoader(bcl)
+			 *         BeanFactoryAware            --> bean.setBeanFactory(defaultListableBeanFactory)
+			 * 02. this.applyBeanPostProcessorsBeforeInitialization(..)
+			 * 		   for beanPostProcessors 	   --> BeanPostProcessor.postProcessBeforeInitialization
+			 * 			   =>> TODO：ConfigurationClassPostProcessor$ImportAwareBeanPostProcessor
+			 * 03. this.invokeInitMethods
+			 * 		   bean.afterPropertiesSet()
+			 * 		   this.invokeCustomInitMethod --> 配置的 init-method 方法
+			 * 04. this.applyBeanPostProcessorsAfterInitialization
+			 * 		   for beanPostProcessors	   --> BeanPostProcessor.postProcessAfterInitialization
+			 * 		       =>> 动态代理				：AnnotationAwareAspectJAutoProxyCreator
+			 * 			   =>> 收集监听器到广播器		：ApplicationListenerDetector
+			 */
+			exposedObject = initializeBean(beanName, exposedObject, mbd);		// =>> 执行生命周期相关的方法
 		}
 		catch (Throwable ex) {
 			if (ex instanceof BeanCreationException && beanName.equals(((BeanCreationException) ex).getBeanName())) {
@@ -1133,6 +1189,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see MergedBeanDefinitionPostProcessor#postProcessMergedBeanDefinition
 	 */
 	protected void applyMergedBeanDefinitionPostProcessors(RootBeanDefinition mbd, Class<?> beanType, String beanName) {
+		/*
+		 * getBeanPostProcessors() = {CopyOnWriteArrayList@2281}  size = 4
+		 * 		0 = {ApplicationContextAwareProcessor@2832}
+		 * 		1 = {PostProcessorRegistrationDelegate$BeanPostProcessorChecker@2833}
+		 * 			// 没走这里，它不是 MergedBeanDefinitionPostProcessor 实现类
+		 * 		2 = {AnnotationAwareAspectJAutoProxyCreator@2499} "proxyTargetClass=false; optimize=false; opaque=false; exposeProxy=false; frozen=false"
+		 * 		3 = {ApplicationListenerDetector@2834}
+		 */
 		for (BeanPostProcessor bp : getBeanPostProcessors()) {
 			if (bp instanceof MergedBeanDefinitionPostProcessor) {
 				MergedBeanDefinitionPostProcessor bdp = (MergedBeanDefinitionPostProcessor) bp;
@@ -1218,6 +1282,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
 
+		/**
+		 * mbd = {ConfigurationClassBeanDefinitionReader$ConfigurationClassBeanDefinition@3525}
+		 * 		derivedBeanName = "loadTimeWeaver"
+		 * 		factoryBeanName = "org.springframework.context.annotation.LoadTimeWeavingConfiguration"
+		 * 		factoryMethodName = "loadTimeWeaver"
+		 */
 		if (mbd.getFactoryMethodName() != null) {
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
@@ -1357,12 +1427,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, this);		// =>> 10、getBean
 			}
 			BeanWrapper bw = new BeanWrapperImpl(beanInstance);
-			initBeanWrapper(bw);
+			initBeanWrapper(bw);	// TODO：每个 Bean 实例都需要注册呀 ？？
 			return bw;
 		}
 		catch (Throwable ex) {
-			throw new BeanCreationException(
-					mbd.getResourceDescription(), beanName, "Instantiation of bean failed", ex);
+			throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Instantiation of bean failed", ex);
 		}
 	}
 
@@ -1841,9 +1910,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected Object initializeBean(String beanName, Object bean, @Nullable RootBeanDefinition mbd) {
 		/*
 		 * 01、调用 invokeAwareMethods(..)，内部：
-		 * 		如果 bean 实现了 BeanNameAware 接口，			则将 beanName    回调传给你
-		 * 		如果 bean 实现了 BeanClassLoaderAware 接口，	则将 ClassLoader 回调传给你
-		 * 		如果 bean 实现了 BeanFactoryAware 接口，		则将 beanFactory 回调传给你
+		 * 		BeanNameAware 				--> bean.setBeanName(beanName)
+		 * 		BeanClassLoaderAware		--> bean.setBeanClassLoader(bcl)
+		 * 		BeanFactoryAware			--> bean.setBeanFactory(defaultListableBeanFactory)
 		 */
 		if (System.getSecurityManager() != null) {
 			AccessController.doPrivileged((PrivilegedAction<Object>) () -> {

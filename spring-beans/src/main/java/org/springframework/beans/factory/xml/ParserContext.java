@@ -17,6 +17,7 @@
 package org.springframework.beans.factory.xml;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.lang.Nullable;
+import org.w3c.dom.Element;
 
 /**
  * Context that gets passed along a bean definition parsing process,
@@ -40,13 +42,44 @@ import org.springframework.lang.Nullable;
  */
 public final class ParserContext {
 
-	private final XmlReaderContext readerContext;
+	private final XmlReaderContext readerContext;						//
 
-	private final BeanDefinitionParserDelegate delegate;
+	private final BeanDefinitionParserDelegate delegate;				//
 
 	@Nullable
 	private BeanDefinition containingBeanDefinition;
-
+	/**
+	 * TODO：总结把相关的 beanDefinition 组合到一起，便于使用。
+	 *
+	 * push：
+	 * 		解析 <aop:config> 时
+	 *      {@link org.springframework.aop.config.ConfigBeanDefinitionParser#parse}
+	 *       	CompositeComponentDefinition compositeDef = ...
+	 *       	parserContext.pushContainingComponent(compositeDef);
+	 *
+	 * read：{@link ParserContext#registerComponent} =>> getContainingComponent()
+	 *
+	 * ---------------------------------------------
+	 *
+	 * containingComponents = {ArrayDeque@2191}  size = 2
+	 * 		1 = {CompositeComponentDefinition@2192} "aop:config"
+	 * 			name = "aop:config"
+	 *			nestedComponents = {ArrayList@2199}  size = 3
+	 * 				0 = {BeanComponentDefinition@2210} "Bean definition with name 'org.springframework.aop.config.internalAutoProxyCreator'"
+	 * 				1 = {PointcutComponentDefinition@2235} "Pointcut <name='pointcut', expression=[execution(* org.springframework.beans.bean.aop.ArithmeticCalculator.*(int, int))]>"
+	 * 				2 = {AdvisorComponentDefinition@2242} "Advisor <advice(ref)='loggingAdvisor', pointcut(ref)='pointcut'>"
+	 *
+	 * 				// 从 containingComponents 下面，转移到所属的这个组下面
+	 *		 		4 = {AspectComponentDefinition@2249} ""
+	 *		 			name = ""
+	 *		 			beanDefinitions = {BeanDefinition[2]@2251}
+	 *		 				0 = {RootBeanDefinition@2257} "Root bean: class [org.springframework.aop.aspectj.AspectJPointcutAdvisor]"
+	 *		 				1 = {RootBeanDefinition@2258} "Root bean: class [org.springframework.aop.aspectj.AspectJPointcutAdvisor]"
+	 *		 			beanReferences = {BeanReference[3]@2252}
+	 *		 				0 = {RuntimeBeanReference@2261} "<loggingAspect>"
+	 *		 				1 = {RuntimeBeanReference@2262} "<pointcut>"
+	 *		 				2 = {RuntimeBeanReference@2263} "<pointcut>"
+	 */
 	private final Deque<CompositeComponentDefinition> containingComponents = new ArrayDeque<>();
 
 
@@ -95,7 +128,7 @@ public final class ParserContext {
 	}
 
 	@Nullable
-	public CompositeComponentDefinition getContainingComponent() {
+	public CompositeComponentDefinition getContainingComponent() {		//
 		return this.containingComponents.peek();
 	}
 
