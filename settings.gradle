@@ -33,6 +33,7 @@ include "spring-websocket"
 include "framework-bom"
 include "integration-tests"
 include "spring-boot-study"
+include "spring-5.0.2-study"
 
 rootProject.name = "spring"
 rootProject.children.each {project ->
