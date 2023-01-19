@@ -44,6 +44,19 @@ import org.springframework.util.Assert;
  * @see #execute
  * @see #setTransactionManager
  * @see org.springframework.transaction.PlatformTransactionManager
+ *
+ * ---------------------------------------------------------------
+ *
+ *                                                                 TransactionDefinition
+ *                                                                       ▲ ▲
+ *                     ┌──────────────────────────┬──────────────────────┘ │
+ *                     │                          │                        │              TransactionOperations
+ * DelegatingTransactionDefinition  TransactionAttribute    DefaultTransactionDefinition       InitializingBean
+ *                     ▲                        ▲ ▲                        ▲ ▲                        ▲
+ *                     │ ┌──────────────────────┘ └──────────────────────┐ │ └──────────────────────┐ │
+ *                     │ │                                  DefaultTransactionAttribute    TransactionTemplate
+ *                     │ │                                                 ▲
+ * DelegatingTransactionAttribute ( abstract )            RuleBasedTransactionAttribute
  */
 @SuppressWarnings("serial")
 public class TransactionTemplate extends DefaultTransactionDefinition
@@ -53,7 +66,7 @@ public class TransactionTemplate extends DefaultTransactionDefinition
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	@Nullable
-	private PlatformTransactionManager transactionManager;
+	private PlatformTransactionManager transactionManager;			//
 
 
 	/**
@@ -118,7 +131,9 @@ public class TransactionTemplate extends DefaultTransactionDefinition
 			return ((CallbackPreferringPlatformTransactionManager) this.transactionManager).execute(this, action);
 		}
 		else {
-			TransactionStatus status = this.transactionManager.getTransaction(this);
+			// this.transactionManager = {DataSourceTransactionManager@5129}
+			// definition = {TransactionTemplate@5112} "PROPAGATION_REQUIRES_NEW,ISOLATION_DEFAULT,timeout_30000"
+			TransactionStatus status = this.transactionManager.getTransaction(this);		// =>>
 			T result;
 			try {
 				result = action.doInTransaction(status);
@@ -133,7 +148,7 @@ public class TransactionTemplate extends DefaultTransactionDefinition
 				rollbackOnException(status, ex);
 				throw new UndeclaredThrowableException(ex, "TransactionCallback threw undeclared checked exception");
 			}
-			this.transactionManager.commit(status);
+			this.transactionManager.commit(status);		// =>>
 			return result;
 		}
 	}
