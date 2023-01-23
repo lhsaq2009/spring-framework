@@ -54,7 +54,7 @@ public interface BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 */
-	@Nullable  // populated 之后，afterPropertiesSet、custom init-method 之前执行
+	@Nullable	// populated 之后，afterPropertiesSet、custom init-method 之「前」执行
 	default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
@@ -80,7 +80,7 @@ public interface BeanPostProcessor {
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.beans.factory.FactoryBean
 	 */
-	@Nullable   // 在调用 init-method、afterPropertiesSet 之后执行
+	@Nullable	// populated 之后，afterPropertiesSet、custom init-method 之「后」执行
 	default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
