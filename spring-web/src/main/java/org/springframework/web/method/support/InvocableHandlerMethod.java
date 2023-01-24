@@ -171,6 +171,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	protected Object doInvoke(Object... args) throws Exception {
 		ReflectionUtils.makeAccessible(getBridgedMethod());
 		try {
+			// CASE 1. getBridgedMethod() = {Method@5887} "public HashMap TransactionController.transactional()"
 			return getBridgedMethod().invoke(getBean(), args);
 		}
 		catch (IllegalArgumentException ex) {
