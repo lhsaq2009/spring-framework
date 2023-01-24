@@ -584,30 +584,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		if (instanceWrapper == null) {
 			/*
-			 * instanceWrapper = {BeanWrapperImpl@3732} "org.springframework.beans.BeanWrapperImpl: wrapping object [org.springframework.beans.bean.aop.LoggingAdvisor2@346a361]"
+			 * instanceWrapper = {BeanWrapperImpl@3732} "BeanWrapperImpl: wrapping object [LoggingAdvisor2@346a361]"
 			 * 		wrappedObject = {LoggingAdvisor2@3731}
-			 * 		overriddenDefaultEditors = {HashMap@3929}  size = 12
-			 * 			{Class@54} "class java.io.Reader" 		-> {ReaderEditor@4198}
-			 * 			{Class@1943} "interface org.springframework.core.io.ContextResource" -> {ResourceEditor@3908}
-			 * 			{Class@271} "class java.io.File" 		-> {FileEditor@4199}
-			 * 			{Class@269} "class java.net.URL" 		-> {URLEditor@4200}
-			 * 			{Class@1224} "class java.net.URI" 		-> {URIEditor@4201}
-			 * 			{Class@321} "class java.lang.Class" 	-> {ClassEditor@4202}
-			 * 			{Class@273} "class java.io.InputStream" -> {InputStreamEditor@4203}
-			 * 			{Class@1229} "class org.xml.sax.InputSource" 	-> {InputSourceEditor@4204}
-			 * 			{Class@249} "class [Ljava.lang.Class;" 			-> {ClassArrayEditor@4205}
-			 * 			{Class@4206} "class [Lorg.springframework.core.io.Resource;" 	-> {ResourceArrayPropertyEditor@4207}
-			 * 			{Class@4208} "interface java.nio.file.Path" 	-> {PathEditor@4209}
-			 * 			{Class@1939} "interface org.springframework.core.io.Resource" 	-> {ResourceEditor@3908}
+			 *      ...
 			 *
 			 * =>> instantiateBean(beanName, mbd);											// ==> 09、通过无参构造函数创建对象
-			 * =>> getInstantiationStrategy().instantiate(mbd, beanName, this);				// =>> 10、
-			 *     eg：getInstantiationStrategy() = CglibSubclassingInstantiationStrategy
-			 * =>> SimpleInstantiationStrategy#instantiate(..)
-			 *     =>> BeanUtils.instantiateClass(constructorToUse);                        // =>> 11、
-			 *	       =>> ctor.newInstance(argsWithDefaultValues);							// 反射创建对象
+			 * 	   getInstantiationStrategy() = CglibSubclassingInstantiationStrategy
+			 *     =>> getInstantiationStrategy().instantiate(mbd, beanName, this);			// =>> 10、
+			 *         =>> SimpleInstantiationStrategy.instantiate(..)
+			 *             =>> BeanUtils.instantiateClass(constructorToUse);                // =>> 11、
+			 *                 =>> ctor.newInstance(argsWithDefaultValues);					// 反射创建对象
 			 */
-			instanceWrapper = createBeanInstance(beanName, mbd, args);                      // =>> 08、后续略，基于注释展示后续调用
+			instanceWrapper = createBeanInstance(beanName, mbd, args);                      // =>> 08、基于构造器反射创建对象
 		}
 		// 反射创建的原始对象
 		Object bean = instanceWrapper.getWrappedInstance();
