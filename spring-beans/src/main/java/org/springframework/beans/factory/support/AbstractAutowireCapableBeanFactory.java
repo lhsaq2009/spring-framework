@@ -631,6 +631,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
+		// 缓存单例到三级缓存中，以防循环依赖：迫切的缓存单例，以便能够解析循环引用，即使由 BeanFactoryAware 等生命周期接口触发。
+
 		// allowCircularReferences：默认为 true，在 Spring Boot 2.6.0 默认禁止循环引用
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));	// 正在创建的 Bean
@@ -639,7 +641,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
-			/** 回调匿名方法：{@link DefaultSingletonBeanRegistry#getSingleton(String, boolean)} */
+			/**
+			 * 存储位置：this.singletonFactories.put(beanName, singletonFactory);
+			 * ----------------------------------------------------------------
+			 * 何时回调：{@link DefaultSingletonBeanRegistry#getSingleton(String, boolean)}
+			 *         ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
+			 *         singletonObject = singletonFactory.getObject();
+			 */
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 		}
 		// 实例已经 "暴露"，为何这么讲，是在 () -> getEarlyBeanReference(beanName, mbd, bean) 第三个参数将 bean 暴漏出去。
