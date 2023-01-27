@@ -49,6 +49,8 @@ public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDef
 		if (parentName != null) {
 			builder.getRawBeanDefinition().setParentName(parentName);
 		}
+		// eg：<tx:advice 则创建对应 TransactionInterceptor 实例
+		// core，点进去 <tx:advice，可以看到 <xsd:element name="advice"> 对应的实现类类型
 		Class<?> beanClass = getBeanClass(element);
 		if (beanClass != null) {
 			builder.getRawBeanDefinition().setBeanClass(beanClass);
@@ -69,7 +71,7 @@ public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDef
 			// Default-lazy-init applies to custom bean definitions as well.
 			builder.setLazyInit(true);
 		}
-		doParse(element, parserContext, builder);
+		doParse(element, parserContext, builder);	// =>> 解析标签
 		return builder.getBeanDefinition();
 	}
 
