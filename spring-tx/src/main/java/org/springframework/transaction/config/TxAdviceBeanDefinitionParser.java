@@ -55,8 +55,32 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		return TransactionInterceptor.class;
 	}
 
+	/**
+	 * 03-CASE-1、示例解析结果，关键属性展示：
+	 *
+	 * attributeSourceDefinition = {RootBeanDefinition@3724}
+	 * 	 beanClass = {Class@3730} "NameMatchTransactionAttributeSource"
+	 * 	 propertyValues = {MutablePropertyValues@3733}
+	 * 		propertyValueList = {ArrayList@3738}  size = 1
+	 * 			0 = {PropertyValue@3759}
+	 * 				name = "nameMap"
+	 * 				value = {ManagedMap@3672}  size = 5
+	 *                  {TypedStringValue@3703}
+	 * 						key = {TypedStringValue@3703}
+	 * 							value = "purchase"
+	 * 						value = {RuleBasedTransactionAttribute@3704}
+	 *                             isolationLevel = 2
+	 *                             propagationBehavior = 3
+	 *                             readOnly = false
+	 *                             rollbackRules = {ArrayList@3825}  size = 3
+	 *                                 0 = {RollbackRuleAttribute@3827}   "[java.io.IOException]"
+	 *                                 1 = {RollbackRuleAttribute@3828}   "[java.sql.SQLException]"
+	 *                                 2 = {NoRollbackRuleAttribute@3829} "[java.lang.ArithmeticException]"
+	 *                             timeout = 30
+	 */
+
 	@Override
-	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {  // 解析 <tx:advice>
 		builder.addPropertyReference("transactionManager", TxNamespaceHandler.getTransactionManagerName(element));
 
 		List<Element> txAttributes = DomUtils.getChildElementsByTagName(element, ATTRIBUTES_ELEMENT);
@@ -64,10 +88,10 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 			parserContext.getReaderContext().error(
 					"Element <attributes> is allowed at most once inside element <advice>", element);
 		}
-		else if (txAttributes.size() == 1) {
+		else if (txAttributes.size() == 1) {	// 01、只有一个：<tx:attributes>
 			// Using attributes source.
 			Element attributeSourceElement = txAttributes.get(0);
-			RootBeanDefinition attributeSourceDefinition = parseAttributeSource(attributeSourceElement, parserContext);
+			RootBeanDefinition attributeSourceDefinition = parseAttributeSource(attributeSourceElement, parserContext);	// tx parse
 			builder.addPropertyValue("transactionAttributeSource", attributeSourceDefinition);
 		}
 		else {
@@ -77,8 +101,8 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		}
 	}
 
-	private RootBeanDefinition parseAttributeSource(Element attrEle, ParserContext parserContext) {
-		List<Element> methods = DomUtils.getChildElementsByTagName(attrEle, METHOD_ELEMENT);
+	private RootBeanDefinition parseAttributeSource(Element attrEle, ParserContext parserContext) {			// <tx:attributes>
+		List<Element> methods = DomUtils.getChildElementsByTagName(attrEle, METHOD_ELEMENT);				// <tx:method
 		ManagedMap<TypedStringValue, RuleBasedTransactionAttribute> transactionAttributeMap =
 				new ManagedMap<>(methods.size());
 		transactionAttributeMap.setSource(parserContext.extractSource(attrEle));
