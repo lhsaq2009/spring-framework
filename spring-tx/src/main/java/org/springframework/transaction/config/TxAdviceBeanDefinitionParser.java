@@ -88,14 +88,27 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 			parserContext.getReaderContext().error(
 					"Element <attributes> is allowed at most once inside element <advice>", element);
 		}
-		else if (txAttributes.size() == 1) {	// 01、只有一个：<tx:attributes>
+
+		/*
+		 * 在事务拦截器拦截时，获取指定方法的事务属性：
+		 *
+		 * {@link org.springframework.transaction.interceptor.TransactionAspectSupport#invokeWithinTransaction}
+		 *  =>> final TransactionAttribute txAttr = (tas != null ? tas.getTransactionAttribute(method, targetClass) : null);
+		 *
+		 *     CASE 1. NameMatchTransactionAttributeSource  -> nameMap -> <tx:method ../>
+		 *             =>> for nameMap -> match methodName
+		 *
+		 *     CASE 2. AnnotationTransactionAttributeSource -> @Transactional
+		 *             =>> TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass)
+		 */
+		else if (txAttributes.size() == 1) {	// CASE 1. 只有一个：<tx:attributes>
 			// Using attributes source.
 			Element attributeSourceElement = txAttributes.get(0);
 			RootBeanDefinition attributeSourceDefinition = parseAttributeSource(attributeSourceElement, parserContext);	// tx parse
 			builder.addPropertyValue("transactionAttributeSource", attributeSourceDefinition);
 		}
 		else {
-			// Assume annotations source.
+			// Assume annotations source.		// CASE 2. 启用 @Transactional，在 TransactionInterceptor 拦截时会去解析方法上的注解属性
 			builder.addPropertyValue("transactionAttributeSource",
 					new RootBeanDefinition("org.springframework.transaction.annotation.AnnotationTransactionAttributeSource"));
 		}
