@@ -3,6 +3,7 @@ package org.springframework.aop.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -43,7 +44,7 @@ import org.springframework.util.xml.DomUtils;
  * @author Ramnivas Laddad
  * @since 2.0
  */
-class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// <aop:config>
+class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// 用于解析：<aop:config>
 
 	private static final String ASPECT = "aspect";
 	private static final String EXPRESSION = "expression";
@@ -88,6 +89,8 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// <aop:conf
 				new CompositeComponentDefinition(element.getTagName(), parserContext.extractSource(element));
 		parserContext.pushContainingComponent(compositeDef);
 		/*
+		 * 注册：beanName = "internalAutoProxyCreator" --> {@link AspectJAwareAdvisorAutoProxyCreator}
+		 * -----------------------------------------------------------------------------------------
 		 * =>> AopNamespaceUtils.registerAspectJAutoProxyCreatorIfNecessary(..);
 		 * 	   BeanDefinition beanDefinition = registerOrEscalateApcAsRequired(AspectJAwareAdvisorAutoProxyCreator.class, registry, source);
 		 * 	   =>> AopConfigUtils.registerOrEscalateApcAsRequired(...)
@@ -102,13 +105,14 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// <aop:conf
 		configureAutoProxyCreator(parserContext, element);
 		/*
 		 * 得到 <aop:config> 的子标签：
+		 *
 		 * childElts = {ArrayList@2287}  size = 2
 		 * 		0 = {DeferredElementNSImpl@2264} "[aop:pointcut: null]"
-		 * 		1 = {DeferredElementNSImpl@2240} "[aop:advisor: null]"
-		 * 		2 = {DeferredElementNSImpl@2241} "[aop:aspect: null]"
+		 * 		1 = {DeferredElementNSImpl@2240} "[aop:advisor : null]"
+		 * 		2 = {DeferredElementNSImpl@2241} "[aop:aspect  : null]"
 		 */
 		List<Element> childElts = DomUtils.getChildElements(element);
-		for (Element elt: childElts) {
+		for (Element elt: childElts) {									// 按顺序定义，按顺序解析
 			String localName = parserContext.getDelegate().getLocalName(elt);
 			if (POINTCUT.equals(localName)) {							// <aop:pointcut>
 				parsePointcut(elt, parserContext);		// AspectJExpressionPointcut
@@ -148,12 +152,15 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// <aop:conf
 		try {
 			this.parseState.push(new AdvisorEntry(id));
 			String advisorBeanName = id;
+
+			// org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor
 			if (StringUtils.hasText(advisorBeanName)) {
 				parserContext.getRegistry().registerBeanDefinition(advisorBeanName, advisorDef);
 			}
 			else {
 				advisorBeanName = parserContext.getReaderContext().registerWithGeneratedName(advisorDef);
 			}
+
 			// 解析对应的 'pointcut' and 'pointcut-ref'，不允许同时配置
 			Object pointcut = parsePointcutProperty(advisorElement, parserContext);
 			// 配置了内联切点：pointcut="..."
@@ -244,7 +251,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// <aop:conf
 			boolean adviceFoundAlready = false;
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
-				// 判断子标签：before | after | after-returning | after-throwing | around
+				// 判断子标签：<aop:before method = ...，after | after-returning | after-throwing | around
 				if (isAdviceNode(node, parserContext)) {
 					// <aop:aspect ref=".."> 必须设置 ref，否则 代理谁呢. 这个 ref 只需解析一次就好，所有有个 adviceFoundAlready flag
 					if (!adviceFoundAlready) {
@@ -273,7 +280,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// <aop:conf
 					 *
 					 * ------------------------
 					 *
-					 * advisorDefinition = {RootBeanDefinition@2624} "Root bean: class [org.springframework.aop.aspectj.AspectJPointcutAdvisor]"
+					 * advisorDefinition = {RootBeanDefinition@2624} "Root bean: class [AspectJPointcutAdvisor]"
 					 *
 					 * 		// 01、解析 <aop:aspect order=".."> 属性
 					 * 		propertyValues = {MutablePropertyValues@2282} "PropertyValues: length=1; bean property 'order'"
@@ -327,9 +334,9 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// <aop:conf
 					 *													0 = {PropertyValue@2911} "bean property 'aspectBeanName'"
 					 * 														value = "loggingAspect"
 					 */
-					AbstractBeanDefinition advisorDefinition = parseAdvice(
+					AbstractBeanDefinition advisorDefinition = parseAdvice(		// =>>
 							aspectName, i, aspectElement, (Element) node, parserContext, beanDefinitions, beanReferences);
-					beanDefinitions.add(advisorDefinition);
+					beanDefinitions.add(advisorDefinition);						//
 				}
 			}
 
@@ -419,7 +426,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// <aop:conf
 		try {
 			this.parseState.push(new AdviceEntry(parserContext.getDelegate().getLocalName(adviceElement)));
 
-			// create the method factory bean		// <aop:before method=".."
+			// create the method factory bean		// <aop:before method=".." -> method 的封装信息
 			RootBeanDefinition methodDefinition = new RootBeanDefinition(MethodLocatingFactoryBean.class);
 			methodDefinition.getPropertyValues().add("targetBeanName", aspectName);
 			methodDefinition.getPropertyValues().add("methodName", adviceElement.getAttribute("method"));
@@ -572,15 +579,15 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// <aop:conf
 		try {
 			this.parseState.push(new PointcutEntry(id));
 			/*
+			 *
 			 * pointcutDefinition = {RootBeanDefinition@2742}
-			 *      beanClass = {Class@2741} "class org.springframework.aop.aspectj.AspectJExpressionPointcut"
-			 *      scope = "prototype"
+			 *      beanClass = {Class@2741} "class {@link org.springframework.aop.aspectj.AspectJExpressionPointcut}"
+			 *      ...
 			 *      propertyValues = {MutablePropertyValues@2753}
 			 *           propertyValueList = {ArrayList@2758}  size = 1
 			 *               0 = {PropertyValue@2760} "bean property 'expression'"
 			 *                   name = "expression"
 			 *                   value = "execution(* org.springframework.beans.bean.aop.ArithmeticCalculator.*(int, int))"
-			 *      synthetic = true
 			 */
 			pointcutDefinition = createPointcutDefinition(expression);
 			pointcutDefinition.setSource(parserContext.extractSource(pointcutElement));
@@ -647,7 +654,9 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {		// <aop:conf
 	 * the supplied pointcut expression.
 	 */
 	protected AbstractBeanDefinition createPointcutDefinition(String expression) {
-		RootBeanDefinition beanDefinition = new RootBeanDefinition(AspectJExpressionPointcut.class);	//
+		// <aop:pointcut id="pointcutXML" expression="execution(* org.example.service.tx.TransactionByAnnotation.*(..))"/>
+
+		RootBeanDefinition beanDefinition = new RootBeanDefinition(AspectJExpressionPointcut.class);
 		beanDefinition.setScope(BeanDefinition.SCOPE_PROTOTYPE);
 		beanDefinition.setSynthetic(true);		// TODO：
 		beanDefinition.getPropertyValues().add(EXPRESSION, expression);
