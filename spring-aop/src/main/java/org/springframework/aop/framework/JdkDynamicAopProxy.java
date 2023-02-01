@@ -98,13 +98,20 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	}
 
 	@Override
-	public Object getProxy(@Nullable ClassLoader classLoader) {		//
+	public Object getProxy(@Nullable ClassLoader classLoader) {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Creating JDK dynamic proxy: " + this.advised.getTargetSource());
 		}
 		Class<?>[] proxiedInterfaces = AopProxyUtils.completeProxiedInterfaces(this.advised, true);
-		findDefinedEqualsAndHashCodeMethods(proxiedInterfaces);
-		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);	// =>>
+		findDefinedEqualsAndHashCodeMethods(proxiedInterfaces);						// 略
+		/*
+		 * proxiedInterfaces = {Class[4]@4936}
+		 *     0 = {Class@3931} "interface org.example.service.tx.ITXByAnnotation"
+		 *     1 = {Class@4939} "interface org.springframework.aop.SpringProxy"
+		 *     2 = {Class@4496} "interface org.springframework.aop.framework.Advised"
+		 *     3 = {Class@4934} "interface org.springframework.core.DecoratingProxy"
+		 */
+		return Proxy.newProxyInstance(classLoader, proxiedInterfaces, this);		// =>> java.lang.reflect.Proxy.newProxyInstance(..)
 	}
 
 	/**
