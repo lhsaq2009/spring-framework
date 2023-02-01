@@ -17,8 +17,16 @@ public class ProxyConfig implements Serializable {
 	/** use serialVersionUID from Spring 1.2 for interoperability. */
 	private static final long serialVersionUID = -8409359707199703185L;
 
-
-	private boolean proxyTargetClass = false;		// TODO：false JDK 接口代理，否则 CGlib 子类 ？？
+	/**
+	 * 是否直接代理目标类
+	 * {@link #setProxyTargetClass}
+	 * 		false	：优先 接口 JDK 代理
+	 * 		true	：对目标类进行代理，
+	 * 					> 若目标是接口，则创建   JDK 代理
+	 * 					> 若目标是类　，则创建 CGLIB 代理
+	 *
+	 */
+	private boolean proxyTargetClass = false;
 
 	private boolean optimize = false;
 
@@ -39,6 +47,15 @@ public class ProxyConfig implements Serializable {
 	 * <p>Note: Depending on the configuration of the concrete proxy factory,
 	 * the proxy-target-class behavior will also be applied if no interfaces
 	 * have been specified (and no interface autodetection is activated).
+	 *
+	 * 设置是否直接代理目标类，而不仅仅是代理特定接口。默认：false。<br/><br/>
+	 *
+	 * 若设置为 true，以强制对目标源公开的目标类进行代理。
+	 * 如果该目标类是接口，则将为给定接口创建 JDK 代理。
+	 * 如果该目标类是任何其它类，则将为给定类创建 CGLIB 代理。
+	 *
+	 * 注意：根据具体代理工厂的配置，如果未指定接口（并且未激活接口自动检测），则还将应用 proxy-target-class 行为
+	 *
 	 * @see org.springframework.aop.TargetSource#getTargetClass()
 	 */
 	public void setProxyTargetClass(boolean proxyTargetClass) {
@@ -46,7 +63,8 @@ public class ProxyConfig implements Serializable {
 	}
 
 	/**
-	 * 返回是否直接代理目标类以及任何接口。 Return whether to proxy the target class directly as well as any interfaces.
+	 * 是否直接代理目标类以及任何接口
+	 * Return whether to proxy the target class directly as well as any interfaces.
 	 */
 	public boolean isProxyTargetClass() {
 		return this.proxyTargetClass;
