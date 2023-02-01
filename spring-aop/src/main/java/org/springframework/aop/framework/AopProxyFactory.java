@@ -24,6 +24,12 @@ package org.springframework.aop.framework;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ *
+ * -------------------------------
+ *
+ *        AopProxyFactory
+ *                 ▲
+ * DefaultAopProxyFactory ──▶ createAopProxy
  */
 public interface AopProxyFactory {
 
@@ -34,6 +40,6 @@ public interface AopProxyFactory {
 	 * @return the corresponding AOP proxy
 	 * @throws AopConfigException if the configuration is invalid
 	 */
-	AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException;
+	AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException;		// DefaultAopProxyFactory.createAopProxy
 
 }
