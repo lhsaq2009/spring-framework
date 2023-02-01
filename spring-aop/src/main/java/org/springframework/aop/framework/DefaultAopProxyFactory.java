@@ -28,10 +28,24 @@ import org.springframework.aop.SpringProxy;
  * @see AdvisedSupport#setInterfaces
  */
 @SuppressWarnings("serial")
-public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
+public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {			//
 
+	/**
+	 * 根据适合的代理方式，去创建代理对象：
+	 *
+	 *        AopProxyFactory
+	 *                 ▲
+	 * DefaultAopProxyFactory ─▶ createAopProxy
+	 *                             new ObjenesisCglibAopProxy(config)	-> CGLIB
+	 *                             new JdkDynamicAopProxy(config)		-> AOP
+	 *
+	 * @param config the AOP configuration in the form of an
+	 * AdvisedSupport object
+	 * @return
+	 * @throws AopConfigException
+	 */
 	@Override
-	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {	//
 		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
 			Class<?> targetClass = config.getTargetClass();
 			if (targetClass == null) {
