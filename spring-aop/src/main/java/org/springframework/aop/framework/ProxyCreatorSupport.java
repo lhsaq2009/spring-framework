@@ -16,7 +16,7 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public class ProxyCreatorSupport extends AdvisedSupport {
 
-	private AopProxyFactory aopProxyFactory;		//
+	private AopProxyFactory aopProxyFactory;					// this.aopProxyFactory = {DefaultAopProxyFactory@4328}
 
 	private final List<AdvisedSupportListener> listeners = new LinkedList<>();
 
@@ -28,7 +28,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 	 * Create a new ProxyCreatorSupport instance.
 	 */
 	public ProxyCreatorSupport() {
-		this.aopProxyFactory = new DefaultAopProxyFactory();
+		this.aopProxyFactory = new DefaultAopProxyFactory();	//
 	}
 
 	/**
