@@ -45,7 +45,7 @@ import org.springframework.util.ClassUtils;
  * @see AdvisedSupport
  * @see ProxyFactory
  */
-final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializable {	//
+final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializable {		// java.lang.reflect.InvocationHandler
 
 	/** use serialVersionUID from Spring 1.2 for interoperability. */
 	private static final long serialVersionUID = 5531744639992436476L;
@@ -189,11 +189,11 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 				retVal = AopUtils.invokeJoinpointUsingReflection(target, method, argsToUse);
 			}
 			else {
-				// We need to create a method invocation...
-				MethodInvocation invocation =  // =>>
+				// 我们需要创建一个方法调用 ..；We need to create a method invocation...
+				MethodInvocation invocation =  		// =>>
 						new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);	// =>>
-				// 通过拦截器链前往连接点。Proceed to the joinpoint through the interceptor chain.
-				retVal = invocation.proceed();  // =>> 调用 代理对象 的 代理方法
+				// 通过拦截器链前往 joinpoint；Proceed to the joinpoint through the interceptor chain.
+				retVal = invocation.proceed();  	// =>> 调用 代理对象 的 代理方法
 			}
 
 			// Massage return value if necessary.
