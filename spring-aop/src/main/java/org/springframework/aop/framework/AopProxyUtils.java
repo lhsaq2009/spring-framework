@@ -141,6 +141,14 @@ public abstract class AopProxyUtils {
 		if (addDecoratingProxy) {
 			proxiedInterfaces[index] = DecoratingProxy.class;
 		}
+
+		/*
+		 * proxiedInterfaces = {Class[4]@4936}
+		 * 		0 = {Class@3931} "interface org.example.service.tx.ITXByAnnotation"
+		 * 		1 = {Class@4939} "interface org.springframework.aop.SpringProxy"
+		 * 		2 = {Class@4496} "interface org.springframework.aop.framework.Advised"
+		 * 		3 = {Class@4934} "interface org.springframework.core.DecoratingProxy"
+		 */
 		return proxiedInterfaces;
 	}
 
