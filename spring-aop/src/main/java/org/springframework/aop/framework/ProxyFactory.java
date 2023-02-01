@@ -1,7 +1,6 @@
 package org.springframework.aop.framework;
 
 import org.aopalliance.intercept.Interceptor;
-
 import org.springframework.aop.TargetSource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
@@ -15,9 +14,24 @@ import org.springframework.util.ClassUtils;
  * @author Juergen Hoeller
  * @author Rob Harrop
  * @since 14.03.2003
+ *
+ * ---------------------------------------------
+ *
+ *                            TargetClassAware
+ *                               ▲
+ *         ProxyConfig        Advised
+ *               ▲               ▲
+ *               │┌──────────────┘
+ *      AdvisedSupport ──▶ Map<,> methodCache
+ *               ▲
+ * ProxyCreatorSupport
+ *               ▲
+ *        ProxyFactory
+ *        		 {@link org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator#createProxy}
+ *        		 =>> ProxyFactory proxyFactory = new ProxyFactory();
  */
 @SuppressWarnings("serial")
-public class ProxyFactory extends ProxyCreatorSupport {		// TODO： + 类继承
+public class ProxyFactory extends ProxyCreatorSupport {
 
 	/**
 	 * Create a new ProxyFactory.
