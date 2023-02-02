@@ -89,19 +89,30 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 		setTransactionAttributes(attributes);
 	}
 
-
+	/*
+	 * invocation = {ReflectiveMethodInvocation@5246}
+	 * 		interceptorsAndDynamicMethodMatchers = {ArrayList@5245}  size = 2
+	 * 		method = {Method@5242} "public abstract java.util.List org.example.service.tx.ITXByXML.getUserList()"
+	 * 		proxy = {$Proxy23@5241} "org.example.service.tx.TransactionByXML@51b90217"
+	 * 		target = {TransactionByXML@5244}
+	 * 		targetClass = {Class@4296} "class org.example.service.tx.TransactionByXML"… Navigate
+	 *
+	 * 		userAttributes = null
+	 * 		arguments = {Object[0]@5302}
+	 * 		currentInterceptorIndex = 1
+	 */
 	@Override
 	@Nullable
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 		// Work out the target class: may be {@code null}.
 		// The TransactionAttributeSource should be passed the target class
 		// as well as the method, which may be from an interface.
+		// invocation.getThis() = {TransactionByXML@5256}，解析得到 被代理 Class
 		Class<?> targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
 
 		// Adapt to TransactionAspectSupport's invokeWithinTransaction...
 		return invokeWithinTransaction(invocation.getMethod(), targetClass, invocation::proceed);
 	}
-
 
 	//---------------------------------------------------------------------
 	// Serialization support
