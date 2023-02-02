@@ -156,6 +156,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		// 从 -1 的索引开始，并提前递增；
 		// We start with an index of -1 and increment early.
 		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
+			// =>> AopUtils.invokeJoinpointUsingReflection(..);
 			return invokeJoinpoint();						// 拦截器链执行完毕，执行目标方法 ->
 		}
 		/*
