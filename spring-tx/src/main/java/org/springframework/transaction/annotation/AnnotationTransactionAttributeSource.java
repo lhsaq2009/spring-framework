@@ -35,6 +35,12 @@ import org.springframework.util.ClassUtils;
  * @see Ejb3TransactionAnnotationParser
  * @see org.springframework.transaction.interceptor.TransactionInterceptor#setTransactionAttributeSource
  * @see org.springframework.transaction.interceptor.TransactionProxyFactoryBean#setTransactionAttributeSource
+ *
+ *                 TransactionAttributeSource
+ *                            ▲
+ * AbstractFallbackTransactionAttributeSource
+ *                            ▲
+ *       AnnotationTransactionAttributeSource
  */
 @SuppressWarnings("serial")
 public class AnnotationTransactionAttributeSource extends AbstractFallbackTransactionAttributeSource
@@ -120,11 +126,12 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 		this.annotationParsers = annotationParsers;
 	}
 
-
+	// targetClass = {Class@4018} "class org.springframework.jdbc.datasource.DriverManagerDataSource"
 	@Override
 	public boolean isCandidateClass(Class<?> targetClass) {
 		for (TransactionAnnotationParser parser : this.annotationParsers) {
-			if (parser.isCandidateClass(targetClass)) {
+			// parser = {SpringTransactionAnnotationParser@4455}
+			if (parser.isCandidateClass(targetClass)) {				// =>>
 				return true;
 			}
 		}
@@ -140,7 +147,7 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 	@Override
 	@Nullable
 	protected TransactionAttribute findTransactionAttribute(Method method) {
-		return determineTransactionAttribute(method);
+		return determineTransactionAttribute(method);		// =>> 策略方式，解析 @Transactional -> RuleBasedTransactionAttribute
 	}
 
 	/**
@@ -156,7 +163,7 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 	@Nullable
 	protected TransactionAttribute determineTransactionAttribute(AnnotatedElement element) {
 		for (TransactionAnnotationParser parser : this.annotationParsers) {
-			TransactionAttribute attr = parser.parseTransactionAnnotation(element);
+			TransactionAttribute attr = parser.parseTransactionAnnotation(element);		// =>> 解析 @Transactional -> RuleBasedTransactionAttribute
 			if (attr != null) {
 				return attr;
 			}
