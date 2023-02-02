@@ -91,7 +91,7 @@ public class NameMatchTransactionAttributeSource implements TransactionAttribute
 
 		// Look for direct name match.
 		String methodName = method.getName();
-		TransactionAttribute attr = this.nameMap.get(methodName);
+		TransactionAttribute attr = this.nameMap.get(methodName);		// 优先 methodName 完全匹配
 
 		if (attr == null) {
 			// Look for most specific name match.
