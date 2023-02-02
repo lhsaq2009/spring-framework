@@ -56,11 +56,14 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
+	 * TransactionAttributes 的缓存，按特定目标类上的方法进行键控。
+	 * 由于此基类未标记为可序列化，因此将在序列化后重新创建缓存-前提是具体子类是可序列化的。
+	 *
 	 * Cache of TransactionAttributes, keyed by method on a specific target class.
 	 * <p>As this base class is not marked Serializable, the cache will be recreated
 	 * after serialization - provided that the concrete subclass is Serializable.
 	 */
-	private final Map<Object, TransactionAttribute> attributeCache = new ConcurrentHashMap<>(1024);
+	private final Map<Object, TransactionAttribute> attributeCache = new ConcurrentHashMap<>(1024);	// core
 
 
 	/**
