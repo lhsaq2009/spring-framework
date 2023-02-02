@@ -16,10 +16,23 @@ import org.springframework.lang.Nullable;
  * @see TransactionInterceptor#setTransactionAttributeSource
  * @see TransactionProxyFactoryBean#setTransactionAttributeSource
  * @see org.springframework.transaction.annotation.AnnotationTransactionAttributeSource
+ *
+ * -------------------------------------------------------------------------------
+ *
+ *                             TransactionAttributeSource
+ *                                               ▲
+ * AbstractFallbackTransactionAttributeSource ───┤
+ *       AnnotationTransactionAttributeSource    │   @Transactional
+ *                                               │
+ *        NameMatchTransactionAttributeSource ───┘   <tx:advice> -> <tx:method>
  */
-public interface TransactionAttributeSource {
+public interface TransactionAttributeSource {		//
 
 	/**
+	 * 确定指定类，是否是此事务属性源的元数据格式的事务属性的候选项。如果此方法返回
+	 * false，则不会遍历指定类上的方法以进行 getTransactionAttribute 自检。因此，返回 false
+	 * 是对不受影响的类的优化，而 true 只是意味着该类需要对给定类上的每个方法进行完全内省。
+	 *
 	 * Determine whether the given class is a candidate for transaction attributes
 	 * in the metadata format of this {@code TransactionAttributeSource}.
 	 * <p>If this method returns {@code false}, the methods on the given class
@@ -38,6 +51,8 @@ public interface TransactionAttributeSource {
 	}
 
 	/**
+	 * 返回指定方法的事务属性，如果该方法是非事务性的，则返回 null。<br/><br/>
+	 *
 	 * Return the transaction attribute for the given method,
 	 * or {@code null} if the method is non-transactional.
 	 * @param method the method to introspect
@@ -46,6 +61,6 @@ public interface TransactionAttributeSource {
 	 * @return the matching transaction attribute, or {@code null} if none found
 	 */
 	@Nullable
-	TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass);
+	TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass);		//
 
 }
