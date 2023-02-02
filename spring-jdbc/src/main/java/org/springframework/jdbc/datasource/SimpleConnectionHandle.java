@@ -13,7 +13,7 @@ import org.springframework.util.Assert;
  */
 public class SimpleConnectionHandle implements ConnectionHandle {
 
-	private final Connection connection;
+	private final Connection connection;	// this.connection = {JDBC4Connection@5391}
 
 
 	/**
