@@ -44,7 +44,7 @@ public abstract class InstantiationAwareBeanPostProcessorAdapter implements Smar
 	@Override
 	@Nullable
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
-		return null;
+		return null;	//
 	}
 
 	@Override
