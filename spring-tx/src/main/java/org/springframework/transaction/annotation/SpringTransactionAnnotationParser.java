@@ -30,7 +30,7 @@ public class SpringTransactionAnnotationParser implements TransactionAnnotationP
 	}
 
 	@Override
-	@Nullable	// 重要
+	@Nullable																				// 重要
 	public TransactionAttribute parseTransactionAnnotation(AnnotatedElement element) {		// java.lang.reflect.AnnotatedElement
 		/*
 		 * 获得使用的 @Transactional 的属性等
