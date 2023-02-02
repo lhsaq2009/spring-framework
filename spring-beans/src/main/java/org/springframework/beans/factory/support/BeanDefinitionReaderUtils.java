@@ -22,10 +22,15 @@ import org.springframework.util.StringUtils;
 public abstract class BeanDefinitionReaderUtils {
 
 	/**
+	 * 生成的 Bean name 的分隔符。
+	 * 如果 class name 或 parent name 不唯一，则将附加 "#1"、"#2" 等，直到名称变为唯一<br/><br/>
+	 *
 	 * Separator for generated bean names. If a class name or parent name is not
 	 * unique, "#1", "#2" etc will be appended, until the name becomes unique.
+	 *
+	 * CASE 1. org.springframework.transaction.interceptor.TransactionInterceptor#0
 	 */
-	public static final String GENERATED_BEAN_NAME_SEPARATOR = BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR;
+	public static final String GENERATED_BEAN_NAME_SEPARATOR = BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR;		// #
 
 
 	/**
@@ -68,7 +73,7 @@ public abstract class BeanDefinitionReaderUtils {
 	public static String generateBeanName(BeanDefinition beanDefinition, BeanDefinitionRegistry registry)
 			throws BeanDefinitionStoreException {
 
-		return generateBeanName(beanDefinition, registry, false);
+		return generateBeanName(beanDefinition, registry, false);	// =>>
 	}
 
 	/**
@@ -87,7 +92,7 @@ public abstract class BeanDefinitionReaderUtils {
 	public static String generateBeanName(
 			BeanDefinition definition, BeanDefinitionRegistry registry, boolean isInnerBean)
 			throws BeanDefinitionStoreException {
-
+		// generatedBeanName = "org.springframework.transaction.interceptor.TransactionInterceptor"
 		String generatedBeanName = definition.getBeanClassName();
 		if (generatedBeanName == null) {
 			if (definition.getParentName() != null) {
@@ -101,7 +106,7 @@ public abstract class BeanDefinitionReaderUtils {
 			throw new BeanDefinitionStoreException("Unnamed bean definition specifies neither " +
 					"'class' nor 'parent' nor 'factory-bean' - can't generate bean name");
 		}
-		/**
+		/*
 		 * <bean class="org.springframework.beans.model.Environment">
 		 *     <property name="food">
 		 *         <bean class="org.springframework.beans.model.Food"/>
@@ -113,8 +118,8 @@ public abstract class BeanDefinitionReaderUtils {
 			return generatedBeanName + GENERATED_BEAN_NAME_SEPARATOR + ObjectUtils.getIdentityHexString(definition);
 		}
 
-		// Top-level bean: use plain class name with unique suffix if necessary.
-		return uniqueBeanName(generatedBeanName, registry);
+		// Top-level bean：如有必要，请使用 带有唯一后缀的 纯类名；Top-level bean: use plain class name with unique suffix if necessary.
+		return uniqueBeanName(generatedBeanName, registry);		// =>>
 	}
 
 	/**
