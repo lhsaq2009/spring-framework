@@ -56,9 +56,14 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 		ejb3Present = ClassUtils.isPresent("javax.ejb.TransactionAttribute", classLoader);
 	}
 
-	private final boolean publicMethodsOnly;
+	private final boolean publicMethodsOnly;								//
 
-	private final Set<TransactionAnnotationParser> annotationParsers;
+	/**
+	 * {@link AnnotationTransactionAttributeSource#AnnotationTransactionAttributeSource(boolean)}
+	 * =>> this.annotationParsers = Collections.singleton(new SpringTransactionAnnotationParser());
+	 * 	   -- @Transactional <--> SpringTransactionAnnotationParser
+	 */
+	private final Set<TransactionAnnotationParser> annotationParsers;		//
 
 
 	/**
@@ -79,7 +84,7 @@ public class AnnotationTransactionAttributeSource extends AbstractFallbackTransa
 	 * with proxy-based AOP), or protected/private methods as well
 	 * (typically used with AspectJ class weaving)
 	 */
-	public AnnotationTransactionAttributeSource(boolean publicMethodsOnly) {
+	public AnnotationTransactionAttributeSource(boolean publicMethodsOnly) {		//
 		this.publicMethodsOnly = publicMethodsOnly;
 		if (jta12Present || ejb3Present) {
 			this.annotationParsers = new LinkedHashSet<>(4);
