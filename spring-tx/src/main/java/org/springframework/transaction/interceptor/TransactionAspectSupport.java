@@ -151,6 +151,29 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	@Nullable
 	private TransactionManager transactionManager;
 
+	/**
+	 *                             TransactionAttributeSource
+	 *                                               ▲
+	 * AbstractFallbackTransactionAttributeSource ───┤
+	 *       AnnotationTransactionAttributeSource    │   @Transactional
+	 *                                               │
+	 *        NameMatchTransactionAttributeSource ───┘   <tx:advice> -> <tx:method>
+	 *
+	 * ----------------------------------------------------------------------------
+	 *
+	 * CASE 1. BeanDefinition：TxAdviceBeanDefinitionParser.parseAttributeSource ->> NameMatchTransactionAttributeSource
+	 *
+	 * 		   <tx:advice id="txAdvice" transaction-manager="transactionManager">
+	 * 		       <tx:attributes>
+	 * 		           <tx:method ...>..</tx:method>
+	 *
+	 *         transactionAttributeSource = {NameMatchTransactionAttributeSource@5261}
+	 *             nameMap = {HashMap@5314}  size = 5
+	 *         	       "get*" 		-> {RuleBasedTransactionAttribute@5323} "PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly"
+	 *         			...
+	 *
+	 * CASE 1. TODO：@Transactional 解析
+	 */
 	@Nullable
 	private TransactionAttributeSource transactionAttributeSource;
 
