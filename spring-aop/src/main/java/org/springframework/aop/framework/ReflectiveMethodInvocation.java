@@ -76,7 +76,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 
 	/**
 	 * List of MethodInterceptor and InterceptorAndDynamicMethodMatcher
-	 * that need dynamic checks.
+	 * that need dynamic checks.  该方法对应的拦截器列表；
 	 */
 	protected final List<?> interceptorsAndDynamicMethodMatchers;	//
 
@@ -109,7 +109,7 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 		this.targetClass = targetClass;
 		this.method = BridgeMethodResolver.findBridgedMethod(method);
 		this.arguments = AopProxyUtils.adaptArgumentsIfNecessary(method, arguments);
-		this.interceptorsAndDynamicMethodMatchers = interceptorsAndDynamicMethodMatchers;
+		this.interceptorsAndDynamicMethodMatchers = interceptorsAndDynamicMethodMatchers;		// core
 	}
 
 
@@ -152,17 +152,24 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 
 	@Override
 	@Nullable
-	public Object proceed() throws Throwable {   //
+	public Object proceed() throws Throwable {   			//
+		// 从 -1 的索引开始，并提前递增；
 		// We start with an index of -1 and increment early.
 		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
-			return invokeJoinpoint();
+			return invokeJoinpoint();						// 拦截器链执行完毕，执行目标方法 ->
 		}
-
+		/*
+		 * this.interceptorsAndDynamicMethodMatchers = {ArrayList@6546}  size = 4
+		 * 		0 = {ExposeInvocationInterceptor@6869}
+		 * 		1 = {MethodBeforeAdviceInterceptor@6885}   	// TODO：？？？？
+		 * 		2 = {TransactionInterceptor@6963}
+		 * 		3 = {MyPointcutAdvisor$lambda@6964}
+		 */
 		Object interceptorOrInterceptionAdvice =
 				this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
 		if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
-			// Evaluate dynamic method matcher here: static part will already have
-			// been evaluated and found to match.
+			// 在此处 评估动态方法匹配器：静态部分已经过评估并找到匹配项。
+			// Evaluate dynamic method matcher here: static part will already have been evaluated and found to match.
 			InterceptorAndDynamicMethodMatcher dm =
 					(InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
 			Class<?> targetClass = (this.targetClass != null ? this.targetClass : this.method.getDeclaringClass());
@@ -170,15 +177,15 @@ public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Clonea
 				return dm.interceptor.invoke(this);
 			}
 			else {
-				// Dynamic matching failed.
-				// Skip this interceptor and invoke the next in the chain.
+				// 动态匹配失败，跳过此拦截器并调用链中的下一个拦截器。
+				// Dynamic matching failed. Skip this interceptor and invoke the next in the chain.
 				return proceed();
 			}
 		}
 		else {
 			// It's an interceptor, so we just invoke it: The pointcut will have
 			// been evaluated statically before this object was constructed.
-			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this); // =>>
+			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this); // =>> 逐个拦截器调用
 		}
 	}
 
