@@ -391,7 +391,7 @@ abstract class AbstractAspectJAdvisorFactoryTests {
 		AnnotatedTarget target = new AnnotatedTargetImpl();
 		List<Advisor> advisors = getFixture().getAdvisors(
 				new SingletonMetadataAwareAspectInstanceFactory(new MakeAnnotatedTypeModifiable(), "someBean"));
-		Object proxy = createProxy(target, advisors, AnnotatedTarget.class);
+		Object proxy = createProxy(target, advisors, AnnotatedTarget.class);		// 无需关注
 		System.out.println(advisors.get(1));
 		assertThat(proxy instanceof Lockable).isTrue();
 		Lockable lockable = (Lockable)proxy;
