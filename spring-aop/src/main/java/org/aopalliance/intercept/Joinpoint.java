@@ -24,7 +24,7 @@ import java.lang.reflect.AccessibleObject;
 public interface Joinpoint {
 
 	/**
-	 * Proceed to the next interceptor in the chain.
+	 * Proceed to the next interceptor in the chain. 继续执行链中的下一个拦截器。
 	 * <p>The implementation and the semantics of this method depends
 	 * on the actual joinpoint type (see the children interfaces).
 	 * @return see the children interfaces' proceed definition
