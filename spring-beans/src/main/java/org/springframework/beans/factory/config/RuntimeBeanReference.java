@@ -4,6 +4,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
+ * 不可变占位符类，用于属性值对象（当它是对 factory 中其它 Bean 的引用，将在运行时解析。<br/>
+ *
  * Immutable placeholder class used for a property value object when it's
  * a reference to another bean in the factory, to be resolved at runtime.
  *
@@ -93,7 +95,8 @@ public class RuntimeBeanReference implements BeanReference {
 	}
 
 	/**
-	 * Return whether this is an explicit reference to a bean in the parent factory.
+	 * Return whether this is an explicit reference to a bean in the parent factory.<br/>
+	 * 返回这是否是对 parent factory 中 Bean 的显式引用
 	 */
 	public boolean isToParent() {
 		return this.toParent;
