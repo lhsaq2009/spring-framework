@@ -28,7 +28,7 @@ import org.springframework.aop.support.ComposablePointcut;
  * @see org.springframework.aop.aspectj.AspectJExpressionPointcut
  */
 @SuppressWarnings("serial")
-public class AspectMetadata implements Serializable {
+public class AspectMetadata implements Serializable {		//
 
 	/**
 	 * The name of this aspect as defined to Spring (the bean name) -
