@@ -17,19 +17,21 @@ package org.springframework.aop;
 public interface Pointcut {
 
 	/**
-	 * Return the ClassFilter for this pointcut.
+	 * 返回此 pointcut 的 ClassFilter ；	Return the ClassFilter for this pointcut.<br/><br/>
+	 *
 	 * @return the ClassFilter (never {@code null})
 	 */
 	ClassFilter getClassFilter();
 
 	/**
-	 * Return the MethodMatcher for this pointcut.
+	 * 返回此 pointcut 的 MethodMatcher；		Return the MethodMatcher for this pointcut. <br/><br/>
+	 *
 	 * @return the MethodMatcher (never {@code null})
 	 */
 	MethodMatcher getMethodMatcher();
 
-
 	/**
+	 * 始终匹配「规范的 Pointcut 实例」
 	 * Canonical Pointcut instance that always matches.
 	 */
 	Pointcut TRUE = TruePointcut.INSTANCE;

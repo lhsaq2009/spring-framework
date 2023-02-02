@@ -13,6 +13,12 @@ import java.lang.reflect.Method;
 public interface IntroductionAwareMethodMatcher extends MethodMatcher {
 
 	/**
+	 * 对指定方法，执行静态检查，是否匹配。
+	 * 如果 caller，支持扩展的 IntroductionAwareMethodMatcher 接口，
+	 * 则可以调用此方法而不是 2-arg matches(Method, Class) 方法。<br/><br/>
+	 *
+	 * <hr>
+	 *
 	 * Perform static checking whether the given method matches. This may be invoked
 	 * instead of the 2-arg {@link #matches(java.lang.reflect.Method, Class)} method
 	 * if the caller supports the extended IntroductionAwareMethodMatcher interface.

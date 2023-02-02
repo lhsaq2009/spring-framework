@@ -18,6 +18,12 @@ import org.springframework.util.ObjectUtils;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see org.springframework.aop.framework.AdvisedSupport#setTarget(Object)
+ *
+ * 		         TargetClassAware
+ * 		               ▲
+ * 		         TargetSource
+ * 		               ▲
+ * 		SingletonTargetSource  -- JdkDynamicAopProxy.advised.targetSource
  */
 public class SingletonTargetSource implements TargetSource, Serializable {
 
