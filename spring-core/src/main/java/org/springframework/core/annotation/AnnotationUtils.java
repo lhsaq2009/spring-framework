@@ -86,7 +86,7 @@ import org.springframework.util.StringUtils;
  * @see java.lang.reflect.AnnotatedElement#getAnnotation(Class)
  * @see java.lang.reflect.AnnotatedElement#getDeclaredAnnotations()
  */
-public abstract class AnnotationUtils {
+public abstract class AnnotationUtils {		// TODO：工具类
 
 	/**
 	 * The attribute name for annotations with a single element.
@@ -133,21 +133,29 @@ public abstract class AnnotationUtils {
 	 * if {@code true} is being returned here.
 	 * @since 5.2
 	 * @see #isCandidateClass(Class, String)
-	 */
+	 */  //
 	public static boolean isCandidateClass(Class<?> clazz, Class<? extends Annotation> annotationType) {
-		return isCandidateClass(clazz, annotationType.getName());
+		return isCandidateClass(clazz, annotationType.getName());	// =>>
 	}
 
 	/**
+	 * 确定 clazz 是否是携带指定 annotationName 的候选项（在类型、方法或字段级别）<br><br>
+	 *
 	 * Determine whether the given class is a candidate for carrying the specified annotation
 	 * (at type, method or field level).
 	 * @param clazz the class to introspect
 	 * @param annotationName the fully-qualified name of the searchable annotation type
+	 *
 	 * @return {@code false} if the class is known to have no such annotations at any level;
 	 * {@code true} otherwise. Callers will usually perform full method/field introspection
 	 * if {@code true} is being returned here.
+	 * 如果已知类在任何级别都没有此类注释，则为 false; 否则为 true。如果此处返回 true，调用方通常会执行完整的方法/字段自检。
+	 *
 	 * @since 5.2
 	 * @see #isCandidateClass(Class, Class)
+	 *
+	 * clazz 		  = {Class@4043} "class org.springframework.jdbc.datasource.DriverManagerDataSource"… 导航
+	 * annotationName =                    "org.springframework.transaction.annotation.Transactional"
 	 */
 	public static boolean isCandidateClass(Class<?> clazz, String annotationName) {
 		if (annotationName.startsWith("java.")) {
