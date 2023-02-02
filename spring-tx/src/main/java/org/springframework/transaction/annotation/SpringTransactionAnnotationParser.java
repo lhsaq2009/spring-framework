@@ -21,7 +21,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @since 2.5
  */
 @SuppressWarnings("serial")
-public class SpringTransactionAnnotationParser implements TransactionAnnotationParser, Serializable {
+public class SpringTransactionAnnotationParser implements TransactionAnnotationParser, Serializable {		//
 
 	@Override
 	public boolean isCandidateClass(Class<?> targetClass) {
@@ -29,12 +29,26 @@ public class SpringTransactionAnnotationParser implements TransactionAnnotationP
 	}
 
 	@Override
-	@Nullable
-	public TransactionAttribute parseTransactionAnnotation(AnnotatedElement element) {
+	@Nullable	// 重要
+	public TransactionAttribute parseTransactionAnnotation(AnnotatedElement element) {		// java.lang.reflect.AnnotatedElement
+		/*
+		 * 获得使用的 @Transactional 的属性等
+		 * 		attributes = {AnnotationAttributes@5258}  size = 10
+		 * 			"isolation" 				-> {Isolation@5273} "DEFAULT"
+		 * 			"noRollbackFor" 			-> {Class[0]@5275}
+		 * 			"noRollbackForClassName" 	-> {String[0]@5277} []
+		 * 			"propagation" 				-> {Propagation@5279} "NESTED"
+		 * 			"readOnly" 					-> {Boolean@5281} false
+		 * 			"rollbackFor" 				-> {Class[0]@5283}
+		 * 			"rollbackForClassName" 		-> {String[0]@5277} []
+		 * 			"timeout" 					-> {Integer@5286} 1991000
+		 * 			"transactionManager" 		-> ""
+		 * 			"value" 					-> ""
+		 */
 		AnnotationAttributes attributes = AnnotatedElementUtils.findMergedAnnotationAttributes(
 				element, Transactional.class, false, false);
 		if (attributes != null) {
-			return parseTransactionAnnotation(attributes);
+			return parseTransactionAnnotation(attributes);		// 封装 @Transactional 属性 -> RuleBasedTransactionAttribute
 		}
 		else {
 			return null;
@@ -45,6 +59,10 @@ public class SpringTransactionAnnotationParser implements TransactionAnnotationP
 		return parseTransactionAnnotation(AnnotationUtils.getAnnotationAttributes(ann, false, false));
 	}
 
+	/*
+	 * 重要：解析某个方法标注的 @Transactional 事务属性；
+	 * ==> {@link SpringTransactionAnnotationParser#parseTransactionAnnotation(AnnotatedElement)}
+	 */
 	protected TransactionAttribute parseTransactionAnnotation(AnnotationAttributes attributes) {
 		RuleBasedTransactionAttribute rbta = new RuleBasedTransactionAttribute();
 
