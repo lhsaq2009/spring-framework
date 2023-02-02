@@ -15,24 +15,35 @@ import org.springframework.core.BridgeMethodResolver;
 import org.springframework.lang.Nullable;
 
 /**
+ * Spring 实现了 AOP Alliance MethodInvocation 接口，实现了扩展的 ProxyMethodInvocation 接口。<br/><br/>
+ *
  * Spring's implementation of the AOP Alliance
  * {@link org.aopalliance.intercept.MethodInvocation} interface,
  * implementing the extended
- * {@link org.springframework.aop.ProxyMethodInvocation} interface.
+ * {@link org.springframework.aop.ProxyMethodInvocation} interface.<br/><br/>
+ *
+ * 使用反射调用目标对象。子类可以重写 invokeJoinpoint() 来更改此行为，
+ * 因此对于更专业的 MethodInvocation 实现来说，这也是一个有用的基类。<br/><br/>
  *
  * <p>Invokes the target object using reflection. Subclasses can override the
  * {@link #invokeJoinpoint()} method to change this behavior, so this is also
- * a useful base class for more specialized MethodInvocation implementations.
+ * a useful base class for more specialized MethodInvocation implementations.<br/><br/>
+ *
+ * 可以使用 invocableClone() 克隆调用，重复调用 proceed()（每个克隆一次）。
+ * 也可以使用 setUserAttribute / getUserAttribute 方法将 自定义属性 附加到调用中。<br/><br/>
  *
  * <p>It is possible to clone an invocation, to invoke {@link #proceed()}
  * repeatedly (once per clone), using the {@link #invocableClone()} method.
  * It is also possible to attach custom attributes to the invocation,
- * using the {@link #setUserAttribute} / {@link #getUserAttribute} methods.
+ * using the {@link #setUserAttribute} / {@link #getUserAttribute} methods.<br/><br/>
+ *
+ * 注意：此类被视为内部类，不应直接访问。它公开的唯一原因是与现有框架集成（例如Pitchfork）的兼容性。
+ * 对于任何其他目的，请改用 ProxyMethodInvocation 接口。<br/><br/>
  *
  * <p><b>NOTE:</b> This class is considered internal and should not be
  * directly accessed. The sole reason for it being public is compatibility
  * with existing framework integrations (e.g. Pitchfork). For any other
- * purposes, use the {@link ProxyMethodInvocation} interface instead.
+ * purposes, use the {@link ProxyMethodInvocation} interface instead.<br/><br/>
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -43,7 +54,7 @@ import org.springframework.lang.Nullable;
  * @see #setUserAttribute
  * @see #getUserAttribute
  */
-public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Cloneable {
+public class ReflectiveMethodInvocation implements ProxyMethodInvocation, Cloneable {		//
 
 	protected final Object proxy;
 
