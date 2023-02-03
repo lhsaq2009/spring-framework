@@ -709,8 +709,8 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			processRollback(defStatus, true);
 			return;
 		}
-
-		processCommit(defStatus);
+		// defStatus = {DefaultTransactionStatus@5326}
+		processCommit(defStatus);	// =>> commit()
 	}
 
 	/**
@@ -742,7 +742,11 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 						logger.debug("Initiating transaction commit");
 					}
 					unexpectedRollback = status.isGlobalRollbackOnly();
-					doCommit(status);
+					/**
+					 * 疑问：如果是只读事务，为啥还整这一套呢，先 auto commit => false，再 commit，关闭自动提交就是开启事务
+					 * 只读事务 与 不使用事务 的区别：查询结果不同，事务是有隔离级别的；
+					 */
+					doCommit(status);					// =>>
 				}
 				else if (isFailEarlyOnGlobalRollbackOnly()) {
 					unexpectedRollback = status.isGlobalRollbackOnly();
