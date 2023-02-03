@@ -386,7 +386,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			try {
 				// This is an around advice: Invoke the next interceptor in the chain.
 				// This will normally result in a target object being invoked.
-				retVal = invocation.proceedWithInvocation();
+				retVal = invocation.proceedWithInvocation();		// =>> invoke the next interceptor，直至目标方法
 			}
 			catch (Throwable ex) {
 				// target invocation exception
@@ -671,7 +671,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			if (logger.isTraceEnabled()) {
 				logger.trace("Completing transaction for [" + txInfo.getJoinpointIdentification() + "]");
 			}
-			txInfo.getTransactionManager().commit(txInfo.getTransactionStatus());
+			txInfo.getTransactionManager().commit(txInfo.getTransactionStatus());	//
 		}
 	}
 
@@ -702,8 +702,8 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				}
 			}
 			else {
-				// We don't roll back on this exception.
-				// Will still roll back if TransactionStatus.isRollbackOnly() is true.
+				// 我们不会回滚此异常；We don't roll back on this exception.
+				// 如果 TransactionStatus.isRollbackOnly() 为 true，则仍会回滚；Will still roll back if TransactionStatus.isRollbackOnly() is true.
 				try {
 					txInfo.getTransactionManager().commit(txInfo.getTransactionStatus());
 				}
@@ -726,8 +726,8 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	 * @param txInfo information about the current transaction (may be {@code null})
 	 */
 	protected void cleanupTransactionInfo(@Nullable TransactionInfo txInfo) {
-		if (txInfo != null) {
-			txInfo.restoreThreadLocalStatus();
+		if (txInfo != null) {	// txInfo = {TransactionAspectSupport$TransactionInfo@5456} "PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly"
+			txInfo.restoreThreadLocalStatus();		// 把挂起的事务对象，还原回去；
 		}
 	}
 
