@@ -58,7 +58,7 @@ import org.springframework.util.Assert;
  * @see org.springframework.jdbc.datasource.DataSourceTransactionManager
  * @see org.springframework.jdbc.datasource.DataSourceUtils#getConnection
  */
-public abstract class TransactionSynchronizationManager {		// 事务同步管理器
+public abstract class TransactionSynchronizationManager {		// 事务同步管理器，全靠 static，连类也不支持实例化；
 
 	private static final Log logger = LogFactory.getLog(TransactionSynchronizationManager.class);
 
@@ -158,7 +158,7 @@ public abstract class TransactionSynchronizationManager {		// 事务同步管理
 	 * @throws IllegalStateException if there is already a value bound to the thread
 	 * @see ResourceTransactionManager#getResourceFactory()
 	 */
-	public static void bindResource(Object key, Object value) throws IllegalStateException {
+	public static void bindResource(Object key, Object value) throws IllegalStateException { //
 		Object actualKey = TransactionSynchronizationUtils.unwrapResourceIfNecessary(key);
 		Assert.notNull(value, "Value must not be null");
 		Map<Object, Object> map = resources.get();
@@ -214,15 +214,15 @@ public abstract class TransactionSynchronizationManager {		// 事务同步管理
 	 * Actually remove the value of the resource that is bound for the given key.
 	 */
 	@Nullable
-	private static Object doUnbindResource(Object actualKey) {
+	private static Object doUnbindResource(Object actualKey) {		//
 		Map<Object, Object> map = resources.get();
 		if (map == null) {
 			return null;
 		}
-		Object value = map.remove(actualKey);
+		Object value = map.remove(actualKey);						//
 		// Remove entire ThreadLocal if empty...
 		if (map.isEmpty()) {
-			resources.remove();
+			resources.remove();										//
 		}
 		// Transparently suppress a ResourceHolder that was marked as void...
 		if (value instanceof ResourceHolder && ((ResourceHolder) value).isVoid()) {
