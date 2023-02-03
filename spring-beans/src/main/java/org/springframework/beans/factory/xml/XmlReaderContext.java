@@ -116,7 +116,8 @@ public class XmlReaderContext extends ReaderContext {
 	 * @see org.springframework.beans.factory.support.BeanNameGenerator#generateBeanName
 	 */
 	public String generateBeanName(BeanDefinition beanDefinition) {
-		return this.reader.getBeanNameGenerator().generateBeanName(beanDefinition, getRegistry());
+		// this.reader.getBeanNameGenerator() = {DefaultBeanNameGenerator@3516}
+		return this.reader.getBeanNameGenerator().generateBeanName(beanDefinition, getRegistry());	// =>>
 	}
 
 	/**
@@ -127,7 +128,8 @@ public class XmlReaderContext extends ReaderContext {
 	 * @see BeanDefinitionRegistry#registerBeanDefinition
 	 */
 	public String registerWithGeneratedName(BeanDefinition beanDefinition) {
-		String generatedName = generateBeanName(beanDefinition);
+		// generatedName = "org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0"
+		String generatedName = generateBeanName(beanDefinition);		// =>> 得到 BeanName
 		getRegistry().registerBeanDefinition(generatedName, beanDefinition);
 		return generatedName;
 	}

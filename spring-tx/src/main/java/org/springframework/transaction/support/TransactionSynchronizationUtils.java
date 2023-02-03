@@ -20,10 +20,10 @@ import org.springframework.util.ClassUtils;
  * @see TransactionSynchronization
  * @see TransactionSynchronizationManager#getSynchronizations()
  */
-public abstract class TransactionSynchronizationUtils {
+public abstract class TransactionSynchronizationUtils {	//
 
 	private static final Log logger = LogFactory.getLog(TransactionSynchronizationUtils.class);
-
+	//
 	private static final boolean aopAvailable = ClassUtils.isPresent(
 			"org.springframework.aop.scope.ScopedObject", TransactionSynchronizationUtils.class.getClassLoader());
 
@@ -50,7 +50,7 @@ public abstract class TransactionSynchronizationUtils {
 		if (resourceRef instanceof InfrastructureProxy) {
 			resourceRef = ((InfrastructureProxy) resourceRef).getWrappedObject();
 		}
-		if (aopAvailable) {
+		if (aopAvailable) {	// 是否存在：org.springframework.aop.scope.ScopedObject
 			// now unwrap scoped proxy
 			resourceRef = ScopedProxyUnwrapper.unwrapIfNecessary(resourceRef);
 		}

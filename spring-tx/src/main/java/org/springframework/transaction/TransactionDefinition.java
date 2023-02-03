@@ -57,6 +57,13 @@ public interface TransactionDefinition {
 	int PROPAGATION_SUPPORTS = 1;
 
 	/**
+	 * 支持当前交易；如果当前事务不存在，则引发异常。
+	 * 类似于同名的 EJB transaction 属性。<br/><br/>
+	 *
+	 * 请注意，PROPAGATION_MANDATORY 范围内的事务同步，将始终由周围的事务驱动。<br/><br/>
+	 *
+	 * <hr>
+	 *
 	 * Support a current transaction; throw an exception if no current transaction
 	 * exists. Analogous to the EJB transaction attribute of the same name.
 	 * <p>Note that transaction synchronization within a {@code PROPAGATION_MANDATORY}
@@ -105,12 +112,25 @@ public interface TransactionDefinition {
 	/**
 	 * Execute within a nested transaction if a current transaction exists,
 	 * behave like {@link #PROPAGATION_REQUIRED} otherwise. There is no
-	 * analogous feature in EJB.
+	 * analogous feature in EJB. <br/><br/>
+	 *
+	 * 如果存在当前事务，则在嵌套事务中执行，否则的行为与 PROPAGATION_REQUIRED 类似。
+	 * EJB 中没有类似的功能。<br/><br/>
+	 *
+	 * <hr><br/>
+	 *
 	 * <p><b>NOTE:</b> Actual creation of a nested transaction will only work on
 	 * specific transaction managers. Out of the box, this only applies to the JDBC
 	 * {@link org.springframework.jdbc.datasource.DataSourceTransactionManager}
 	 * when working on a JDBC 3.0 driver. Some JTA providers might support
-	 * nested transactions as well.
+	 * nested transactions as well. <br/><br/>
+	 *
+	 * 注意：嵌套事务的实际创建仅适用于特定的事务管理器。
+	 * 开箱即用，这仅适用于在处理 JDBC 3.0 驱动程序时的 JDBC org.springframework.jdbc.datasource.DataSourceTransactionManager。
+	 * 某些 JTA 提供程序可能也支持嵌套事务。<br/><br/>
+	 *
+	 * <hr><br/>
+	 *
 	 * @see org.springframework.jdbc.datasource.DataSourceTransactionManager
 	 */
 	int PROPAGATION_NESTED = 6;

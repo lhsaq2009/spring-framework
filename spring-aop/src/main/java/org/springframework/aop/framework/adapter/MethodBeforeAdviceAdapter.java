@@ -26,7 +26,7 @@ class MethodBeforeAdviceAdapter implements AdvisorAdapter, Serializable {
 	@Override
 	public MethodInterceptor getInterceptor(Advisor advisor) {
 		MethodBeforeAdvice advice = (MethodBeforeAdvice) advisor.getAdvice();
-		return new MethodBeforeAdviceInterceptor(advice);
+		return new MethodBeforeAdviceInterceptor(advice);		//
 	}
 
 }

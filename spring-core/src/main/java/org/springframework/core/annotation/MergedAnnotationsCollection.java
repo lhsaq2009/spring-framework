@@ -21,14 +21,14 @@ import org.springframework.util.Assert;
  * @since 5.2
  * @see MergedAnnotations#of(Collection)
  */
-final class MergedAnnotationsCollection implements MergedAnnotations {
+final class MergedAnnotationsCollection implements MergedAnnotations {		//
 
 	private final MergedAnnotation<?>[] annotations;
 
 	private final AnnotationTypeMappings[] mappings;
 
 
-	private MergedAnnotationsCollection(Collection<MergedAnnotation<?>> annotations) {
+	private MergedAnnotationsCollection(Collection<MergedAnnotation<?>> annotations) {	//
 		Assert.notNull(annotations, "Annotations must not be null");
 		this.annotations = annotations.toArray(new MergedAnnotation<?>[0]);
 		this.mappings = new AnnotationTypeMappings[this.annotations.length];

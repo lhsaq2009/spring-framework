@@ -46,7 +46,7 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.aop.framework.ProxyFactoryBean
  * @see org.springframework.jndi.JndiObjectFactoryBean
  */
-public interface FactoryBean<T> {
+public interface FactoryBean<T> {		// 工厂 Bean
 
 	/**
 	 * The name of an attribute that can be
@@ -77,7 +77,7 @@ public interface FactoryBean<T> {
 	 * @see FactoryBeanNotInitializedException
 	 */
 	@Nullable
-	T getObject() throws Exception;
+	T getObject() throws Exception;		// core
 
 	/**
 	 * Return the type of object that this FactoryBean creates,

@@ -85,7 +85,7 @@ public abstract class JdbcUtils {
 	 */
 	public static void closeStatement(@Nullable Statement stmt) {
 		if (stmt != null) {
-			try {
+			try {	// stmt = {JDBC42PreparedStatement@5493} "com.mysql.jdbc.JDBC42PreparedStatement@93970e9: SELECT id, name FROM user WHERE id < 5"
 				stmt.close();
 			}
 			catch (SQLException ex) {

@@ -29,7 +29,7 @@ import org.springframework.core.AliasRegistry;
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
  * @see PropertiesBeanDefinitionReader
  */
-// Bean 注册器
+// Bean 注册器，作为 Bean Factory 的接口
 public interface BeanDefinitionRegistry extends AliasRegistry {
 
 	/**

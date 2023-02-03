@@ -72,10 +72,14 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * Given a PropertyValue, return a value, resolving any references to other
-	 * beans in the factory if necessary. The value could be:
+	 * beans in the factory if necessary. The value could be:<br/>
+	 * 给定一个 PropertyValue，返回一个值，如有必要，解析在 factory 中其它 bean 的任何引用。该值可以是：
+	 *
 	 * <li>A BeanDefinition, which leads to the creation of a corresponding
 	 * new bean instance. Singleton flags and names of such "inner beans"
-	 * are always ignored: Inner beans are anonymous prototypes.
+	 * are always ignored: Inner beans are anonymous prototypes.<br/>
+	 * BeanDefinition，它导致创建相应的 new Bean 实例。这种 “inner beans” 的「单例标志」和名称总是被忽略：内豆是匿名原型。
+	 *
 	 * <li>A RuntimeBeanReference, which must be resolved.
 	 * <li>A ManagedList. This is a special collection that may contain
 	 * RuntimeBeanReferences or Collections that will need to be resolved.
@@ -90,9 +94,14 @@ class BeanDefinitionValueResolver {
 	 */
 	@Nullable
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
-		// We must check each value to see whether it requires a runtime reference
-		// to another bean to be resolved.
+		// We must check each value to see whether it requires a runtime reference to another bean to be resolved.
+		// 我们必须检查每个值，看它需要的是否是「其它待解决 Bean 的运行时引用」
 		if (value instanceof RuntimeBeanReference) {
+			/*
+			 * {@link org.springframework.transaction.config.AnnotationDrivenBeanDefinitionParser.AopAutoProxyConfigurer#configureAutoProxyCreator}
+			 * =>> advisorDef.getPropertyValues().add("transactionAttributeSource", new RuntimeBeanReference(sourceName));
+			 *     =>> ref = {RuntimeBeanReference@4214} "<...AnnotationTransactionAttributeSource#0>"
+			 */
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
 			return resolveReference(argName, ref);
 		}
@@ -258,7 +267,7 @@ class BeanDefinitionValueResolver {
 	 * Evaluate the given String value as an expression, if necessary.
 	 * @param value the original value (may be an expression)
 	 * @return the resolved value if necessary, or the original String value
-	 */
+	 */  // evaluate：评估
 	@Nullable
 	private Object doEvaluate(@Nullable String value) {
 		return this.beanFactory.evaluateBeanDefinitionString(value, this.beanDefinition);
@@ -302,7 +311,7 @@ class BeanDefinitionValueResolver {
 					bean = parent.getBean(String.valueOf(doEvaluate(ref.getBeanName())));
 				}
 			}
-			else {	// <<=
+			else {																				// <<=
 				String resolvedName;
 				if (beanType != null) {
 					NamedBeanHolder<?> namedBean = this.beanFactory.resolveNamedBean(beanType);
@@ -311,7 +320,7 @@ class BeanDefinitionValueResolver {
 				}
 				else {
 					resolvedName = String.valueOf(doEvaluate(ref.getBeanName()));
-					bean = this.beanFactory.getBean(resolvedName);						// =>> 去加载依赖的 Bean，若循环依赖则涉及提前获取当前 Bean 暴漏的引用
+					bean = this.beanFactory.getBean(resolvedName);								// =>> 去加载依赖的 Bean，若循环依赖则涉及提前获取当前 Bean 暴漏的引用
 				}
 				this.beanFactory.registerDependentBean(resolvedName, this.beanName);	// =>> 记录 Bean 依赖关系
 			}

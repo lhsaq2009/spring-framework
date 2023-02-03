@@ -48,7 +48,7 @@ import org.springframework.util.ClassUtils;
  * @since 14.03.2003
  * @see SimpleDriverDataSource
  */
-public class DriverManagerDataSource extends AbstractDriverBasedDataSource {
+public class DriverManagerDataSource extends AbstractDriverBasedDataSource {	//
 
 	/**
 	 * Constructor for bean-style configuration.

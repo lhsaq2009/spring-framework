@@ -3,6 +3,12 @@ package org.springframework.transaction.support;
 import java.io.Flushable;
 
 /**
+ * 事务同步回调接口，由 AbstractPlatformTransactionManager 支持。<br/><br/>
+ *
+ * 事务同步实现可以实现有序接口来影响其执行顺序。未实现 Ordered 接口的同步将追加到同步链的末尾。<br/><br/>
+ *
+ * Spring 本身执行的系统同步 使用特定的顺序值，允许与其执行顺序进行细粒度交互（如有必要）。<br/><br/>
+ *
  * Interface for transaction synchronization callbacks.
  * Supported by AbstractPlatformTransactionManager.
  *
@@ -19,17 +25,16 @@ import java.io.Flushable;
  * @see AbstractPlatformTransactionManager
  * @see org.springframework.jdbc.datasource.DataSourceUtils#CONNECTION_SYNCHRONIZATION_ORDER
  */
-public interface TransactionSynchronization extends Flushable {
+public interface TransactionSynchronization extends Flushable {			// 事务同步
 
-	/** Completion status in case of proper commit. */
+	/** 正确提交时的完成状态；Completion status in case of proper commit. */
 	int STATUS_COMMITTED = 0;
 
-	/** Completion status in case of proper rollback. */
+	/** 正确回滚时的完成状态；Completion status in case of proper rollback. */
 	int STATUS_ROLLED_BACK = 1;
 
-	/** Completion status in case of heuristic mixed completion or system errors. */
+	/** 启发式混合完成 或 系统错误情况下的完成状态；Completion status in case of heuristic mixed completion or system errors. */
 	int STATUS_UNKNOWN = 2;
-
 
 	/**
 	 * Suspend this synchronization.

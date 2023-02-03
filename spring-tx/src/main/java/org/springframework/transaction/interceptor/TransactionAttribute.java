@@ -23,7 +23,7 @@ public interface TransactionAttribute extends TransactionDefinition {
 	 * @since 3.0
 	 */
 	@Nullable
-	String getQualifier();
+	String getQualifier();		// TODO：分析 tx 时，没赋值的地方呀，什么情况会用到呢，2023-01-12
 
 	/**
 	 * Should we roll back on the given exception?

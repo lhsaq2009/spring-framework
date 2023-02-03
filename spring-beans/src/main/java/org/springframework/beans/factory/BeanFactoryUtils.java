@@ -222,8 +222,12 @@ public abstract class BeanFactoryUtils {
 	}
 
 	/**
+	 * 获取 given type 的所有 Bean names，包括在 ancestor factories 中定义的 Bean 名称。
+	 * 将在被覆盖的 Bean 定义的情况下返回唯一名称。<br/><br/>
+	 *
 	 * Get all bean names for the given type, including those defined in ancestor
-	 * factories. Will return unique names in case of overridden bean definitions.
+	 * factories. Will return unique names in case of overridden bean definitions. <br/><br/>
+	 *
 	 * <p>Does consider objects created by FactoryBeans if the "allowEagerInit"
 	 * flag is set, which means that FactoryBeans will get initialized. If the
 	 * object created by the FactoryBean doesn't match, the raw FactoryBean itself
@@ -242,7 +246,7 @@ public abstract class BeanFactoryUtils {
 	 * @return the array of matching bean names, or an empty array if none
 	 * @see ListableBeanFactory#getBeanNamesForType(Class, boolean, boolean)
 	 */
-	public static String[] beanNamesForTypeIncludingAncestors(
+	public static String[] beanNamesForTypeIncludingAncestors(		// 获取 given type 的所有 Bean names
 			ListableBeanFactory lbf, Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 
 		Assert.notNull(lbf, "ListableBeanFactory must not be null");
