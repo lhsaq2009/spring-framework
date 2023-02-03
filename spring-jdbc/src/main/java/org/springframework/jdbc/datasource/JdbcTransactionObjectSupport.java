@@ -29,12 +29,25 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 1.1
  * @see DataSourceTransactionManager
- */
+ */ // private static class DataSourceTransactionObject extends JdbcTransactionObjectSupport {
 public abstract class JdbcTransactionObjectSupport implements SavepointManager, SmartTransactionObject {
 
 	private static final Log logger = LogFactory.getLog(JdbcTransactionObjectSupport.class);
 
-
+	/*
+	 * this.connectionHolder = {ConnectionHolder@5456}
+	 * 		connectionHandle 	= {SimpleConnectionHandle@5458} "SimpleConnectionHandle: com.mysql.jdbc.JDBC4Connection@7b2ac585"
+	 * 			connection = {JDBC4Connection@5446}
+	 * 		currentConnection 	= null
+	 * 		deadline 			= null
+	 * 		isVoid 				= false
+	 * 		referenceCount 		= 0
+	 * 		rollbackOnly 		= false
+	 * 		savepointCounter 	= 0
+	 * 		savepointsSupported = null
+	 * 		synchronizedWithTransaction = true
+	 * 		transactionActive 	= false
+	 */
 	@Nullable
 	private ConnectionHolder connectionHolder;
 
@@ -43,14 +56,14 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 
 	private boolean readOnly = false;
 
-	private boolean savepointAllowed = false;
+	private boolean savepointAllowed = false;	//  ???
 
 
 	/**
 	 * Set the ConnectionHolder for this transaction object.
 	 */
 	public void setConnectionHolder(@Nullable ConnectionHolder connectionHolder) {
-		this.connectionHolder = connectionHolder;
+		this.connectionHolder = connectionHolder;	//
 	}
 
 	/**
@@ -104,7 +117,7 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 	 * Set whether savepoints are allowed within this transaction.
 	 * The default is {@code false}.
 	 */
-	public void setSavepointAllowed(boolean savepointAllowed) {
+	public void setSavepointAllowed(boolean savepointAllowed) {		// ???
 		this.savepointAllowed = savepointAllowed;
 	}
 
@@ -169,10 +182,10 @@ public abstract class JdbcTransactionObjectSupport implements SavepointManager, 
 	 * @see java.sql.Connection#releaseSavepoint
 	 */
 	@Override
-	public void releaseSavepoint(Object savepoint) throws TransactionException {
+	public void releaseSavepoint(Object savepoint) throws TransactionException {			//
 		ConnectionHolder conHolder = getConnectionHolderForSavepoint();
 		try {
-			conHolder.getConnection().releaseSavepoint((Savepoint) savepoint);
+			conHolder.getConnection().releaseSavepoint((Savepoint) savepoint);	// =>> 无操作 ？？
 		}
 		catch (Throwable ex) {
 			logger.debug("Could not explicitly release JDBC savepoint", ex);
