@@ -374,15 +374,33 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 	/**
 	 * Start a new transaction.
-	 */
+	 */ // definition = TransactionAttribute，transaction = DataSourceTransactionObject
 	private TransactionStatus startTransaction(TransactionDefinition definition, Object transaction,
 			boolean debugEnabled, @Nullable SuspendedResourcesHolder suspendedResources) {
-
+		// eg1: newSynchronization = true		----
 		boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
+		/*
+		 * eg1: status = {DefaultTransactionStatus@5333}
+		 * 		completed 			= false
+		 * 		debug 				= false
+		 * 		newSynchronization 	= true		----
+		 * 		newTransaction 		= true
+		 * 		readOnly 			= true
+		 * 		rollbackOnly 		= false
+		 * 		savepoint 			= null
+		 * 		suspendedResources	= null
+		 * 		transaction 		= {DataSourceTransactionManager$DataSourceTransactionObject@5314}
+		 * 			connectionHolder 		= null
+		 * 			mustRestoreAutoCommit 	= false
+		 * 			newConnectionHolder 	= false
+		 * 			previousIsolationLevel 	= null
+		 * 			readOnly 				= false
+		 * 			savepointAllowed 		= true
+		 */
 		DefaultTransactionStatus status = newTransactionStatus(
 				definition, transaction, true, newSynchronization, debugEnabled, suspendedResources);
-		doBegin(transaction, definition);
-		prepareSynchronization(status, definition);
+		doBegin(transaction, definition);				// =>> 获取链接，设置到 事务对象(DataSourceTransactionObject) 的 connectionHolder 字段上
+		prepareSynchronization(status, definition);		// 设置同步器的一些参数 ？？
 		return status;
 	}
 
