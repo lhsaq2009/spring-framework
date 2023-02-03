@@ -182,10 +182,10 @@ public class ConnectionHolder extends ResourceHolderSupport {
 	public void released() {
 		super.released();
 		if (!isOpen() && this.currentConnection != null) {
-			if (this.connectionHandle != null) {
+			if (this.connectionHandle != null) { 	// this.currentConnection = {JDBC4Connection@5439}
 				this.connectionHandle.releaseConnection(this.currentConnection);
 			}
-			this.currentConnection = null;
+			this.currentConnection = null;			//
 		}
 	}
 
