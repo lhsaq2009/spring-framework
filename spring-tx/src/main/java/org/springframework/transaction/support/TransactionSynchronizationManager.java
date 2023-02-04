@@ -61,25 +61,55 @@ import org.springframework.util.Assert;
 public abstract class TransactionSynchronizationManager {		// 事务同步管理器，全靠 static，连类也不支持实例化；
 
 	private static final Log logger = LogFactory.getLog(TransactionSynchronizationManager.class);
+	/*
+	 * 何时添加：
+	 * 		CASE 1. DataSourceTransactionManager.doBegin()
+	 * 			    =>> !txObject.hasConnectionHolder()
+	 * 					Connection newCon = obtainDataSource().getConnection();
+	 * 					txObject.setConnectionHolder(new ConnectionHolder(newCon), true);
+	 * 				=>> if (txObject.isNewConnectionHolder()) {
+	 * 					TransactionSynchronizationManager.bindResource(obtainDataSource(), txObject.getConnectionHolder());
+	 *
+	 * 何时释放：
+	 * 		CASE 1. AbstractPlatformTransactionManager.processCommit(..)
+	 * 				=>> AbstractPlatformTransactionManager.cleanupAfterCompletion
+	 * 					=>> DataSourceTransactionManager.doCleanupAfterCompletion
+	 * 						TransactionSynchronizationManager.unbindResource(obtainDataSource());
+	 *
+	 * map = {HashMap@6461}  size = 1
+	 * 		key  	= {DriverManagerDataSource@5364}	-- 数据源
+	 * 		value	= {ConnectionHolder@6463}			-- 数据库链接
+	 * 			connectionHandle 	= {SimpleConnectionHandle@6467} "SimpleConnectionHandle:...JDBC4Connection@7542e3c9"
+	 * 				connection 		= {JDBC4Connection@6468}
+	 * 			currentConnection 	= {JDBC4Connection@6468}
+	 */
+	private static final ThreadLocal<Map<Object, Object>> resources = new NamedThreadLocal<>("Transactional resources");
+	// static
 
-	private static final ThreadLocal<Map<Object, Object>> resources =
-			new NamedThreadLocal<>("Transactional resources");
-
-	private static final ThreadLocal<Set<TransactionSynchronization>> synchronizations =
-			new NamedThreadLocal<>("Transaction synchronizations");
-
-	private static final ThreadLocal<String> currentTransactionName =
-			new NamedThreadLocal<>("Current transaction name");
-
-	private static final ThreadLocal<Boolean> currentTransactionReadOnly =
-			new NamedThreadLocal<>("Current transaction read-only status");
-
-	private static final ThreadLocal<Integer> currentTransactionIsolationLevel =
-			new NamedThreadLocal<>("Current transaction isolation level");
-
-	private static final ThreadLocal<Boolean> actualTransactionActive =
-			new NamedThreadLocal<>("Actual transaction active");
-
+	/**
+	 * TODO：synchronizations 何用？？2023-01-27
+	 *
+	 * 何时添加：涉及下面 5个 ThreadLocal
+	 * 		CASE 1. TransactionAspectSupport.createTransactionIfNecessary(.)
+	 * 				=>> AbstractPlatformTransactionManager.getTransaction()
+	 * 					=>> startTransaction
+	 * 						=>> {@link AbstractPlatformTransactionManager#prepareSynchronization}
+	 * 							synchronizations.set(new LinkedHashSet<>());
+	 * 何时释放：涉及下面 5个
+	 * 		CASE 1. {@link org.springframework.transaction.support.AbstractPlatformTransactionManager#processCommit}
+	 *				=>> AbstractPlatformTransactionManager.cleanupAfterCompletion(..)
+	 * 					=>> {@link #clear}
+	 * 						=>> remove();
+	 */
+	private static final ThreadLocal<Set<TransactionSynchronization>> synchronizations = new NamedThreadLocal<>("Transaction synchronizations");
+	// 当前事务名称，即方法名：示例：org.example.service.tx.TransactionByAnnotation.updateUserSuccess
+	private static final ThreadLocal<String> currentTransactionName = new NamedThreadLocal<>("Current transaction name");
+	// 当前事务是否只读
+	private static final ThreadLocal<Boolean> currentTransactionReadOnly = new NamedThreadLocal<>("Current transaction read-only status");
+	// 当前事务隔离级别
+	private static final ThreadLocal<Integer> currentTransactionIsolationLevel = new NamedThreadLocal<>("Current transaction isolation level");
+	// 当前是否存在事务
+	private static final ThreadLocal<Boolean> actualTransactionActive = new NamedThreadLocal<>("Actual transaction active");
 
 	//-------------------------------------------------------------------------
 	// Management of transaction-associated resource handles
@@ -117,10 +147,15 @@ public abstract class TransactionSynchronizationManager {		// 事务同步管理
 	 * @return a value bound to the current thread (usually the active
 	 * resource object), or {@code null} if none
 	 * @see ResourceTransactionManager#getResourceFactory()
+	 *
+	 * key = {DriverManagerDataSource@5267}
+	 * <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 	 */
 	@Nullable
-	public static Object getResource(Object key) {
+	public static Object getResource(Object key) {	//
+		// <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		Object actualKey = TransactionSynchronizationUtils.unwrapResourceIfNecessary(key);
+		// eg1：getUserList，value = null
 		Object value = doGetResource(actualKey);
 		if (value != null && logger.isTraceEnabled()) {
 			logger.trace("Retrieved value [" + value + "] for key [" + actualKey + "] bound to thread [" +
@@ -245,7 +280,7 @@ public abstract class TransactionSynchronizationManager {		// 事务同步管理
 	 * Can be called before register to avoid unnecessary instance creation.
 	 * @see #registerSynchronization
 	 */
-	public static boolean isSynchronizationActive() {		// 获取到当前是否存在事务
+	public static boolean isSynchronizationActive() {		// 获取当前是否存在事务
 		return (synchronizations.get() != null);
 	}
 
