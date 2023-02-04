@@ -14,9 +14,16 @@ import org.springframework.lang.Nullable;
  * @since 2.0
  */
 @SuppressWarnings("serial")
-public class AspectJMethodBeforeAdvice extends AbstractAspectJAdvice implements MethodBeforeAdvice, Serializable {
+public class AspectJMethodBeforeAdvice extends AbstractAspectJAdvice implements MethodBeforeAdvice, Serializable {		//
 
-	public AspectJMethodBeforeAdvice(Method aspectJBeforeAdviceMethod,
+	/**
+	 * {@link org.springframework.aop.aspectj.annotation.ReflectiveAspectJAdvisorFactory#getAdvice}
+	 *  switch (aspectJAnnotation.getAnnotationType()) {
+	 *      case AtBefore:
+	 *          springAdvice = new AspectJMethodBeforeAdvice(
+	 *                  candidateAdviceMethod, expressionPointcut, aspectInstanceFactory);
+	 */
+	public AspectJMethodBeforeAdvice(Method aspectJBeforeAdviceMethod,		//
 									 AspectJExpressionPointcut pointcut,
 									 AspectInstanceFactory aif) {
 
@@ -26,7 +33,7 @@ public class AspectJMethodBeforeAdvice extends AbstractAspectJAdvice implements 
 
 	@Override
 	public void before(Method method, Object[] args, @Nullable Object target) throws Throwable {
-		invokeAdviceMethod(getJoinPointMatch(), null, null);
+		invokeAdviceMethod(getJoinPointMatch(), null, null);	// =>>
 	}
 
 	@Override
