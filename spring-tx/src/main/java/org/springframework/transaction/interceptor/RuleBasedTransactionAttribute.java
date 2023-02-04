@@ -22,6 +22,16 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 09.04.2003
  * @see TransactionAttributeEditor
+ *
+ *                              TransactionDefinition
+ *                                     ▲ ▲
+ *              ┌──────────────────────┘ │
+ * TransactionAttribute  DefaultTransactionDefinition
+ *              ▲                        ▲
+ *              └──────────────────────┐ │
+ *                        DefaultTransactionAttribute
+ *                                       ▲
+ *                      RuleBasedTransactionAttribute
  */
 @SuppressWarnings("serial")
 public class RuleBasedTransactionAttribute extends DefaultTransactionAttribute implements Serializable {
