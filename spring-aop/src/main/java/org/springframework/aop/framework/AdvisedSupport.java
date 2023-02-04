@@ -54,36 +54,38 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	 */
 	public static final TargetSource EMPTY_TARGET_SOURCE = EmptyTargetSource.INSTANCE;
 
+	/**
+	 * Package-protected to allow direct access for efficiency.
+	 * {@link org.springframework.aop.target.SingletonTargetSource}
+	 */
+	TargetSource targetSource = EMPTY_TARGET_SOURCE;								// AOP 被代理的目标对象
 
-	/** Package-protected to allow direct access for efficiency. */
-	TargetSource targetSource = EMPTY_TARGET_SOURCE;
-
-	/** Whether the Advisors are already filtered for the specific target class. */
+	/** Advisors 是否已针对特定目标类进行筛选；Whether the Advisors are already filtered for the specific target class. */
 	private boolean preFiltered = false;
 
 	/** The AdvisorChainFactory to use. */
 	AdvisorChainFactory advisorChainFactory = new DefaultAdvisorChainFactory();		//
 
 	/** Cache with Method as key and advisor chain List as value. */
-	private transient Map<MethodCacheKey, List<Object>> methodCache;	//
+	private transient Map<MethodCacheKey, List<Object>> methodCache;				// TODO:
 
 	/**
 	 * Interfaces to be implemented by the proxy. Held in List to keep the order
 	 * of registration, to create JDK proxy with specified order of interfaces.
 	 */
-	private List<Class<?>> interfaces = new ArrayList<>();
+	private List<Class<?>> interfaces = new ArrayList<>();				// 自实现的接口
 
 	/**
 	 * List of Advisors. If an Advice is added, it will be wrapped
 	 * in an Advisor before being added to this List.
 	 */
-	private List<Advisor> advisors = new ArrayList<>();
+	private List<Advisor> advisors = new ArrayList<>();					//
 
 	/**
 	 * Array updated on changes to the advisors list, which is easier
 	 * to manipulate internally.
 	 */
-	private Advisor[] advisorArray = new Advisor[0];
+	private Advisor[] advisorArray = new Advisor[0];					//
 
 
 	/**
@@ -463,8 +465,20 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		MethodCacheKey cacheKey = new MethodCacheKey(method);
 		List<Object> cached = this.methodCache.get(cacheKey);
 		if (cached == null) {
+			/*
+			 * this.advisorChainFactory = {DefaultAdvisorChainFactory@5631}
+			 * TODO：各种方式的 advisor，对应 Interceptor，
+			 * cached = {ArrayList@5640}  size = 7
+			 * 		0 = {ExposeInvocationInterceptor@8380}					--
+			 * 		1 = {MethodBeforeAdviceInterceptor@6919}				-- aspectName = "logXML_AOP_Aspect_Order_22"
+			 * 		2 = {MethodBeforeAdviceInterceptor@8381}				-- aspectName = "log_Annotation_Order_33"
+			 * 		3 = {Log_Service_Advisor_extend_Orders_44$lambda@7176}	-- 来自 getAdvice() 返回的匿名类
+			 * 		4 = {MethodBeforeAdviceInterceptor@7234}				-- advice = {Log_XML_AOP_Advisor_Implement_Order_55@6757}
+			 * 		5 = {AfterReturningAdviceInterceptor@8275}				-- advice = {Log_XML_AOP_Advisor_Implement_Order_55@6757}
+			 * 		6 = {TransactionInterceptor@8382}						-- transactionManagerBeanName = "transactionManager"
+			 */
 			cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(
-					this, method, targetClass);
+					this, method, targetClass);		// =>> 重要，得到对应的 interceptor
 			this.methodCache.put(cacheKey, cached);
 		}
 		return cached;
