@@ -148,6 +148,13 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	@Nullable
 	private String transactionManagerBeanName;
 
+	/*
+	 * <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	 *
+	 * transactionManager = {DataSourceTransactionManager@5255}
+	 * 		dataSource = {DriverManagerDataSource@5289}
+	 * 		...
+	 */
 	@Nullable
 	private TransactionManager transactionManager;
 
