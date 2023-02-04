@@ -39,10 +39,15 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 2.0
  */
-public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFactory {
+public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFactory {		//
 
 	private static final String AJC_MAGIC = "ajc$";
 
+	/**
+	 * =>> {@link ReflectiveAspectJAdvisorFactory#getPointcut(Method, Class)}
+	 *     AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
+	 *     =>> for (Class<?> clazz : ASPECTJ_ANNOTATION_CLASSES) -> findAnnotation(method, (Class<Annotation>) clazz);
+	 */
 	private static final Class<?>[] ASPECTJ_ANNOTATION_CLASSES = new Class<?>[] {
 			Pointcut.class, Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class};
 
@@ -60,11 +65,13 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	 * when compiled by ajc with the -1.5 flag, yet they cannot be consumed by Spring AOP.
 	 */
 	@Override
-	public boolean isAspect(Class<?> clazz) {
+	public boolean isAspect(Class<?> clazz) {		//
 		return (hasAspectAnnotation(clazz) && !compiledByAjc(clazz));
 	}
 
 	private boolean hasAspectAnnotation(Class<?> clazz) {
+		//                                               clazz = {Class@4129} "class org.example.beans.LoggingAspect"
+		// AnnotationUtils.findAnnotation(clazz, Aspect.class) = {$Proxy18@4603} "@org.aspectj.lang.annotation.Aspect(value=)"
 		return (AnnotationUtils.findAnnotation(clazz, Aspect.class) != null);
 	}
 
@@ -115,7 +122,7 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	@Nullable
 	protected static AspectJAnnotation<?> findAspectJAnnotationOnMethod(Method method) {
 		for (Class<?> clazz : ASPECTJ_ANNOTATION_CLASSES) {
-			AspectJAnnotation<?> foundAnnotation = findAnnotation(method, (Class<Annotation>) clazz);
+			AspectJAnnotation<?> foundAnnotation = findAnnotation(method, (Class<Annotation>) clazz);		//
 			if (foundAnnotation != null) {
 				return foundAnnotation;
 			}
@@ -169,7 +176,7 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 
 		private final AspectJAnnotationType annotationType;
 
-		private final String pointcutExpression;
+		private final String pointcutExpression;		//
 
 		private final String argumentNames;
 
