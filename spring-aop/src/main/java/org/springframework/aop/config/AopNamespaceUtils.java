@@ -39,10 +39,15 @@ public abstract class AopNamespaceUtils {
 	 */
 	private static final String EXPOSE_PROXY_ATTRIBUTE = "expose-proxy";
 
+	/**
+	 * 何种情况需要注册：InfrastructureAdvisorAutoProxyCreator.class
+	 * =>> {@link AopConfigUtils#registerAutoProxyCreatorIfNecessary(BeanDefinitionRegistry, Object)}
+	 */
 	public static void registerAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
 
-		BeanDefinition beanDefinition = AopConfigUtils.registerAutoProxyCreatorIfNecessary(		// PPArf8u7^Nbw
+		BeanDefinition beanDefinition = AopConfigUtils.registerAutoProxyCreatorIfNecessary(		// <**:annotation-driven ...> =>>
+				// parserContext.getRegistry() = {DefaultListableBeanFactory@3641} "DefaultListableBeanFactory@48af2d5d"
 				parserContext.getRegistry(), parserContext.extractSource(sourceElement));
 		useClassProxyingIfNecessary(parserContext.getRegistry(), sourceElement);
 		registerComponentIfNecessary(beanDefinition, parserContext);
