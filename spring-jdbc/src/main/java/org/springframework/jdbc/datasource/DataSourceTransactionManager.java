@@ -385,7 +385,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			if (txObject.isMustRestoreAutoCommit()) {
 				con.setAutoCommit(true);
 			}
-			DataSourceUtils.resetConnectionAfterTransaction(
+				DataSourceUtils.resetConnectionAfterTransaction(			// =>> 还原之前的事务相关
 					con, txObject.getPreviousIsolationLevel(), txObject.isReadOnly());
 		}
 		catch (Throwable ex) {
