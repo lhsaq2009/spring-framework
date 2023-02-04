@@ -16,9 +16,14 @@ import org.springframework.lang.Nullable;
  * @since 2.0.2
  * @see #setPointcut
  * @see #setAdviceBeanName
+ *
+ * usage:
+ * 		CASE 1. {@link org.springframework.aop.config.ConfigBeanDefinitionParser#parseAdvisor}
+ * 	            advisorBeanName = parserContext.getReaderContext().registerWithGeneratedName(advisorDef);
+ * 	    CASE 2.
  */
 @SuppressWarnings("serial")
-public class DefaultBeanFactoryPointcutAdvisor extends AbstractBeanFactoryPointcutAdvisor {
+public class DefaultBeanFactoryPointcutAdvisor extends AbstractBeanFactoryPointcutAdvisor {		//
 
 	private Pointcut pointcut = Pointcut.TRUE;
 
