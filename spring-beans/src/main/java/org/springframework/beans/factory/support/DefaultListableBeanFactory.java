@@ -490,9 +490,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return getBeanNamesForType(type, true, true);
 	}
 
+	/**
+	 * CASE 1. type = {Class@3745} "interface BeanDefinitionRegistryPostProcessor"
+	 */
 	@Override	// 3&h@*kzwMrjK
 	public String[] getBeanNamesForType(@Nullable Class<?> type, boolean includeNonSingletons, boolean allowEagerInit) {
 		if (!isConfigurationFrozen() || type == null || !allowEagerInit) {
+			// CASE 1. =>> 分析何时 put mergedBeanDefinitions
 			return doGetBeanNamesForType(ResolvableType.forRawClass(type), includeNonSingletons, allowEagerInit);	// =>> 05
 		}
 		Map<Class<?>, String[]> cache =
@@ -512,17 +516,18 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// 收集能兼容 type.getType().getTypeName() 类型的 Bean
 		List<String> result = new ArrayList<>();
 
-		// Check all bean definitions.
+		// 检查所有 Bean definition
 		for (String beanName : this.beanDefinitionNames) {
 			// Only consider bean as eligible if the bean name is not defined as alias for some other bean.
 			if (!isAlias(beanName)) {														// 有缓存，检查非别名，SimpleAliasRegistry.aliasMap
 				try {
+					// CASE 1. =>> 分析何时 put mergedBeanDefinitions
 					RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);		// 有缓存：AbstractBeanFactory.mergedBeanDefinitions
-					// Only check bean definition if it is complete.
+					// 仅检查 Bean definition 是否完整；Only check bean definition if it is complete.
 					if (!mbd.isAbstract() && (allowEagerInit ||
 							(mbd.hasBeanClass() || !mbd.isLazyInit() || isAllowEagerClassLoading()) &&
 									!requiresEagerInitForType(mbd.getFactoryBeanName()))) {
-						boolean isFactoryBean = isFactoryBean(beanName, mbd);
+						boolean isFactoryBean = isFactoryBean(beanName, mbd);				// =>> 先获得类型，再判断是否派生自 FactoryBean
 						BeanDefinitionHolder dbd = mbd.getDecoratedDefinition();
 						boolean matchFound = false;
 						boolean allowFactoryBeanInit = (allowEagerInit || containsSingleton(beanName));		// 有单例缓存：this.singletonObjects
