@@ -448,11 +448,41 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		 *
 		 * 		3 = {CommonAnnotationBeanPostProcessor@2733}
 		 * 		4 = {AutowiredAnnotationBeanPostProcessor@2734}
+		 *
 		 * 		5 = {AnnotationAwareAspectJAutoProxyCreator@2300}	------> AOP 动态代理
+		 * 		. =  {InfrastructureAdvisorAutoProxyCreator@4056}	------> Spring MVC 补充
+		 *
 		 * 		6 = {ApplicationListenerDetector@2508}
+		 *
+		 * -----------------------------------------------------------
+		 *
+		 * ProxyConfig
+		 * 		ProxyProcessorSupport
+		 * 			AbstractAutoProxyCreator								// --------
+		 * 				AbstractAdvisorAutoProxyCreator
+		 * 					InfrastructureAdvisorAutoProxyCreator			// 优先级最低
+		 * 					AspectJAwareAdvisorAutoProxyCreator
+		 * 						AnnotationAwareAspectJAutoProxyCreator		// 优先级最高
+		 * 					DefaultAdvisorAutoProxyCreator
+		 *
+		 * -----------------------------------------------------------
+		 *
+		 * eg1：processor = {InfrastructureAdvisorAutoProxyCreator@4056}
+		 * 					"proxyTargetClass=false; optimize=false; opaque=false; exposeProxy=false; frozen=false"
 		 */
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
-			Object current = processor.postProcessAfterInitialization(result, beanName);	// AnnotationAwareAspectJAutoProxyCreator 返回代理对象
+			/*
+			 * CASE 1: processor = {InfrastructureAdvisorAutoProxyCreator@4046}
+			 * CASE 2: processor = {AspectJAwareAdvisorAutoProxyCreator@4069}
+			 *         =>> AbstractAutoProxyCreator.postProcessAfterInitialization
+			 *             wrapIfNecessary(bean, beanName, cacheKey);
+			 *             =>> 所有实例化类，再次是否需要创建代理类；
+			 *                 相关 AOP Advisors 收集起来：proxyFactory.addAdvisors(advisors);
+			 */
+			/** {@link org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator#wrapIfNecessary} */
+			// AnnotationAwareAspectJAutoProxyCreator 返回代理对象
+			Object current = processor.postProcessAfterInitialization(result, beanName);
+			// CASE 1. current = {$Proxy20@4826} "org.example.service.tx.TransactionByAnnotation@7d40bac5"
 			if (current == null) {
 				return result;
 			}
@@ -659,6 +689,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 			/*
 			 * 存储位置：this.singletonFactories.put(beanName, singletonFactory);
+			 *         =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#doCreateBean}
+			 *             addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+			 *             =>> 存储位置：this.singletonFactories.put(beanName, singletonFactory);
 			 * ----------------------------------------------------------------
 			 * 何时回调：{@link DefaultSingletonBeanRegistry#getSingleton(String, boolean)}
 			 *         ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
@@ -1257,7 +1290,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		for (BeanPostProcessor bp : getBeanPostProcessors()) {
 			if (bp instanceof InstantiationAwareBeanPostProcessor) {
 				InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
-				Object result = ibp.postProcessBeforeInstantiation(beanClass, beanName);
+				// CASE 1. InfrastructureAdvisorAutoProxyCreator ( core ) -- <tx:annotation-driven ...
+				// CASE 2. AnnotationAwareAspectJAutoProxyCreator ( core ) -- <aop:aspectj-autoproxy ...
+				Object result = ibp.postProcessBeforeInstantiation(beanClass, beanName);	// =>>
 				if (result != null) {
 					return result;
 				}
