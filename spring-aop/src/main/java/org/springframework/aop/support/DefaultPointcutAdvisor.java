@@ -18,11 +18,11 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @see #setPointcut
  * @see #setAdvice
- */
+ */  // org.springframework.aop.interceptor.ExposeInvocationInterceptor
 @SuppressWarnings("serial")
-public class DefaultPointcutAdvisor extends AbstractGenericPointcutAdvisor implements Serializable {
+public class DefaultPointcutAdvisor extends AbstractGenericPointcutAdvisor implements Serializable {		//
 
-	private Pointcut pointcut = Pointcut.TRUE;
+	private Pointcut pointcut = Pointcut.TRUE;		//
 
 
 	/**
