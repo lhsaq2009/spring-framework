@@ -16,7 +16,7 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 2.0
  */
-public class AspectJPointcutAdvisor implements PointcutAdvisor, Ordered {
+public class AspectJPointcutAdvisor implements PointcutAdvisor, Ordered {		//
 
 	private final AbstractAspectJAdvice advice;
 
