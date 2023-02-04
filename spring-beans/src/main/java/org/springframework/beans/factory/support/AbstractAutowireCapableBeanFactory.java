@@ -526,8 +526,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
-			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
-			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
+			/*
+			 * CASE 1. beanName = "org.springframework.transaction.config.internalTransactionAdvisor"
+			 * 		   mbdToUse = {RootBeanDefinition@4190} "Root bean: class [BeanFactoryTransactionAttributeSourceAdvisor];"
+			 * ------------------------------------------------------------------
+			 * 在 doCreateBean(..) 之前，让 BeanPostProcessor 有机会返回代理对象，而不是目标 Bean 实例；
+			 * Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
+			 * ------------------------------------------------------------------
+			 * resolveBeforeInstantiation(beanName, mbdToUse);
+			 *     =>> bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
+			 *     	   =>> 可返回代理对象，使正常创建实例短路：InstantiationAwareBeanPostProcessor.postProcessBeforeInstantiation
+			 *             =>> InstantiationAwareBeanPostProcessor.postProcessBeforeInstantiation(..)
+			 *
+			 *     若返回了代理对象：if (bean != null)，则执行
+			 *     =>> bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+			 *         =>> AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsAfterInitialization(..)
+			 *             =>> BeanPostProcessor.postProcessAfterInitialization(..)
+			 */
+			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);		// =>>
 			if (bean != null) {
 				return bean;
 			}
@@ -641,7 +657,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
-			/**
+			/*
 			 * 存储位置：this.singletonFactories.put(beanName, singletonFactory);
 			 * ----------------------------------------------------------------
 			 * 何时回调：{@link DefaultSingletonBeanRegistry#getSingleton(String, boolean)}
