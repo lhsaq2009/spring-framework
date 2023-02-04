@@ -44,7 +44,13 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	private AnnotatedElement qualifiedElement;
 
-	/** Determines if the definition needs to be re-merged. */
+	/**
+	 * 确定是否需要重新合并定义，重新得到 BeanDefinition
+	 *
+	 * Determines if the definition needs to be re-merged.
+	 * =>> {@link AbstractBeanFactory#clearMergedBeanDefinition}
+	 *     bd.stale = true;
+	 */
 	volatile boolean stale;
 
 	boolean allowCaching = true;
@@ -54,11 +60,21 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	volatile ResolvableType targetType;
 
-	/** Package-visible field for caching the determined Class of a given bean definition. */
+	/** Package-visible field for caching the determined Class of a given bean definition.
+	 *
+	 *  CASE 1. internalTransactionAdvisor
+	 *          =>> {@link AbstractAutowireCapableBeanFactory#determineTargetType}
+	 *              =>> mbd.resolvedTargetType = targetType;
+	 */
 	@Nullable
 	volatile Class<?> resolvedTargetType;
 
-	/** Package-visible field for caching if the bean is a factory bean. */
+	/**
+	 * Package-visible field for caching if the bean is a factory bean.
+	 *
+	 * =>> {@link AbstractBeanFactory#isFactoryBean(String, RootBeanDefinition)}
+	 *     mbd.isFactoryBean = result;
+	 */
 	@Nullable
 	volatile Boolean isFactoryBean;
 
@@ -71,11 +87,11 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	volatile Method factoryMethodToIntrospect;
 
 	/** Common lock for the four constructor fields below. */
-	final Object constructorArgumentLock = new Object();
+	final Object constructorArgumentLock = new Object();	//
 
 	/** Package-visible field for caching the resolved constructor or factory method. */
 	@Nullable
-	Executable resolvedConstructorOrFactoryMethod;		// TODO：构造函数？？
+	Executable resolvedConstructorOrFactoryMethod;			// TODO：构造函数？？
 
 	/** Package-visible field that marks the constructor arguments as resolved. */
 	boolean constructorArgumentsResolved = false;
