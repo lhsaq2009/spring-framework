@@ -84,11 +84,22 @@ public abstract class DataSourceUtils {
 	 */
 	public static Connection doGetConnection(DataSource dataSource) throws SQLException {
 		Assert.notNull(dataSource, "No DataSource specified");
+		// 关键点：事务相关。TODO：整理到 JdbcTemplate.execute 段落去，2023-01-13
 
+		/*
+		 * CASE 1、当存在事务管理器，ConnectionHolder 已经在 xxx 获取 Connection 了
+		 * 		=>> DataSourceTransactionManager.doBegin()
+		 * 			Connection newCon = obtainDataSource().getConnection();
+		 * 			...
+		 * 			txObject.setConnectionHolder(new ConnectionHolder(newCon), true);
+		 * 			...
+		 * 			if (txObject.isNewConnectionHolder()) {
+		 * 				TransactionSynchronizationManager.bindResource(obtainDataSource(), txObject.getConnectionHolder());
+		 */
 		ConnectionHolder conHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
 		if (conHolder != null && (conHolder.hasConnection() || conHolder.isSynchronizedWithTransaction())) {
 			conHolder.requested();
-			if (!conHolder.hasConnection()) {
+			if (!conHolder.hasConnection()) {		// 当启用事务管理器时，没遇到这里进来的情况
 				logger.debug("Fetching resumed JDBC Connection from DataSource");
 				conHolder.setConnection(fetchConnection(dataSource));
 			}
@@ -96,6 +107,7 @@ public abstract class DataSourceUtils {
 		}
 		// Else we either got no holder or an empty thread-bound holder here.
 
+		// CASE 2、当没有事务管理器，去获取 Connection
 		logger.debug("Fetching JDBC Connection from DataSource");
 		Connection con = fetchConnection(dataSource);
 
@@ -169,7 +181,7 @@ public abstract class DataSourceUtils {
 				if (debugEnabled) {
 					logger.debug("Setting JDBC Connection [" + con + "] read-only");
 				}
-				con.setReadOnly(true);
+				con.setReadOnly(true);		// 传递给 JDBC 连接对象
 			}
 			catch (SQLException | RuntimeException ex) {
 				Throwable exToCheck = ex;
@@ -199,7 +211,7 @@ public abstract class DataSourceUtils {
 			}
 		}
 
-		return previousIsolationLevel;
+		return previousIsolationLevel;	// 之前的「隔离级别」
 	}
 
 	/**
@@ -372,7 +384,7 @@ public abstract class DataSourceUtils {
 				return;
 			}
 		}
-		doCloseConnection(con, dataSource);
+		doCloseConnection(con, dataSource);				// =>> MySQL JDBC 关闭数据库连接
 	}
 
 	/**
