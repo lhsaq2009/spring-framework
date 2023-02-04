@@ -655,7 +655,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 			/*
 			 * ==> {@link AbstractAutowireCapableBeanFactory#applyPropertyValues}
-			 * 为 Bean 实例，赋上 XML 配置里的 <property name="sex" value="boy"/> 属性值
+			 * 为 Bean 实例，赋值配置的属性，比如：XML 方式配置 <property name="sex" value="boy"/>，或 代码里组装的
 			 */
 			populateBean(beanName, mbd, instanceWrapper);						// =>> 填充实例属性
 
@@ -687,7 +687,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		if (earlySingletonExposure) {											// 单例，true
 			Object earlySingletonReference = getSingleton(beanName, false);
-			if (earlySingletonReference != null) {								// TODO：???
+			if (earlySingletonReference != null) {									// 为解决循环引用，获取提前暴漏的对象
 				if (exposedObject == bean) {
 					exposedObject = earlySingletonReference;
 				}
@@ -724,9 +724,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return exposedObject;
 	}
 
+	/**
+	 * 推断 Bean 的实际类型
+	 */
 	@Override
 	@Nullable
 	protected Class<?> predictBeanType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
+		// 顺序：resolvedTargetType > targetType > mbd.getBeanClass()
 		Class<?> targetType = determineTargetType(beanName, mbd, typesToMatch);
 		// Apply SmartInstantiationAwareBeanPostProcessors to predict the
 		// eventual type after a before-instantiation shortcut.
@@ -747,12 +751,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 	/**
+	 * 确定给定 bean definition 的目标类型。<br/><br/>
+	 *
 	 * Determine the target type for the given bean definition.
 	 * @param beanName the name of the bean (for error handling purposes)
 	 * @param mbd the merged bean definition for the bean
 	 * @param typesToMatch the types to match in case of internal type matching purposes
 	 * (also signals that the returned {@code Class} will never be exposed to application code)
 	 * @return the type for the bean if determinable, or {@code null} otherwise
+	 *
+	 * CASE 1. beanName = "org.springframework.transaction.config.internalTransactionAdvisor"
+	 *         mbd.getTargetType() = null
+	 *		   =>> resolveBeanClass(..) -> mbd.getBeanClass();
 	 */
 	@Nullable
 	protected Class<?> determineTargetType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
@@ -762,7 +772,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					getTypeForFactoryMethod(beanName, mbd, typesToMatch) :
 					resolveBeanClass(mbd, beanName, typesToMatch));
 			if (ObjectUtils.isEmpty(typesToMatch) || getTempClassLoader() == null) {
-				mbd.resolvedTargetType = targetType;
+				mbd.resolvedTargetType = targetType;	// 赋值
 			}
 		}
 		return targetType;
@@ -1187,7 +1197,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	/**
 	 * Apply before-instantiation post-processors, resolving whether there is a
-	 * before-instantiation shortcut for the specified bean.
+	 * before-instantiation shortcut for the specified bean. <br/>
+	 *
+	 * 应用「before-instantiation 后处理器」，当解析指定 Bean 是否存在 before-instantiation 快捷方式
+	 *
 	 * @param beanName the name of the bean
 	 * @param mbd the bean definition for the bean
 	 * @return the shortcut-determined bean instance, or {@code null} if none
@@ -1200,9 +1213,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 				Class<?> targetType = determineTargetType(beanName, mbd);
 				if (targetType != null) {
-					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
+					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);		// =>>
 					if (bean != null) {
-						bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+						// for getBeanPostProcessors() -> BeanPostProcessor.postProcessAfterInitialization(..)
+						bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);					// resolveBeforeInstantiation(..)
 					}
 				}
 			}
@@ -1541,8 +1555,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			checkDependencies(beanName, mbd, filteredPds, pvs);
 		}
 
-		if (pvs != null) {	// 存在 <property> 属性
-			applyPropertyValues(beanName, mbd, bw, pvs);		// =>>
+		if (pvs != null) {											// 存在 <property> 属性
+			/*
+			 * CASE 1: beanName = org.springframework.transaction.config.internalTransactionAdvisor
+			 *         propertyValueList = {ArrayList@4233}  size = 2
+			 * 		   		0 = {PropertyValue@4219} "bean property 'transactionAttributeSource'"
+			 * 				1 = {PropertyValue@4291} "bean property 'adviceBeanName'"
+			 */
+			applyPropertyValues(beanName, mbd, bw, pvs);		// =>> 填充对象属性
 		}
 	}
 
@@ -1801,7 +1821,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					}
 					originalValue = new DependencyDescriptor(new MethodParameter(writeMethod, 0), true);
 				}
-				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);	// =>> 根据配置为实例赋值属性
+				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);	// =>> 根据指定「属性名」，为实例赋值属性
 				Object convertedValue = resolvedValue;
 				boolean convertible = bw.isWritableProperty(propertyName) &&
 						!PropertyAccessorUtils.isNestedOrIndexedProperty(propertyName);
@@ -1889,7 +1909,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	// 调用 Bean 一些生命周期相关的方法
 	protected Object initializeBean(String beanName, Object bean, @Nullable RootBeanDefinition mbd) {
 		/*
-		 * 01、调用 invokeAwareMethods(..)，内部：
+		 * 01、调用 3种 invokeAwareMethods(..)，内部：
 		 * 		BeanNameAware 				--> bean.setBeanName(beanName)
 		 * 		BeanClassLoaderAware		--> bean.setBeanClassLoader(bcl)
 		 * 		BeanFactoryAware			--> bean.setBeanFactory(defaultListableBeanFactory)
@@ -1901,6 +1921,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}, getAccessControlContext());
 		}
 		else {
+			/*
+			 * BeanNameAware				--> setBeanName(beanName);
+			 * BeanClassLoaderAware			--> setBeanClassLoader(bcl);
+			 * BeanFactoryAware				--> setBeanFactory(AbstractAutowireCapableBeanFactory.this);
+			 */
 			invokeAwareMethods(beanName, bean);
 		}
 
@@ -1920,8 +1945,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					beanName, "Invocation of init method failed", ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
-			// 04、调用：BeanPostProcessor.postProcessAfterInitialization
-			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+			// 04、调用：BeanPostProcessor.postProcessAfterInitialization()
+			// 		populated 之后，afterPropertiesSet、init-method 之「后」执行
+			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);		// initializeBean(..)
 		}
 
 		return wrappedBean;
