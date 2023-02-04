@@ -149,8 +149,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * 		1 = {ApplicationListenerDetector@3198}
 	 */
 	private final List<BeanPostProcessor> beanPostProcessors = new CopyOnWriteArrayList<>();
-
-	/** Indicates whether any InstantiationAwareBeanPostProcessors have been registered. */
+	/**
+	 * Indicates whether any InstantiationAwareBeanPostProcessors have been registered.<br/>
+	 *
+	 * 是否已注册任何 InstantiationAwareBeanPostProcessors ( 实例化感知 Processor )
+	 * 	=>> {@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation}
+	 * 	=>> {@link InstantiationAwareBeanPostProcessor#postProcessAfterInstantiation}
+	 */
 	private volatile boolean hasInstantiationAwareBeanPostProcessors;
 
 	/** Indicates whether any DestructionAwareBeanPostProcessors have been registered. */
@@ -164,7 +169,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private SecurityContextProvider securityContextProvider;
 
     /**
-     * Map from bean name to merged RootBeanDefinition.   记录着 BeanName 1:1 RootBeanDefinition
+	 * 压平：child Bean 和 parent Bean 合并属性；
+	 *
+     * Map from bean name to merged RootBeanDefinition.<br/><br/>
+	 * Map (1:1)：BeanName -> merged RootBeanDefinition
+	 *
+	 * PUT：CASE 1: {@link AbstractBeanFactory#getMergedBeanDefinition(String, BeanDefinition, BeanDefinition)}
+	 *              =>> this.mergedBeanDefinitions.put(beanName, mbd);
      */
     private final Map<String, RootBeanDefinition> mergedBeanDefinitions = new ConcurrentHashMap<>(256);
 
@@ -1299,7 +1310,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	/**
 	 * Return a merged RootBeanDefinition, traversing the parent bean definition
-	 * if the specified bean corresponds to a child bean definition.
+	 * if the specified bean corresponds to a child bean definition.<br/><br/>
+	 *
+	 * 返回合并的 RootBeanDefinition，如果指定的 Bean 对应于 child Bean 定义，则遍历父Bean 定义 <br/><br/>
+	 *
 	 * @param beanName the name of the bean to retrieve the merged definition for
 	 * @return a (potentially merged) RootBeanDefinition for the given bean
 	 * @throws NoSuchBeanDefinitionException if there is no bean with the given name
@@ -1311,6 +1325,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		if (mbd != null && !mbd.stale) {
 			return mbd;
 		}
+		// CASE 1. =>> 分析何时 put mergedBeanDefinitions
 		return getMergedBeanDefinition(beanName, getBeanDefinition(beanName));
 	}
 
