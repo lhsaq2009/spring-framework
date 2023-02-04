@@ -93,6 +93,21 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			ClassUtils.isPresent("org.reactivestreams.Publisher", TransactionAspectSupport.class.getClassLoader());
 
 	/**
+	 * ==> TransactionInterceptor#invoke
+	 * 	   ==> TransactionAspectSupport#invokeWithinTransaction
+	 *         TransactionInfo txInfo = createTransactionIfNecessary(ptm, txAttr, joinpointIdentification);
+	 *         ==> TransactionAspectSupport.prepareTransactionInfo()
+	 *             txInfo.bindToThread();
+	 *             ==> TransactionAspectSupport.TransactionInfo#bindToThread()
+	 *             	   this.oldTransactionInfo = transactionInfoHolder.get();  -- 1. 第一次进入，get() 返回 null
+	 *                 transactionInfoHolder.set(this);
+	 * ( 去执行目标事务方法 ... )
+	 * =>> cleanupTransactionInfo(txInfo);
+	 *     =>> txInfo.restoreThreadLocalStatus();
+	 *         // private static final ThreadLocal<TransactionInfo> transactionInfoHolder = ...
+	 *         transactionInfoHolder.set(this.oldTransactionInfo);             -- 2. 恢复之前挂起的事务对象
+	 *
+	 *
 	 * Holder to support the {@code currentTransactionStatus()} method,
 	 * and to support communication between different cooperating advices
 	 * (e.g. before and after advice) if the aspect involves more than a
