@@ -246,7 +246,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected <T> T doGetBean(                                // =>> 02、getBean
 			String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly)
 			throws BeansException {
-        // 不管 name 是别名还是真名，得到 Bean 的真名
+		/*
+		 * 不管 name 是别名还是真名，得到 Bean 的真名
+		 *  CASE 1: BeanFactory.FACTORY_BEAN_PREFIX = "&"
+		 */
 		String beanName = transformedBeanName(name);
 		Object bean;
 
@@ -297,6 +300,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			if (!typeCheckOnly) {
+				/*
+				 * =>> AbstractBeanFactory.clearMergedBeanDefinition(..)
+				 *     =>> AbstractBeanFactory.clearMergedBeanDefinition(..)
+				 *         bd.stale = true;
+				 */
 				markBeanAsCreated(beanName);
 			}
 
@@ -1322,13 +1330,33 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	/**
 	 * Return a RootBeanDefinition for the given bean, by merging with the
-	 * parent if the given bean's definition is a child bean definition.
+	 * parent if the given bean's definition is a child bean definition.<br/><br/>
+	 *
+	 * 返回给定 Bean 的 RootBeanDefinition, 如果给定的 bean definition 是 child bean definition，则需要和
+	 * parent Bean definition 合并。<br/><br/>
+	 *
+	 * 通俗点：就是压平
+	 *
+	 * <br/><br/>
+	 *
+	 * <hr>
+	 *
 	 * @param beanName the name of the bean definition
 	 * @param bd the original bean definition (Root/ChildBeanDefinition)
 	 * @param containingBd the containing bean definition in case of inner bean,
 	 * or {@code null} in case of a top-level bean
 	 * @return a (potentially merged) RootBeanDefinition for the given bean
 	 * @throws BeanDefinitionStoreException in case of an invalid bean definition
+	 *
+	 * ------------------------------
+	 *
+	 * CASE 1. beanName = "org.springframework.transaction.config.internalTransactionAdvisor"
+	 *     ==> getBean(String, Class)
+	 *     	   ==> AbstractBeanFactory.doGetBean(..)
+	 *     	       RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+	 *     	       ==> AbstractBeanFactory.getMergedBeanDefinition(..)
+	 *     	           ...
+	 *     	           ==> {@link AbstractBeanFactory#getMergedBeanDefinition(String, BeanDefinition, BeanDefinition)}
 	 */
     // eg：getBean(String name)，containingBd = null
 	protected RootBeanDefinition getMergedBeanDefinition(
@@ -1397,12 +1425,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					mbd.setScope(containingBd.getScope());
 				}
 
-				// Cache the merged bean definition for the time being
-				// (it might still get re-merged later on in order to pick up metadata changes)
+				// 暂时缓存合并的 Bean 定义；Cache the merged bean definition for the time being
+				// 它以后可能仍会重新合并，以便获取元数据更改；(it might still get re-merged later on in order to pick up metadata changes)
 				if (containingBd == null && isCacheBeanMetadata()) {
 					this.mergedBeanDefinitions.put(beanName, mbd);
 				}
 			}
+			// CASE 1. previous = {RootBeanDefinition@4718} "Root bean: class [BeanFactoryTransactionAttributeSourceAdvisor]"
 			if (previous != null) {
 				copyRelevantMergedBeanDefinitionCaches(previous, mbd);
 			}
@@ -1487,7 +1516,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		try {
 			if (mbd.hasBeanClass()) {
-				return mbd.getBeanClass();
+				// CASE 1. beanClass = {Class@3712} "BeanFactoryTransactionAttributeSourceAdvisor"
+				return mbd.getBeanClass();		// =>>
 			}
 			if (System.getSecurityManager() != null) {
 				return AccessController.doPrivileged((PrivilegedExceptionAction<Class<?>>)
@@ -1599,11 +1629,21 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * Predict the eventual bean type (of the processed bean instance) for the
 	 * specified bean. Called by {@link #getType} and {@link #isTypeMatch}.
 	 * Does not need to handle FactoryBeans specifically, since it is only
-	 * supposed to operate on the raw bean type.
+	 * supposed to operate on the raw bean type.<br/><br/>
+	 *
+	 * 预测指定 Bean 的最终 Bean 类型（已处理的 Bean 实例）。由 getType 和 isTypeMatch 调用。
+	 * 不需要专门处理 FactoryBeans，因为它只应该在原始 bean 类型上运行。<br/><br/>
+	 *
+	 * <hr>
+	 *
 	 * <p>This implementation is simplistic in that it is not able to
 	 * handle factory methods and InstantiationAwareBeanPostProcessors.
 	 * It only predicts the bean type correctly for a standard bean.
-	 * To be overridden in subclasses, applying more sophisticated type detection.
+	 * To be overridden in subclasses, applying more sophisticated type detection.<br/><br/>
+	 *
+	 * 此实现过于简单，因为它无法处理工厂方法和 InstantiationAwareBeanPostProcessor。它
+	 * 只能正确预测标准 bean 的 bean 类型。在子类中重写，应用更复杂的类型检测。<br/><br/>
+	 *
 	 * @param beanName the name of the bean
 	 * @param mbd the merged bean definition to determine the type for
 	 * @param typesToMatch the types to match in case of internal type matching purposes
@@ -1623,9 +1663,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 * 检查给定的 bean 是否是 FactoryBean
+	 *
 	 * Check whether the given bean is defined as a {@link FactoryBean}.
 	 * @param beanName the name of the bean
 	 * @param mbd the corresponding bean definition
+	 *
+	 * CASE 1. =>> {@link DefaultListableBeanFactory#doGetBeanNamesForType}
+	 *         boolean isFactoryBean = isFactoryBean(beanName, mbd);
+	 *
 	 */
 	protected boolean isFactoryBean(String beanName, RootBeanDefinition mbd) {
 		Boolean result = mbd.isFactoryBean;
