@@ -76,6 +76,12 @@ public class BeanFactoryAdvisorRetrievalHelper {	//
 	 *		   return advisors;
 	 */
 	public List<Advisor> findAdvisorBeans() {
+
+		/*
+		 * advisorNames = {String[2]@4054} ["org.springframe...", "myPointcutAdvis..."]
+		 * 		0 = "org.springframework.transaction.config.internalTransactionAdvisor" -> BeanFactoryTransactionAttributeSourceAdvisor
+		 * 		1 = "myPointcutAdvisor"
+		 */
 		// Determine list of advisor bean names, if not cached already.
 		String[] advisorNames = this.cachedAdvisorBeanNames;
 		if (advisorNames == null) {
@@ -113,8 +119,7 @@ public class BeanFactoryAdvisorRetrievalHelper {	//
 							String bceBeanName = bce.getBeanName();
 							if (bceBeanName != null && this.beanFactory.isCurrentlyInCreation(bceBeanName)) {
 								if (logger.isTraceEnabled()) {
-									logger.trace("Skipping advisor '" + name +
-											"' with dependency on currently created bean: " + ex.getMessage());
+									logger.trace("Skipping advisor '" + name + "' with dependency on currently created bean: " + ex.getMessage());
 								}
 								// Ignore: indicates a reference back to the bean we're trying to advise.
 								// We want to find advisors other than the currently created bean itself.
