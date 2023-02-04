@@ -63,18 +63,30 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	/** We use a static Log to avoid serialization issues. */
 	private static final Log logger = LogFactory.getLog(JdkDynamicAopProxy.class);
 
-	/** Config used to configure this proxy. */
-	private final AdvisedSupport advised;		//
+	/*
+	 * 用于配置此代理的配置；Config used to configure this proxy.
+	 *
+	 * advised = {ProxyFactory@4507} "org.springframework.aop.framework.ProxyFactory:
+	 * 			1 interfaces [org.example.service.tx.ITXByAnnotation];
+	 * 			1 advisors [org.springframework.transaction.interceptor.BeanFactoryTransactionAttributeSourceAdvisor:
+	 * 			advice bean 'org.springframework.transaction.interceptor.TransactionInterceptor#0'];
+	 * 			targetSource [SingletonTargetSource for target object [org.example.service.tx.TransactionByAnnotation@21185f21]];"
+	 *
+	 * 		targetSource = {SingletonTargetSource@4506} "SingletonTargetSource for target object [org.example.service.tx.TransactionByAnnotation@21185f21]"
+	 * 			target = {TransactionByAnnotation@4484}
+	 * 				jdbcTemplate = {JdbcTemplate@5979}
+	 */
+	private final AdvisedSupport advised;			//
 
 	/**
 	 * Is the {@link #equals} method defined on the proxied interfaces?
 	 */
-	private boolean equalsDefined;
+	private boolean equalsDefined;					//
 
 	/**
 	 * Is the {@link #hashCode} method defined on the proxied interfaces?
 	 */
-	private boolean hashCodeDefined;
+	private boolean hashCodeDefined;				//
 
 
 	/**
