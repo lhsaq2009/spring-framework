@@ -85,6 +85,17 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * @see #postProcessAfterInstantiation
 	 * @see org.springframework.beans.factory.support.AbstractBeanDefinition#getBeanClass()
 	 * @see org.springframework.beans.factory.support.AbstractBeanDefinition#getFactoryMethodName()
+	 *
+	 * =>> AbstractAutowireCapableBeanFactory.createBean(..)}
+	 * 	   (实例化前) -> Object bean = resolveBeforeInstantiation(beanName, mbdToUse)
+	 * 	   =>> AbstractAutowireCapableBeanFactory.resolveBeforeInstantiation}
+	 * 	   	   bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName)
+	 * 	   	   =>> AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsBeforeInstantiation}
+	 * 	   	   	   if (bp instanceof InstantiationAwareBeanPostProcessor) -> ibp.postProcessBeforeInstantiation(beanClass, beanName)
+	 * 	   ...
+	 * 	   (去实例化) -> Object beanInstance = doCreateBean(beanName, mbdToUse, args)
+	 * ----------------------------------------------------------------------------
+	 * 在对象实例化前，直接返回一个对象，造成短路；
 	 */
 	@Nullable
 	default Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
