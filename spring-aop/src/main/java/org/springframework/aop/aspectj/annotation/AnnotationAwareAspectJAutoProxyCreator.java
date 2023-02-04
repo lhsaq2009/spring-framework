@@ -29,6 +29,11 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 2.0
  * @see org.springframework.aop.aspectj.annotation.AspectJAdvisorFactory
+ *
+ * --------------------------------------------------------------------
+ *
+ * TODO：也是个后置处理器
+ * =>> 父类的 {@link org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator#createProxy}
  */
 @SuppressWarnings("serial")
 public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorAutoProxyCreator {	// TODO：处理 @Aspect ？？
