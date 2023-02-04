@@ -120,12 +120,15 @@ public abstract class AopConfigUtils {
 	// region AnnotationAwareAspectJAutoProxyCreator 解析：<aop:aspectj-autoproxy> + @EnableAspectJAutoProxy
 
 	/**
-	 * 解析：<aop:aspectj-autoproxy>
-	 * internalAutoProxyCreator = "AnnotationAwareAspectJAutoProxyCreator"
+	 * internalAutoProxyCreator -> "AnnotationAwareAspectJAutoProxyCreator"
+	 * =>> AopConfigUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(..)
 	 *
-	 * =>> {@link AopNamespaceHandler#init()}	-- <aop:aspectj-autoproxy>
-	 * 	   =>> {@link org.springframework.aop.config.AspectJAutoProxyBeanDefinitionParser#parse}
-	 * 	   	  =>> {@link AopNamespaceUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary}
+	 *   CASE 1：<aop:aspectj-autoproxy>
+	 *
+	 * =>> {@link AopNamespaceHandler#init()}
+	 *     =>> {@link org.springframework.aop.config.AspectJAutoProxyBeanDefinitionParser#parse}
+	 *         =>> {@link AopNamespaceUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary}
+	 *             =>> {@link #registerAspectJAnnotationAutoProxyCreatorIfNecessary}
 	 */
 	@Nullable
 	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(					// 04、Sz^Rbp$g2#vU
