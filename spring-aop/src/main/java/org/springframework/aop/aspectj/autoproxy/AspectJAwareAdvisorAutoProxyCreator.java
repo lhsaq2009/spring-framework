@@ -82,14 +82,15 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 	@Override
 	protected boolean shouldSkip(Class<?> beanClass, String beanName) {
 		// TODO: Consider optimization by caching the list of the aspect names
-		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		List<Advisor> candidateAdvisors = findCandidateAdvisors();		  // =>> <aop:aspectj-autoproxy ..
 		for (Advisor advisor : candidateAdvisors) {
+			// aspectName = "logXML_AOP_Aspect_Order_22" -- <aop:before ..>
 			if (advisor instanceof AspectJPointcutAdvisor &&
 					((AspectJPointcutAdvisor) advisor).getAspectName().equals(beanName)) {
 				return true;
 			}
 		}
-		return super.shouldSkip(beanClass, beanName);
+		return super.shouldSkip(beanClass, beanName);					// =>>
 	}
 
 
