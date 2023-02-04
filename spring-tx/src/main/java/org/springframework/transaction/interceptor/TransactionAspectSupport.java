@@ -720,7 +720,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			}
 			if (txInfo.transactionAttribute != null && txInfo.transactionAttribute.rollbackOn(ex)) {
 				try {
-					txInfo.getTransactionManager().rollback(txInfo.getTransactionStatus());
+					txInfo.getTransactionManager().rollback(txInfo.getTransactionStatus());		// =>>
 				}
 				catch (TransactionSystemException ex2) {
 					logger.error("Application exception overridden by rollback exception", ex);
