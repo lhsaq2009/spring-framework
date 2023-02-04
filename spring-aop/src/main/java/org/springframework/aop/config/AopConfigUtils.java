@@ -128,7 +128,6 @@ public abstract class AopConfigUtils {
 	 * =>> {@link AopNamespaceHandler#init()}
 	 *     =>> {@link org.springframework.aop.config.AspectJAutoProxyBeanDefinitionParser#parse}
 	 *         =>> {@link AopNamespaceUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary}
-	 *             =>> {@link #registerAspectJAnnotationAutoProxyCreatorIfNecessary}
 	 */
 	@Nullable
 	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(					// 04、Sz^Rbp$g2#vU
