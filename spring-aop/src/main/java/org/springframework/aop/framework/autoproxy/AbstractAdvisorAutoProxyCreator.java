@@ -35,10 +35,10 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyCreator {
 
-	@Nullable
-	private BeanFactoryAdvisorRetrievalHelper advisorRetrievalHelper;
+	@Nullable	// new BeanFactoryAdvisorRetrievalHelperAdapter(beanFactory);
+	private BeanFactoryAdvisorRetrievalHelper advisorRetrievalHelper;	//
 
-
+	// (ConfigurableListableBeanFactory) beanFactory = {DefaultListableBeanFactory@4045}
 	@Override
 	public void setBeanFactory(BeanFactory beanFactory) {
 		super.setBeanFactory(beanFactory);
