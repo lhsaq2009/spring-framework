@@ -36,14 +36,20 @@ final class PostProcessorRegistrationDelegate {
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
-		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
+		/**
+		 * 如果有，首先调用 Bean DefinitionRegistryPostProcessor
+		 * Invoke BeanDefinitionRegistryPostProcessors first, if any.
+		 */
 		Set<String> processedBeans = new HashSet<>();
 
+		// beanFactory = {DefaultListableBeanFactory@3697}，则进入：
+		// region 按优先级，先收集并分批次执行：BeanDefinitionRegistryPostProcessor.class
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
-			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();	//
-			// TODO：
+			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
+
+			// TODO：何时 beanFactoryPostProcessors 不为空？？2023-01-23
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
@@ -62,8 +68,7 @@ final class PostProcessorRegistrationDelegate {
 			// PriorityOrdered, Ordered, and the rest.
 			List<BeanDefinitionRegistryPostProcessor> currentRegistryProcessors = new ArrayList<>();
 
-			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered
-			// region 先处理 PriorityOrdered 的后置处理器
+			// region 01、先处理 implement PriorityOrdered 的 BeanDefinitionRegistryPostProcessor
 			String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
 				if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
@@ -77,8 +82,7 @@ final class PostProcessorRegistrationDelegate {
 			currentRegistryProcessors.clear();
 			// endregion
 
-			// Next, invoke the BeanDefinitionRegistryPostProcessors that implement Ordered.
-			// region 再处理 Ordered 的后置处理器
+			// region 02、再处理 implement Ordered 的 BeanDefinitionRegistryPostProcessor
 			postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
 				if (!processedBeans.contains(ppName) && beanFactory.isTypeMatch(ppName, Ordered.class)) {
@@ -92,8 +96,8 @@ final class PostProcessorRegistrationDelegate {
 			currentRegistryProcessors.clear();
 			// endregion
 
-			// Finally, invoke all other BeanDefinitionRegistryPostProcessors until no further ones appear.
-			// region 最后处理 剩余的 后置处理器
+			// 03、Finally, invoke all other BeanDefinitionRegistryPostProcessors until no further ones appear.
+			// region 03、最后处理 剩余的 BeanDefinitionRegistryPostProcessor
 			boolean reiterate = true;
 			while (reiterate) {
 				reiterate = false;
@@ -119,9 +123,13 @@ final class PostProcessorRegistrationDelegate {
 			// Invoke factory processors registered with the context instance.
 			invokeBeanFactoryPostProcessors(beanFactoryPostProcessors, beanFactory);
 		}
+		// endregion
+
+		// region 按优先级，先收集并分批次执行：BeanFactoryPostProcessor.class
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let the bean factory post-processors apply to them!
+		// 不要在这里初始化 FactoryBeans：我们需要让所有常规 bean 未初始化，让 bean Factory 后处理器应用于它们！
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanFactoryPostProcessor.class, true, false);
 
 		// 将实现 PriorityOrdered、Ordered 和 其余部分的 BeanFactoryPostProcessor 分开
@@ -144,12 +152,12 @@ final class PostProcessorRegistrationDelegate {
 			}
 		}
 
-		// region First, invoke the BeanFactoryPostProcessors that implement PriorityOrdered.
+		// region 01、First, invoke the BeanFactoryPostProcessors that implement PriorityOrdered.
 		sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
 		invokeBeanFactoryPostProcessors(priorityOrderedPostProcessors, beanFactory);
 		// endregion
 
-		// region Next, invoke the BeanFactoryPostProcessors that implement Ordered.
+		// region 02、Next, invoke the BeanFactoryPostProcessors that implement Ordered.
 		List<BeanFactoryPostProcessor> orderedPostProcessors = new ArrayList<>(orderedPostProcessorNames.size());
 		for (String postProcessorName : orderedPostProcessorNames) {
 			orderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));
@@ -158,7 +166,7 @@ final class PostProcessorRegistrationDelegate {
 		invokeBeanFactoryPostProcessors(orderedPostProcessors, beanFactory);
 		// endregion
 
-		// region Finally, invoke all other BeanFactoryPostProcessors.
+		// region 03、Finally, invoke all other BeanFactoryPostProcessors.
 		List<BeanFactoryPostProcessor> nonOrderedPostProcessors = new ArrayList<>(nonOrderedPostProcessorNames.size());
 		for (String postProcessorName : nonOrderedPostProcessorNames) {
 			nonOrderedPostProcessors.add(beanFactory.getBean(postProcessorName, BeanFactoryPostProcessor.class));
@@ -166,6 +174,9 @@ final class PostProcessorRegistrationDelegate {
 		invokeBeanFactoryPostProcessors(nonOrderedPostProcessors, beanFactory);
 		// endregion
 
+		// endregion
+
+		// 清除缓存的合并 Bean 定义，因为后处理器可能具有修改了原始元数据，例如替换值中的占位符…
 		// Clear cached merged bean definitions since the post-processors might have
 		// modified the original metadata, e.g. replacing placeholders in values...
 		beanFactory.clearMetadataCache();
