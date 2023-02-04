@@ -309,6 +309,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport		//
 	}
 
 	/**
+	 * 如果它有资格被代理，则对其进行包装(代理) <br/><br/>
 	 * Wrap the given bean if necessary, i.e. if it is eligible for being proxied.
 	 * @param bean the raw bean instance
 	 * @param beanName the name of the bean
@@ -335,10 +336,18 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport		//
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
 			Object proxy = createProxy(		// =>> AOP 创建代理对象
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
-			this.proxyTypes.put(cacheKey, proxy.getClass());
+			this.proxyTypes.put(cacheKey, proxy.getClass());			// 加入到缓存
 			return proxy;
 		}
 
+		/**
+		 * CASE 1. AbstractAutoProxyCreator.advisedBeans.put (
+		 * 		cacheKey = "AnnotationTransactionAttributeSource#0",
+		 * 		Boolean.FALSE
+		 *
+		 * CASE 2. AbstractAutoProxyCreator.postProcessBeforeInstantiation(..)
+		 *
+		 */
 		this.advisedBeans.put(cacheKey, Boolean.FALSE);
 		return bean;
 	}
@@ -432,20 +441,21 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport		//
 			AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);
 		}
 
-		ProxyFactory proxyFactory = new ProxyFactory();		//
-		proxyFactory.copyFrom(this);
+		ProxyFactory proxyFactory = new ProxyFactory();
+		proxyFactory.copyFrom(this);							// =>>
 
 		if (!proxyFactory.isProxyTargetClass()) {
 			if (shouldProxyTargetClass(beanClass, beanName)) {
-				proxyFactory.setProxyTargetClass(true);
+				proxyFactory.setProxyTargetClass(true);				// 优先 CGLIb 代理目标类
 			}
 			else {
+				// 收集可用于代理的接口 ( 有效接口 )，若没有则 CGLIb 基于类代理：setProxyTargetClass(true);
 				evaluateProxyInterfaces(beanClass, proxyFactory);	// =>> AOP 创建代理对象
 			}
 		}
 		// 前面还是只是收集代理相关的数据，比如有哪些接口
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
-		proxyFactory.addAdvisors(advisors);
+		proxyFactory.addAdvisors(advisors);				// 该类涉及的所有 AOP 相关的 Advisors
 		proxyFactory.setTargetSource(targetSource);
 		customizeProxyFactory(proxyFactory);
 
