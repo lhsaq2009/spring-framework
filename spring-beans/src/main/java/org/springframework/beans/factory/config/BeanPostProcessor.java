@@ -59,23 +59,25 @@ public interface BeanPostProcessor {
 		return bean;
 	}
 
-	/**
-	 * =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#createBean(String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])}
-	 * 	   Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
-	 * 	   =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#resolveBeforeInstantiation}
-	 * 	       CASE 1. if (bean != null)，则 bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
-	 * 	           =>> 可返回代理对象，使正常创建实例短路：
-	 * 	               {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsAfterInitialization}
-	 * 	           	   for getBeanPostProcessors() -> BeanPostProcessor.postProcessAfterInitialization(..)
-	 *
-	 *     =>> CASE 2. AbstractAutowireCapableBeanFactory.doCreateBean(String, RootBeanDefinition, Object[])
-	 *         =>> exposedObject = initializeBean(beanName, exposedObject, mbd);
-	 *             wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
-	 *             =>> populated(.) 之后，afterPropertiesSet、init-method 之「后」执行：
-	 *                 {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsAfterInitialization}
-	 *                 for getBeanPostProcessors() -> BeanPostProcessor.postProcessAfterInitialization(..)
-	 *
-	 * ------------------------------------------------------------------------
+/**
+ * populated(.) 之后，afterPropertiesSet、init-method 之「后」执行：
+ *
+ * =>> AbstractAutowireCapableBeanFactory.createBean(..)
+ * 	   Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
+ * 	   =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#resolveBeforeInstantiation}
+ * 	   	   =>> bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
+ * 	   	       InstantiationAwareBeanPostProcessor.postProcessBeforeInstantiation(..)		：可返回代理对象，使正常创建实例短路
+ * 	   	   if (bean != null) {
+ * 	   	       CASE 1. bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);	：新建的对象，这里也需要去执行初始化 ..
+ * 	   	       =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsAfterInitialization}
+ * 	   	           for getBeanPostProcessors() -> BeanPostProcessor.postProcessAfterInitialization(..)
+ *
+ *     =>> AbstractAutowireCapableBeanFactory.doCreateBean(String, RootBeanDefinition, Object[])
+ *         =>> exposedObject = initializeBean(beanName, exposedObject, mbd);				：populated(.) 之后，afterPropertiesSet、init-method 之「后」执行
+ *             CASE 2. wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+ *             =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsAfterInitialization}
+ *                 for getBeanPostProcessors() -> BeanPostProcessor.postProcessAfterInitialization(..)
+ *
 	 *
 	 * Apply this {@code BeanPostProcessor} to the given new bean instance <i>after</i> any bean
 	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
@@ -93,6 +95,7 @@ public interface BeanPostProcessor {
 	 * @param beanName the name of the bean
 	 * @return the bean instance to use, either the original or a wrapped one;
 	 * if {@code null}, no subsequent BeanPostProcessors will be invoked
+	 *
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.beans.factory.FactoryBean
