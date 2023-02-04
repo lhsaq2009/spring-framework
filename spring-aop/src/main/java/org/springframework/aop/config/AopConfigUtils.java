@@ -70,9 +70,7 @@ public abstract class AopConfigUtils {
 	}
 
 	/**
-	 * ---------------------------------------------------------------------
 	 * internalAutoProxyCreator = "InfrastructureAdvisorAutoProxyCreator"
-	 * ---------------------------------------------------------------------
 	 *
 	 * CASE 1-1：<cache:annotation-driven>
 	 * =>> {@link org.springframework.cache.config.AnnotationDrivenCacheBeanDefinitionParser#parse}
@@ -178,13 +176,17 @@ public abstract class AopConfigUtils {
 	/**
 	 * {@link AopConfigUtils#APC_PRIORITY_LIST}
 	 * 		CASE 1：{@link AopConfigUtils#registerAutoProxyCreatorIfNecessary(BeanDefinitionRegistry, Object)}
-	 * 				cls = InfrastructureAdvisorAutoProxyCreator.class
+	 * 				cls = InfrastructureAdvisorAutoProxyCreator.class		<tx:annotation-driven ... /> -- @Transactional
+	 *																		<cache:annotation-driven>
+	 *																		@EnableTransactionManagement
+	 *																		@EnableCaching
 	 *
 	 * 		CASE 2：{@link AopConfigUtils#registerAspectJAutoProxyCreatorIfNecessary(BeanDefinitionRegistry, Object)}
 	 * 				cls = AspectJAwareAdvisorAutoProxyCreator.class  		<aop:config>
 	 *
 	 * 		CASE 3：{@link AopConfigUtils#registerAspectJAnnotationAutoProxyCreatorIfNecessary(BeanDefinitionRegistry, Object)}
 	 * 				cls = AnnotationAwareAspectJAutoProxyCreator.class		@EnableAspectJAutoProxy
+	 * 																		<aop:aspectj-autoproxy .../>
 	 */
 	@Nullable
 	private static BeanDefinition registerOrEscalateApcAsRequired(		// Escalate：逐步升级
@@ -192,7 +194,8 @@ public abstract class AopConfigUtils {
 
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 
-		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {	// TODO：
+		// 如果已注册，则看看当前注册是不是优先级更高 ( APC_PRIORITY_LIST.indexOf(clazz) ) ，若更高则替换
+		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
 			BeanDefinition apcDefinition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
 			if (!cls.getName().equals(apcDefinition.getBeanClassName())) {
 				int currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());
@@ -204,6 +207,7 @@ public abstract class AopConfigUtils {
 			return null;
 		}
 
+		// 未注册
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);
 		beanDefinition.setSource(source);
 		beanDefinition.getPropertyValues().add("order", Ordered.HIGHEST_PRECEDENCE);
