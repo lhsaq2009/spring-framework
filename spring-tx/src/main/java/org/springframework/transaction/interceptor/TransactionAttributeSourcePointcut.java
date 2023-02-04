@@ -21,14 +21,20 @@ import org.springframework.util.ObjectUtils;
 abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
 
 	protected TransactionAttributeSourcePointcut() {
-		setClassFilter(new TransactionAttributeSourceClassFilter());
+		// 父类：StaticMethodMatcherPointcut.classFilter
+		setClassFilter(new TransactionAttributeSourceClassFilter());	// 检测类
 	}
 
 
 	@Override
-	public boolean matches(Method method, Class<?> targetClass) {
+	public boolean matches(Method method, Class<?> targetClass) {		// 检测方法
+		// =>> 实质：BeanFactoryTransactionAttributeSourceAdvisor.transactionAttributeSource
+		/**
+		 * {@link org.springframework.transaction.annotation.AnnotationTransactionAttributeSource}
+		 * =>> 配置 {@link org.springframework.transaction.annotation.SpringTransactionAnnotationParser} 解析 @Transactional
+		 */
 		TransactionAttributeSource tas = getTransactionAttributeSource();
-		return (tas == null || tas.getTransactionAttribute(method, targetClass) != null);
+		return (tas == null || tas.getTransactionAttribute(method, targetClass) != null);	// =>> method
 	}
 
 	@Override
@@ -75,8 +81,17 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 					PersistenceExceptionTranslator.class.isAssignableFrom(clazz)) {
 				return false;
 			}
+			/**
+			 * =>> BeanFactoryTransactionAttributeSourceAdvisor
+			 * 	   匿名内部类：new TransactionAttributeSourcePointcut()
+			 * 	   =>> tas = {@link BeanFactoryTransactionAttributeSourceAdvisor#transactionAttributeSource}
+			 */
 			TransactionAttributeSource tas = getTransactionAttributeSource();
-			return (tas == null || tas.isCandidateClass(clazz));
+			/**
+			 * CASE 1. tas = {AnnotationTransactionAttributeSource@4555}
+			 * 		   =>> {@link org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#isCandidateClass}
+			 */
+			return (tas == null || tas.isCandidateClass(clazz));	// =>>
 		}
 	}
 
