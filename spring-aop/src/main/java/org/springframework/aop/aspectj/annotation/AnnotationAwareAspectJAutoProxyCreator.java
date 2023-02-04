@@ -30,8 +30,8 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see org.springframework.aop.aspectj.annotation.AspectJAdvisorFactory
  */
-@SuppressWarnings("serial")  // 也是个后置处理器，=>> 父类的 AbstractAutoProxyCreator.createProxy(..)
-public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorAutoProxyCreator {	// 处理 @Aspect ？？
+@SuppressWarnings("serial")
+public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorAutoProxyCreator {	// TODO：处理 @Aspect ？？
 
 	/**
 	 * {@link org.springframework.aop.config.AspectJAutoProxyBeanDefinitionParser#extendBeanDefinition}
@@ -179,7 +179,8 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 
 			super(beanFactory, advisorFactory);
 		}
-
+		// ==> BeanFactoryAspectJAdvisorsBuilder.buildAspectJAdvisors(..)
+		//     for (String beanName : beanNames) -> if (!isEligibleBean(beanName))
 		@Override
 		protected boolean isEligibleBean(String beanName) {
 			return AnnotationAwareAspectJAutoProxyCreator.this.isEligibleAspectBean(beanName);
