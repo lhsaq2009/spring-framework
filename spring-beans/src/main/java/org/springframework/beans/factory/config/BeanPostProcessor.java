@@ -60,6 +60,23 @@ public interface BeanPostProcessor {
 	}
 
 	/**
+	 * =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#createBean(String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])}
+	 * 	   Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
+	 * 	   =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#resolveBeforeInstantiation}
+	 * 	       CASE 1. if (bean != null)，则 bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+	 * 	           =>> 可返回代理对象，使正常创建实例短路：
+	 * 	               {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsAfterInitialization}
+	 * 	           	   for getBeanPostProcessors() -> BeanPostProcessor.postProcessAfterInitialization(..)
+	 *
+	 *     =>> CASE 2. AbstractAutowireCapableBeanFactory.doCreateBean(String, RootBeanDefinition, Object[])
+	 *         =>> exposedObject = initializeBean(beanName, exposedObject, mbd);
+	 *             wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+	 *             =>> populated(.) 之后，afterPropertiesSet、init-method 之「后」执行：
+	 *                 {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#applyBeanPostProcessorsAfterInitialization}
+	 *                 for getBeanPostProcessors() -> BeanPostProcessor.postProcessAfterInitialization(..)
+	 *
+	 * ------------------------------------------------------------------------
+	 *
 	 * Apply this {@code BeanPostProcessor} to the given new bean instance <i>after</i> any bean
 	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
 	 * or a custom init-method). The bean will already be populated with property values.
