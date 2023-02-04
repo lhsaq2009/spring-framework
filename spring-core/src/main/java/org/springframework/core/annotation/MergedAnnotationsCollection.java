@@ -20,6 +20,12 @@ import org.springframework.util.Assert;
  * @author Phillip Webb
  * @since 5.2
  * @see MergedAnnotations#of(Collection)
+ *
+ *       Iterable<T>
+ *               ▲
+ * MergedAnnotations
+ *               ▲
+ * MergedAnnotationsCollection
  */
 final class MergedAnnotationsCollection implements MergedAnnotations {		//
 
