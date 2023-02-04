@@ -33,14 +33,24 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")  // 也是个后置处理器，=>> 父类的 AbstractAutoProxyCreator.createProxy(..)
 public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorAutoProxyCreator {	// 处理 @Aspect ？？
 
+	/**
+	 * {@link org.springframework.aop.config.AspectJAutoProxyBeanDefinitionParser#extendBeanDefinition}
+	 * =>> addIncludePatterns(element, parserContext, beanDef);
+	 * 	   =>> 解析 <aop:include /> -> includePatterns
+	 */
 	@Nullable
 	private List<Pattern> includePatterns;
 
 	@Nullable
 	private AspectJAdvisorFactory aspectJAdvisorFactory;
 
+	/**
+	 * 赋值来自: {@link #initBeanFactory}
+	 * 		    aspectJAdvisorsBuilder = new BeanFactoryAspectJAdvisorsBuilderAdapter(..)
+	 * 		    =>> 这个 Adapter 是本类的内部类，并且 extends BeanFactoryAspectJAdvisorsBuilder
+	 */
 	@Nullable
-	private BeanFactoryAspectJAdvisorsBuilder aspectJAdvisorsBuilder;
+	private BeanFactoryAspectJAdvisorsBuilder aspectJAdvisorsBuilder;		// core：用于扫描和解析 @Aspect 切面类
 
 
 	/**
@@ -59,25 +69,61 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 		this.aspectJAdvisorFactory = aspectJAdvisorFactory;
 	}
 
+	/**
+	 * 何时加载 ？
+	 * 加载后，放在哪 ？
+	 */
 	@Override
 	protected void initBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		super.initBeanFactory(beanFactory);
 		if (this.aspectJAdvisorFactory == null) {
-			this.aspectJAdvisorFactory = new ReflectiveAspectJAdvisorFactory(beanFactory);
+			// Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class)
+			this.aspectJAdvisorFactory = new ReflectiveAspectJAdvisorFactory(beanFactory);		// =>>
 		}
-		this.aspectJAdvisorsBuilder =
-				new BeanFactoryAspectJAdvisorsBuilderAdapter(beanFactory, this.aspectJAdvisorFactory);
+		this.aspectJAdvisorsBuilder = new BeanFactoryAspectJAdvisorsBuilderAdapter(beanFactory, this.aspectJAdvisorFactory);	// =>>
 	}
 
 
 	@Override
 	protected List<Advisor> findCandidateAdvisors() {
-		// Add all the Spring advisors found according to superclass rules.
-		List<Advisor> advisors = super.findCandidateAdvisors();
-		// Build Advisors for all AspectJ aspects in the bean factory.
+
+		/*
+		 * 第一步：收集 Advisor.class 子类
+		 *
+		 * CASE 1. beanName = "transactionByAnnotation"
+		 * 		advisors = {ArrayList@4625}  size = 4
+		 * 		0 = {BeanFactoryTransactionAttributeSourceAdvisor@4404}
+		 * 			adviceBeanName = "org.springframework.transaction.interceptor.TransactionInterceptor#0"
+		 * 		1 = {DefaultBeanFactoryPointcutAdvisor@4177}
+		 * 			advice bean 'logXML_AOP_Advisor_Implement_Order_55'"
+		 * 		2 = {AspectJPointcutAdvisor@4328}					-- 同一个类的每个方法，都单独封装一个 AspectJPointcutAdvisor 对象
+		 * 			aspectName = "logXML_AOP_Aspect_Order_22"
+		 * 			methodName = "myXMLBeforeMethod"
+		 * 		3 = {Log_Service_Advisor_extend_Orders_44@4332}
+		 * 			@Service
+		 * 			public class Log_Service_Advisor_extend_Orders_44 extends AbstractPointcutAdvisor
+		 */
+		List<Advisor> advisors = super.findCandidateAdvisors();							// =>> 收集 Advisor.class 子类：advisorRetrievalHelper.findAdvisorBeans()
+
+		/*
+		 * 第二步：收集 @AspectJ 注解的切面类
+		 *
+		 * 为 bean factory 中的所有 AspectJ aspects 构建 Advisors；
+		 * Build Advisors for all AspectJ aspects in the bean factory.
+		 */
 		if (this.aspectJAdvisorsBuilder != null) {
-			advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());
+			advisors.addAll(this.aspectJAdvisorsBuilder.buildAspectJAdvisors());		// =>> <aop:aspectj-autoproxy
 		}
+
+		/*
+		 * TODO：所有的切面方法；??? 类分组 ？？
+		 *
+		 * CASE 1. beanName = "transactionByAnnotation"
+		 * advisors[5] = {InstantiationModelAwarePointcutAdvisorImpl@4192} -- @Aspect
+		 * 		aspectName 		= "log_Annotation_Order_33"
+		 * 		methodName 		= "myBeforeMethod"
+		 * 		...
+		 */
 		return advisors;
 	}
 
@@ -96,12 +142,18 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	}
 
 	/**
-	 * Check whether the given aspect bean is eligible for auto-proxying.
+	 * ==> BeanFactoryAspectJAdvisorsBuilder.buildAspectJAdvisors(..)
+	 *     for (String beanName : beanNames) -> if (!isEligibleBean(beanName))
+	 *     ==> AnnotationAwareAspectJAutoProxyCreator.this.isEligibleAspectBean(beanName); <br/><br/>
+	 *
+	 * <hr><br/>
+	 *
+	 * 检查给定的 aspect Bean 是否符合自动代理的条件。Check whether the given aspect bean is eligible for auto-proxying.
 	 * <p>If no &lt;aop:include&gt; elements were used then "includePatterns" will be
 	 * {@code null} and all beans are included. If "includePatterns" is non-null,
 	 * then one of the patterns must match.
 	 */
-	protected boolean isEligibleAspectBean(String beanName) {
+	protected boolean isEligibleAspectBean(String beanName) {		// core
 		if (this.includePatterns == null) {
 			return true;
 		}
