@@ -37,6 +37,7 @@ public abstract class AopConfigUtils {
 			"org.springframework.aop.config.internalAutoProxyCreator";		// 可能对应 3种 不同的类，所以并非某个具体的类名
 
 	/**
+	 * 按升级顺序存储 auto proxy 创建器类
 	 * Stores the auto proxy creator classes in escalation order.
 	 */
 	private static final List<Class<?>> APC_PRIORITY_LIST = new ArrayList<>(3);
@@ -46,38 +47,53 @@ public abstract class AopConfigUtils {
 	 * 本来扫描到：<aop:config/> 先注册了个 AspectJAwareAdvisorAutoProxyCreator 处理类
 	 * 后来发现又同时启用了 @EnableAspectJAutoProxy 或 <aop:aspectj-autoproxy，那么 AopConfigUtils#AUTO_PROXY_CREATOR_BEAN_NAME
 	 * 对应的 BeanClass 就会升级为 AnnotationAwareAspectJAutoProxyCreator
+	 *
+	 * beanName = "internalAutoProxyCreator"
 	 */
 	static {
-		// Set up the escalation list...
-		APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);		// 优先级最低
-		APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);
-		APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);	// 优先级最高
+		// Set up the escalation list...	设置升级列表 ...
+		APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);		// 优先级最低，<**:annotation-driven  .../>
+		APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);		// TODO: @Aspect | <aop:config ...>
+		APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);	// 优先级最高：<aop:aspectj-autoproxy .../>
 	}
 
 	// region InfrastructureAdvisorAutoProxyCreator
 
 	/**
-	 * TODO：@EnableTransactionManagement(proxyTargetClass = true)
-	 * =>> {@link org.springframework.context.annotation.AutoProxyRegistrar#registerBeanDefinitions}
+	 * 何种情况需要注册：InfrastructureAdvisorAutoProxyCreator.class
+	 * =>> {@link AopConfigUtils#registerAutoProxyCreatorIfNecessary(BeanDefinitionRegistry, Object)}
 	 */
 	@Nullable
-	public static BeanDefinition registerAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry) {		// ^xd!TCRk$t42
+	public static BeanDefinition registerAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry) {
 		// InfrastructureAdvisorAutoProxyCreator
-		return registerAutoProxyCreatorIfNecessary(registry, null);
+		return registerAutoProxyCreatorIfNecessary(registry, null);		// 何种情况需要注册：@EnableTransactionManagement & @EnableCaching，=>>
 	}
 
 	/**
-	 * CASE 1：<cache:annotation-driven>
+	 * ---------------------------------------------------------------------
+	 * internalAutoProxyCreator = "InfrastructureAdvisorAutoProxyCreator"
+	 * ---------------------------------------------------------------------
+	 *
+	 * CASE 1-1：<cache:annotation-driven>
 	 * =>> {@link org.springframework.cache.config.AnnotationDrivenCacheBeanDefinitionParser#parse}
 	 * 	   =>> {@link org.springframework.aop.config.AopNamespaceUtils#registerAutoProxyCreatorIfNecessary}  相同
-	 * CASE 2：<tx:annotation-driven/>
+	 *
+	 * CASE 1-2：@EnableTransactionManagement(proxyTargetClass = true)
+	 * =>> {@link org.springframework.context.annotation.AutoProxyRegistrar#registerBeanDefinitions}
+	 *     if (mode == AdviceMode.PROXY)
+	 *
+	 * -------------------------------------------------------------
+	 *
+	 * CASE 2-1：<tx:annotation-driven/>，2023-01-21：分析 @Transactional
 	 * =>> {@link org.springframework.transaction.config.AnnotationDrivenBeanDefinitionParser#parse}
 	 * 	   =>> {@link org.springframework.aop.config.AopNamespaceUtils#registerAutoProxyCreatorIfNecessary}  相同
 	 *
-	 * internalAutoProxyCreator = "InfrastructureAdvisorAutoProxyCreator"
+	 * CASE 2-2：@EnableCaching
+	 * =>> {@link org.springframework.context.annotation.AutoProxyRegistrar#registerBeanDefinitions}
+	 *     if (mode == AdviceMode.PROXY)
 	 */
 	@Nullable
-	public static BeanDefinition registerAutoProxyCreatorIfNecessary(		// PPArf8u7^Nbw
+	public static BeanDefinition registerAutoProxyCreatorIfNecessary(
 			BeanDefinitionRegistry registry, @Nullable Object source) {
 		return registerOrEscalateApcAsRequired(InfrastructureAdvisorAutoProxyCreator.class, registry, source);
 	}
