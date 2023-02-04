@@ -317,10 +317,18 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport		//
 	 * @return a proxy wrapping the bean, or the raw bean instance as-is
 	 */
 	protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
+		// 已处理过（解析切面时 targetSourcedBeans 出现过），就是自己实现创建动态代理逻辑
 		if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
-		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
+		/*
+		 * eg1 <tx:annotation-driven/> 解析：
+		 * 		this.advisedBeans = {ConcurrentHashMap@4180}  size = 2
+		 * 				"org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0" -> {Boolean@4257} false
+		 * 				"org.springframework.transaction.config.internalTransactionAdvisor" 				-> {Boolean@4257} false
+		 * 						--> InfrastructureAdvisorAutoProxyCreator
+		 */
+		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {	// 不需要增强的
 			return bean;
 		}
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
