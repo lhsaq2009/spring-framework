@@ -66,9 +66,9 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 	 * {@link ClassFilter} that delegates to {@link TransactionAttributeSource#isCandidateClass}
 	 * for filtering classes whose methods are not worth searching to begin with.
 	 */
-	private class TransactionAttributeSourceClassFilter implements ClassFilter {
+	private class TransactionAttributeSourceClassFilter implements ClassFilter {		// core
 
-		@Override
+		@Override  //
 		public boolean matches(Class<?> clazz) {
 			if (TransactionalProxy.class.isAssignableFrom(clazz) ||
 					TransactionManager.class.isAssignableFrom(clazz) ||
