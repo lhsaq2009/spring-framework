@@ -7,7 +7,11 @@ import org.springframework.lang.Nullable;
 
 /**
  * Extension of the {@link InstantiationAwareBeanPostProcessor} interface,
- * adding a callback for predicting the eventual type of a processed bean.
+ * adding a callback for predicting the eventual type of a processed bean.<br/><br/>
+ *
+ * {@link InstantiationAwareBeanPostProcessor} 接口的扩展，添加用于 预测已处理 Bean 的最终类型的回调。<br/><br/>
+ *
+ * <hr>
  *
  * <p><b>NOTE:</b> This interface is a special purpose interface, mainly for
  * internal use within the framework. In general, application-provided
@@ -19,12 +23,18 @@ import org.springframework.lang.Nullable;
  * @since 2.0.3
  * @see InstantiationAwareBeanPostProcessorAdapter
  */
-public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessor {
+	public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessor {
 
 	/**
+	 * 预测 {@link #postProcessBeforeInstantiation} 最终返回的 Bean 的类型。
+	 * 默认实现返回 null。<br/><br/>
+	 *
 	 * Predict the type of the bean to be eventually returned from this
 	 * processor's {@link #postProcessBeforeInstantiation} callback.
-	 * <p>The default implementation returns {@code null}.
+	 * <p>The default implementation returns {@code null}. <br/><br/>
+	 *
+	 * <hr>
+	 *
 	 * @param beanClass the raw class of the bean
 	 * @param beanName the name of the bean
 	 * @return the type of the bean, or {@code null} if not predictable
@@ -36,6 +46,10 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
 	}
 
 	/**
+	 * 确定要用于给定 Bean 的 候选构造函数。 默认实现返回 null。<br/><br/>
+	 *
+	 * <hr><br/>
+	 *
 	 * Determine the candidate constructors to use for the given bean.
 	 * <p>The default implementation returns {@code null}.
 	 * @param beanClass the raw class of the bean (never {@code null})
@@ -52,7 +66,22 @@ public interface SmartInstantiationAwareBeanPostProcessor extends InstantiationA
 
 	/**
 	 * Obtain a reference for early access to the specified bean,
-	 * typically for the purpose of resolving a circular reference.
+	 * typically for the purpose of resolving a circular reference.<br/><br/>
+	 *
+	 * 提前把可能未初始化完毕的 bean 提前暴漏出去，解决循环引用 ( Circular Reference )
+	 * 获取 reference 以便提前访问 指定的 Bean，通常用于解析循环 (circular reference) 引用。<br/><br/>
+	 *
+	 * 存储位置：this.singletonFactories.put(beanName, singletonFactory);
+	 *         =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#doCreateBean}
+	 *             addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+	 *             =>> 存储位置：this.singletonFactories.put(beanName, singletonFactory);
+	 *
+	 * 何时回调：{@link DefaultSingletonBeanRegistry#getSingleton(String, boolean)}
+	 *         ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
+	 *         singletonObject = singletonFactory.getObject();
+	 *
+	 * <hr>
+	 *
 	 * <p>This callback gives post-processors a chance to expose a wrapper
 	 * early - that is, before the target bean instance is fully initialized.
 	 * The exposed object should be equivalent to the what
