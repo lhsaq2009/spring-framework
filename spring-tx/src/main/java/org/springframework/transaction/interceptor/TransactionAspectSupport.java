@@ -194,7 +194,12 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	 *         	       "get*" 		-> {RuleBasedTransactionAttribute@5323} "PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly"
 	 *         			...
 	 *
-	 * CASE 1. TODO：@Transactional 解析
+	 * CASE 1. @Transactional，借助实时解析器，缓存到 -> attributeCache
+	 *
+	 * 		   tas = {AnnotationTransactionAttributeSource@5286}
+	 * 		   	    annotationParsers = {Collections$SingletonSet@5300}  size = 1
+	 * 		   			0 = {SpringTransactionAnnotationParser@5304}
+	 * 		   		attributeCache = {ConcurrentHashMap@5302}  size = 346
 	 */
 	@Nullable
 	private TransactionAttributeSource transactionAttributeSource;
