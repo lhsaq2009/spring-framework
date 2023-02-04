@@ -14,14 +14,34 @@ import org.springframework.lang.Nullable;
  * @see #setAdviceBeanName
  * @see TransactionInterceptor
  * @see TransactionAttributeSourceAdvisor
+ *
+ *                                      Advisor                                                   MethodMatcher
+ *                              PointcutAdvisor                                             StaticMethodMatcher   Pointcut
+ *                      AbstractPointcutAdvisor  ( Ordered )                                      ▲               ▲
+ *                                         ▲     (            Aware )                             └──────────────┐│
+ *           AbstractBeanFactoryPointcutAdvisor  ( BeanFactoryAware )                          StaticMethodMatcherPointcut
+ *                                         ▲                                                                      ▲
+ * BeanFactoryTransactionAttributeSourceAdvisor  <tx:annotation-driven/> ─▶ pointcut ─▶ TransactionAttributeSourcePointcut
+ *                                                                       ─▶ transactionAttributeSource
+ *            DefaultBeanFactoryPointcutAdvisor  <aop:config>
  */
 @SuppressWarnings("serial")
-public class BeanFactoryTransactionAttributeSourceAdvisor extends AbstractBeanFactoryPointcutAdvisor {
+public class BeanFactoryTransactionAttributeSourceAdvisor extends AbstractBeanFactoryPointcutAdvisor {		// core
 
+	/**
+	 * 写入：{@link org.springframework.transaction.config.AnnotationDrivenBeanDefinitionParser.AopAutoProxyConfigurer#configureAutoProxyCreator}
+	 *		AnnotationTransactionAttributeSource --> SpringTransactionAnnotationParser
+	 */
 	@Nullable
-	private TransactionAttributeSource transactionAttributeSource;
+	private TransactionAttributeSource transactionAttributeSource;											// core
 
-	private final TransactionAttributeSourcePointcut pointcut = new TransactionAttributeSourcePointcut() {
+	/**
+	 * abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
+	 * =>> {@link TransactionAttributeSourcePointcut#TransactionAttributeSourcePointcut}
+	 */
+	private final TransactionAttributeSourcePointcut pointcut = new TransactionAttributeSourcePointcut() {	// 抽象类哦！
+
+		// 何时调用：TransactionAttributeSourcePointcut.TransactionAttributeSourceClassFilter.matches
 		@Override
 		@Nullable
 		protected TransactionAttributeSource getTransactionAttributeSource() {
@@ -44,7 +64,7 @@ public class BeanFactoryTransactionAttributeSourceAdvisor extends AbstractBeanFa
 	 * Set the {@link ClassFilter} to use for this pointcut.
 	 * Default is {@link ClassFilter#TRUE}.
 	 */
-	public void setClassFilter(ClassFilter classFilter) {
+	public void setClassFilter(ClassFilter classFilter) {		//
 		this.pointcut.setClassFilter(classFilter);
 	}
 
