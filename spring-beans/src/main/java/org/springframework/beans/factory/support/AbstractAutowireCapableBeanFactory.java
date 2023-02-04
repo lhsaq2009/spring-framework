@@ -681,11 +681,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// allowCircularReferences：默认为 true，在 Spring Boot 2.6.0 默认禁止循环引用
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
-				isSingletonCurrentlyInCreation(beanName));	// 正在创建的 Bean
+				isSingletonCurrentlyInCreation(beanName));							// 正在创建的 Bean
+
 		if (earlySingletonExposure) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Eagerly caching bean '" + beanName +
-						"' to allow for resolving potential circular references");
+				logger.trace("Eagerly caching bean '" + beanName + "' to allow for resolving potential circular references");
 			}
 			/*
 			 * 存储位置：this.singletonFactories.put(beanName, singletonFactory);
@@ -734,7 +734,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		if (earlySingletonExposure) {											// 单例，true
+		if (earlySingletonExposure) {												// 单例，true
 			Object earlySingletonReference = getSingleton(beanName, false);
 			if (earlySingletonReference != null) {									// 为解决循环引用，获取提前暴漏的对象
 				if (exposedObject == bean) {
@@ -766,8 +766,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
 		}
 		catch (BeanDefinitionValidationException ex) {
-			throw new BeanCreationException(
-					mbd.getResourceDescription(), beanName, "Invalid destruction signature", ex);
+			throw new BeanCreationException(mbd.getResourceDescription(), beanName, "Invalid destruction signature", ex);
 		}
 
 		return exposedObject;
