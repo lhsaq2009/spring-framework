@@ -28,7 +28,7 @@ import org.springframework.util.ClassUtils;
  * @since 2.0
  */
 @SuppressWarnings("serial")
-public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator {
+public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProxyCreator {		//
 
 	private static final Comparator<Advisor> DEFAULT_PRECEDENCE_COMPARATOR = new AspectJPrecedenceComparator();
 
