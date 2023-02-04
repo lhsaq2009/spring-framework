@@ -163,8 +163,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	@Nullable
 	private ConfigurableEnvironment environment;
 
-	/** BeanFactoryPostProcessors to apply on refresh. */
-	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
+	/** BeanFactoryPostProcessors to apply on refresh：BeanFactoryPostProcessor 要在刷新时应用 */
+	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();		//
 
 	/** System time in milliseconds when this context started. */
 	private long startupDate;
@@ -545,8 +545,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				// 模版方法，子类负责实现内容；TODO：Allows post-processing of the bean factory in context subclasses.
 				postProcessBeanFactory(beanFactory);                                    // Done
 
-				// Invoke factory processors registered as beans in the context
 				// 事务功能，TODO：AOP ???
+				/**
+				 * 调用 Bean Factory 后置处理器 <br/><br/>
+				 * Invoke factory processors registered as beans in the context
+				 * 调用在「上下文 ( context )」中注册为 Bean 的 factory processor
+				 *
+				 *
+				 */
 				invokeBeanFactoryPostProcessors(beanFactory);                           // TODO：执行各种后置处理器
 
 				/*
@@ -559,8 +565,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				 * 	   // 分组实例化后，收集到 Bean 工厂
 				 * 	   beanFactory.addBeanPostProcessor(postProcessor);
 				 *
+				 *     初始化：org.springframework.aop.config.internalAutoProxyCreator，AOP 对应的实现类的实例
+				 *
 				 */
-				registerBeanPostProcessors(beanFactory);                                // Done
+				registerBeanPostProcessors(beanFactory);                                // 注册 BeanPostProcessor，后面用户 Bean 创建完毕后，需要执行各种后置处理器处理
 
 				/*
 				 * 初始化国际化配置类，包含配置资源，默认语言，支持的语言文件 等
@@ -584,6 +592,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 				/*
 				 * 实例化所有剩余的（非懒加载）单例
 				 * ==> ConfigurableListableBeanFactory.preInstantiateSingletons
+				 * CASE 1. 自定义的 @Aspect 类
 				 */
 				finishBeanFactoryInitialization(beanFactory);                           // Done
 
@@ -851,10 +860,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 	/**
 	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
 	 * respecting explicit order if given.
-	 * <p>Must be called before singleton instantiation.
+	 * <p>Must be called before singleton instantiation. <br/><br/>
+	 *
+	 * 实例化并调用所有注册的 BeanFactoryPostProcessor bean，如果给定，则遵守显式顺序。
+	 * 必须在单一实例化之前调用。
+	 *
+	 * beanFactory = {DefaultListableBeanFactory@3696}
 	 */
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		// TODO：内容很多，
+		// BeanDefinitionRegistryPostProcessor & BeanFactoryPostProcessor
 		PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());	// ^xd!TCRk$t42
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
