@@ -98,9 +98,9 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		implements ResourceTransactionManager, InitializingBean {
 
 	@Nullable
-	private DataSource dataSource;
+	private DataSource dataSource;				//
 
-	private boolean enforceReadOnly = false;
+	private boolean enforceReadOnly = false;	//
 
 
 	/**
@@ -109,7 +109,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	 * @see #setDataSource
 	 */
 	public DataSourceTransactionManager() {
-		setNestedTransactionAllowed(true);
+		setNestedTransactionAllowed(true);		// 允许嵌套事务：AbstractPlatformTransactionManager.nestedTransactionAllowed
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	 * @throws IllegalStateException in case of no DataSource set
 	 * @since 5.0
 	 */
-	protected DataSource obtainDataSource() {
+	protected DataSource obtainDataSource() {	//
 		DataSource dataSource = getDataSource();
 		Assert.state(dataSource != null, "No DataSource set");
 		return dataSource;
@@ -221,10 +221,23 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	@Override
 	protected Object doGetTransaction() {
 		DataSourceTransactionObject txObject = new DataSourceTransactionObject();
-		txObject.setSavepointAllowed(isNestedTransactionAllowed());
+		txObject.setSavepointAllowed(isNestedTransactionAllowed());		// true
+		/*
+		 * eg1: 多次 getUserList，第一次进来时，返回 null
+		 * eg2: 嵌套方法 ( 嵌套 @Transactional )，
+		 */
 		ConnectionHolder conHolder =
 				(ConnectionHolder) TransactionSynchronizationManager.getResource(obtainDataSource());
 		txObject.setConnectionHolder(conHolder, false);
+		/*
+		 * eg1: txObject = {DataSourceTransactionManager$DataSourceTransactionObject@5317}
+		 * 		connectionHolder = null
+		 * 		mustRestoreAutoCommit = false
+		 * 		newConnectionHolder = false
+		 * 		previousIsolationLevel = null
+		 * 		readOnly = false
+		 * 		savepointAllowed = true
+		 */
 		return txObject;
 	}
 
@@ -246,13 +259,19 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				if (logger.isDebugEnabled()) {
 					logger.debug("Acquired Connection [" + newCon + "] for JDBC transaction");
 				}
+				/*
+				 * newCon = {JDBC4Connection@5391}
+				 * new ConnectionHolder(newCon) = {ConnectionHolder@6590}
+				 * 		connectionHandle = {SimpleConnectionHandle@6591}
+				 * 			connection = {JDBC4Connection@5391}
+				 */
 				txObject.setConnectionHolder(new ConnectionHolder(newCon), true);
 			}
 
 			txObject.getConnectionHolder().setSynchronizedWithTransaction(true);
 			con = txObject.getConnectionHolder().getConnection();
 
-			Integer previousIsolationLevel = DataSourceUtils.prepareConnectionForTransaction(con, definition);
+			Integer previousIsolationLevel = DataSourceUtils.prepareConnectionForTransaction(con, definition);	// =>> readOnly -> true
 			txObject.setPreviousIsolationLevel(previousIsolationLevel);
 			txObject.setReadOnly(definition.isReadOnly());
 
@@ -268,7 +287,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			}
 
 			prepareTransactionalConnection(con, definition);
-			txObject.getConnectionHolder().setTransactionActive(true);
+			txObject.getConnectionHolder().setTransactionActive(true);		// setTransactionActive(true);
 
 			int timeout = determineTimeout(definition);
 			if (timeout != TransactionDefinition.TIMEOUT_DEFAULT) {
@@ -277,7 +296,8 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 			// Bind the connection holder to the thread.
 			if (txObject.isNewConnectionHolder()) {
-				TransactionSynchronizationManager.bindResource(obtainDataSource(), txObject.getConnectionHolder());
+				// ThreadLocal<Map<Object, Object>> TransactionSynchronizationManager.resources
+				TransactionSynchronizationManager.bindResource(obtainDataSource(), txObject.getConnectionHolder());	// =>>
 			}
 		}
 
@@ -309,8 +329,8 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		if (status.isDebug()) {
 			logger.debug("Committing JDBC transaction on Connection [" + con + "]");
 		}
-		try {
-			con.commit();
+		try {	// 通过 JDBC 发送 commit 语句
+			con.commit();	// con = {JDBC4Connection@5386}
 		}
 		catch (SQLException ex) {
 			throw new TransactionSystemException("Could not commit JDBC transaction", ex);
@@ -401,14 +421,27 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 
 	/**
+	 * 事务对象；
+	 *
 	 * DataSource transaction object, representing a ConnectionHolder.
 	 * Used as transaction object by DataSourceTransactionManager.
+	 *
+	 * ----------------------------------------------------------
+	 *
+	 *                   Flushable
+	 *                      ▲
+	 *      SmartTransactionObject   SavepointManager
+	 *                      ▲                   ▲
+	 *                      │ ┌─────────────────┘
+	 *       JdbcTransactionObjectSupport
+	 *                      ▲
+	 * DataSourceTransactionObject
 	 */
 	private static class DataSourceTransactionObject extends JdbcTransactionObjectSupport {
 
 		private boolean newConnectionHolder;
 
-		private boolean mustRestoreAutoCommit;
+		private boolean mustRestoreAutoCommit;	// true
 
 		public void setConnectionHolder(@Nullable ConnectionHolder connectionHolder, boolean newConnectionHolder) {
 			super.setConnectionHolder(connectionHolder);
