@@ -416,12 +416,16 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				retVal = invocation.proceedWithInvocation();		// =>> invoke the next interceptor，直至目标方法
 			}
 			catch (Throwable ex) {
+				/*
+				 * CASE 1：ex = {TransientDataAccessResourceException@5589} "...TransientDataAccessResourceException: PreparedStatementCallback;
+				 * 			SQL [UPDATE user SET name = ? WHERE id = ?]; Connection is read-only. Queries leading to data modification are not allowed;
+				 */
 				// target invocation exception
-				completeTransactionAfterThrowing(txInfo, ex);
+				completeTransactionAfterThrowing(txInfo, ex);	// TODO：
 				throw ex;
 			}
 			finally {
-				cleanupTransactionInfo(txInfo);
+				cleanupTransactionInfo(txInfo);				// =>> main
 			}
 
 			if (retVal != null && vavrPresent && VavrDelegate.isVavrTry(retVal)) {
@@ -432,7 +436,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				}
 			}
 
-			commitTransactionAfterReturning(txInfo);
+			commitTransactionAfterReturning(txInfo);		// =>> commit()
 			return retVal;
 		}
 
