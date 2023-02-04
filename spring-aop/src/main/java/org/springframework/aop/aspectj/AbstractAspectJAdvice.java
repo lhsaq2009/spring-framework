@@ -80,11 +80,11 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	private final String methodName;
 
 	private final Class<?>[] parameterTypes;
-
+	// this.aspectJAdviceMethod = {Method@6073} "public void org.example.beans.Log_Annotation_Order_33_2.myBeforeMethod2(org.aspectj.lang.JoinPoint)"
 	protected transient Method aspectJAdviceMethod;
 
 	private final AspectJExpressionPointcut pointcut;
-
+	// this.aspectInstanceFactory.getAspectInstance() = {Log_Annotation_Order_33_2@6134}
 	private final AspectInstanceFactory aspectInstanceFactory;
 
 	/**
@@ -625,7 +625,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 		try {
 			ReflectionUtils.makeAccessible(this.aspectJAdviceMethod);		// 代理方法
 			// TODO AopUtils.invokeJoinpointUsingReflection
-			return this.aspectJAdviceMethod.invoke(this.aspectInstanceFactory.getAspectInstance(), actualArgs);  // 发射调用 代理对象的 代理方法
+			return this.aspectJAdviceMethod.invoke(this.aspectInstanceFactory.getAspectInstance(), actualArgs);  // 发起调用 代理对象的 代理方法
 		}
 		catch (IllegalArgumentException ex) {
 			throw new AopInvocationException("Mismatch on arguments to advice method [" +
@@ -648,8 +648,8 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	 * Get the current join point match at the join point we are being dispatched on.
 	 */
 	@Nullable
-	protected JoinPointMatch getJoinPointMatch() {
-		MethodInvocation mi = ExposeInvocationInterceptor.currentInvocation();
+	protected JoinPointMatch getJoinPointMatch() {									//
+		MethodInvocation mi = ExposeInvocationInterceptor.currentInvocation();		//
 		if (!(mi instanceof ProxyMethodInvocation)) {
 			throw new IllegalStateException("MethodInvocation is not a Spring ProxyMethodInvocation: " + mi);
 		}
