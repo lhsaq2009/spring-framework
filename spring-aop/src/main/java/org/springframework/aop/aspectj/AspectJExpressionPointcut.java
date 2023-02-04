@@ -64,9 +64,13 @@ import org.springframework.util.StringUtils;
  * @author Ramnivas Laddad
  * @author Dave Syer
  * @since 2.0
+ *
+ * usage:
+ * 		CASE 1. {@link org.springframework.aop.config.ConfigBeanDefinitionParser#parsePointcut}
+ * 	            pointcutDefinition = createPointcutDefinition(expression);
  */
 @SuppressWarnings("serial")
-public class AspectJExpressionPointcut extends AbstractExpressionPointcut
+public class AspectJExpressionPointcut extends AbstractExpressionPointcut		// TODO：<aop:pointcut>  和 @Pointcut 都是一样的吗 ？？
 		implements ClassFilter, IntroductionAwareMethodMatcher, BeanFactoryAware {
 
 	private static final Set<PointcutPrimitive> SUPPORTED_PRIMITIVES = new HashSet<>();
@@ -274,7 +278,7 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 	}
 
 	@Override
-	public boolean matches(Method method, Class<?> targetClass, boolean hasIntroductions) {
+	public boolean matches(Method method, Class<?> targetClass, boolean hasIntroductions) {	//
 		obtainPointcutExpression();
 		ShadowMatch shadowMatch = getTargetShadowMatch(method, targetClass);
 
@@ -443,7 +447,7 @@ public class AspectJExpressionPointcut extends AbstractExpressionPointcut
 					Method methodToMatch = targetMethod;
 					try {
 						try {
-							shadowMatch = obtainPointcutExpression().matchesMethodExecution(methodToMatch);
+							shadowMatch = obtainPointcutExpression().matchesMethodExecution(methodToMatch);	//
 						}
 						catch (ReflectionWorldException ex) {
 							// Failed to introspect target method, probably because it has been loaded
