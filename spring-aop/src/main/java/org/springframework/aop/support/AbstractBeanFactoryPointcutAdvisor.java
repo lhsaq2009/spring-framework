@@ -27,6 +27,10 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public abstract class AbstractBeanFactoryPointcutAdvisor extends AbstractPointcutAdvisor implements BeanFactoryAware {
 
+	/**
+	 * 写入：{@link org.springframework.transaction.config.AnnotationDrivenBeanDefinitionParser.AopAutoProxyConfigurer#configureAutoProxyCreator}
+	 * 	    TransactionInterceptor.class
+	 */
 	@Nullable
 	private String adviceBeanName;
 
