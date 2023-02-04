@@ -254,7 +254,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     /*
      * eg-1：name = "student_aliase"，typeCheckOnly = false
      */
-	protected <T> T doGetBean(                                // =>> 02、getBean
+	protected <T> T doGetBean(                                	// =>> 02、getBean
 			String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly)
 			throws BeansException {
 		/*
@@ -266,7 +266,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		// Eagerly check singleton cache for manually registered singletons.
         // 单例缓存，或 解决循环依赖提前得到未初始化的实例（① getBean(A) -> ② getBean(B) -> ③ getBean(A) -- 在此获取 ① 提前暴漏的未初始化完整的 A 实例）
-		Object sharedInstance = getSingleton(beanName);        // =>> 03、getBean
+		Object sharedInstance = getSingleton(beanName);        	// =>> 03、getBean
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
@@ -344,9 +344,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				// Create bean instance.
 				if (mbd.isSingleton()) {
-					sharedInstance = getSingleton(beanName, () -> {                 // =>> 05、getBean
+					sharedInstance = getSingleton(beanName, () -> {// =>> 05、getBean
 						try {
-							return createBean(beanName, mbd, args);                 // =>> 06、
+							return createBean(beanName, mbd, args);                	// =>> 06、
 						}
 						catch (BeansException ex) {
 							// Explicitly remove instance from singleton cache: It might have been put there
@@ -363,11 +363,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					// It's a prototype -> create a new instance.
 					Object prototypeInstance = null;
 					try {
-						beforePrototypeCreation(beanName);                  // TODO：
+						beforePrototypeCreation(beanName);                  		// TODO：
 						prototypeInstance = createBean(beanName, mbd, args);
 					}
 					finally {
-						afterPrototypeCreation(beanName);                   // TODO：
+						afterPrototypeCreation(beanName);                   		// TODO：
 					}
 					bean = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
 				}
