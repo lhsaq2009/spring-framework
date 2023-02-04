@@ -439,7 +439,17 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 	 */
 	private static class DataSourceTransactionObject extends JdbcTransactionObjectSupport {
 
-		private boolean newConnectionHolder;
+		/**
+		 * CASE 1. {@link DataSourceTransactionManager#doGetTransaction}
+		 * 		   =>> txObject.setConnectionHolder(conHolder, false);
+		 * 		       =>> newConnectionHolder = false
+		 *
+		 * CASE 2. {@link DataSourceTransactionManager#doBegin}
+		 *         Connection newCon = obtainDataSource().getConnection();
+		 *         txObject.setConnectionHolder(new ConnectionHolder(newCon), true);
+		 *		   =>> newConnectionHolder = true
+		 */
+		private boolean newConnectionHolder;	// true
 
 		private boolean mustRestoreAutoCommit;	// true
 
