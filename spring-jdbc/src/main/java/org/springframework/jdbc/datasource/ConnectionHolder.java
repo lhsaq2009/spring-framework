@@ -32,17 +32,17 @@ public class ConnectionHolder extends ResourceHolderSupport {
 
 
 	@Nullable
-	private ConnectionHandle connectionHandle;
+	private ConnectionHandle connectionHandle;		//
 
 	@Nullable
-	private Connection currentConnection;
+	private Connection currentConnection;			// released() =>> null，
 
-	private boolean transactionActive = false;
+	private boolean transactionActive = false;		// 指示事务对象的事务是否正在开启中
 
 	@Nullable
 	private Boolean savepointsSupported;
 
-	private int savepointCounter = 0;
+	private int savepointCounter = 0;				//
 
 
 	/**
@@ -96,7 +96,10 @@ public class ConnectionHolder extends ResourceHolderSupport {
 	}
 
 	/**
-	 * Set whether this holder represents an active, JDBC-managed transaction.
+	 * CASE 1. {@link DataSourceTransactionManager#doBegin}
+	 *         txObject.getConnectionHolder().setTransactionActive(true);
+	 *
+	 * 设置 holder 是否表示 JDBC-managed 的活动事务；Set whether this holder represents an active, JDBC-managed transaction.
 	 * @see DataSourceTransactionManager
 	 */
 	protected void setTransactionActive(boolean transactionActive) {
@@ -167,8 +170,8 @@ public class ConnectionHolder extends ResourceHolderSupport {
 	 * @throws SQLException if thrown by the JDBC driver
 	 */
 	public Savepoint createSavepoint() throws SQLException {
-		this.savepointCounter++;
-		return getConnection().setSavepoint(SAVEPOINT_NAME_PREFIX + this.savepointCounter);
+		this.savepointCounter++;		// getConnection() = MySQL JDBC 链接，SAVEPOINT_1
+		return getConnection().setSavepoint(SAVEPOINT_NAME_PREFIX + this.savepointCounter);		// 依赖 MySQL JDBC Send：SAVEPOINT `SAVEPOINT_1`
 	}
 
 	/**
