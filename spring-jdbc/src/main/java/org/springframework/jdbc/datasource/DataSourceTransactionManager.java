@@ -255,7 +255,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		try {
 			if (!txObject.hasConnectionHolder() ||
 					txObject.getConnectionHolder().isSynchronizedWithTransaction()) {
-				Connection newCon = obtainDataSource().getConnection();
+				Connection newCon = obtainDataSource().getConnection();		// 依赖的就是 JDBC mysql-connector-java 获取连接
 				if (logger.isDebugEnabled()) {
 					logger.debug("Acquired Connection [" + newCon + "] for JDBC transaction");
 				}
@@ -283,6 +283,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				if (logger.isDebugEnabled()) {
 					logger.debug("Switching JDBC Connection [" + con + "] to manual commit");
 				}
+				/** {@link DataSourceTransactionManager#doCommit} =>> con.commit(); */
 				con.setAutoCommit(false);
 			}
 
@@ -322,8 +323,15 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 		TransactionSynchronizationManager.bindResource(obtainDataSource(), suspendedResources);
 	}
 
+	/**
+	 * {@link DataSourceTransactionManager#doBegin}
+	 * 		if (con.getAutoCommit()) {
+	 * 			con.setAutoCommit(false);
+	 *
+	 * @param status the status representation of the transaction
+	 */
 	@Override
-	protected void doCommit(DefaultTransactionStatus status) {
+	protected void doCommit(DefaultTransactionStatus status) {		// TODO：之前看到把 auto commit => 0
 		DataSourceTransactionObject txObject = (DataSourceTransactionObject) status.getTransaction();
 		Connection con = txObject.getConnectionHolder().getConnection();
 		if (status.isDebug()) {
