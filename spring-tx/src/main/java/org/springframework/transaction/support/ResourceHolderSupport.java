@@ -18,15 +18,19 @@ import org.springframework.transaction.TransactionTimedOutException;
  * @see org.springframework.jdbc.datasource.DataSourceUtils#applyTransactionTimeout
  */
 public abstract class ResourceHolderSupport implements ResourceHolder {
+	/*
+	 * CASE 1. AbstractPlatformTransactionManager.startTransaction(..)
+	 *         =>> DataSourceTransactionManager.doBegin(..)
+	 *             txObject.getConnectionHolder().setSynchronizedWithTransaction(true);
+	 */
+	private boolean synchronizedWithTransaction = false;		// TODO：存在事务了???
 
-	private boolean synchronizedWithTransaction = false;
-
-	private boolean rollbackOnly = false;
+	private boolean rollbackOnly = false;						//
 
 	@Nullable
 	private Date deadline;
 
-	private int referenceCount = 0;
+	private int referenceCount = 0;								// requested() =>> ++，released() =>> --
 
 	private boolean isVoid = false;
 
@@ -64,7 +68,7 @@ public abstract class ResourceHolderSupport implements ResourceHolder {
 	}
 
 	/**
-	 * Return whether the resource transaction is marked as rollback-only.
+	 * 返回资源事务是否标记为仅回滚；Return whether the resource transaction is marked as rollback-only.
 	 */
 	public boolean isRollbackOnly() {
 		return this.rollbackOnly;
