@@ -46,7 +46,7 @@ public abstract class AopNamespaceUtils {
 	public static void registerAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
 
-		BeanDefinition beanDefinition = AopConfigUtils.registerAutoProxyCreatorIfNecessary(		// <**:annotation-driven ...> =>>
+		BeanDefinition beanDefinition = AopConfigUtils.registerAutoProxyCreatorIfNecessary(		// 何种情况需要注册：<**:annotation-driven ...> =>>
 				// parserContext.getRegistry() = {DefaultListableBeanFactory@3641} "DefaultListableBeanFactory@48af2d5d"
 				parserContext.getRegistry(), parserContext.extractSource(sourceElement));
 		useClassProxyingIfNecessary(parserContext.getRegistry(), sourceElement);
