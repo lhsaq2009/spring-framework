@@ -87,14 +87,14 @@ public abstract class AopUtils {
 	 * never {@code null})
 	 * @see org.springframework.aop.TargetClassAware#getTargetClass()
 	 * @see org.springframework.aop.framework.AopProxyUtils#ultimateTargetClass(Object)
-	 */
-	public static Class<?> getTargetClass(Object candidate) {
+	 */ // candidate = {TransactionByXML@5244}
+	public static Class<?> getTargetClass(Object candidate) {	// TODO：AOP 时再看，2023-01-11
 		Assert.notNull(candidate, "Candidate object must not be null");
 		Class<?> result = null;
 		if (candidate instanceof TargetClassAware) {
 			result = ((TargetClassAware) candidate).getTargetClass();
 		}
-		if (result == null) {
+		if (result == null) {  // 若是 CGlib 代理，则返回其 super class
 			result = (isCglibProxy(candidate) ? candidate.getClass().getSuperclass() : candidate.getClass());
 		}
 		return result;
@@ -207,7 +207,7 @@ public abstract class AopUtils {
 	 */
 	public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
 		Assert.notNull(pc, "Pointcut must not be null");
-		if (!pc.getClassFilter().matches(targetClass)) {
+		if (!pc.getClassFilter().matches(targetClass)) {		// =>> 01、先 Class
 			return false;
 		}
 
@@ -218,6 +218,24 @@ public abstract class AopUtils {
 		}
 
 		IntroductionAwareMethodMatcher introductionAwareMethodMatcher = null;
+
+		/**
+		 * <tx:annotation-driven transaction-manager="transactionManager"/>
+		 * 		methodMatcher = {BeanFactoryTransactionAttributeSourceAdvisor$1@4092}
+		 *
+		 * <aop:pointcut id="txPointCut"  expression="execution(* org.example.service.tx.*.*(..))"/>
+		 * <aop:pointcut id="pointcutXML" expression="execution(* org.example.service.tx.TransactionByAnnotation.*(..))"/>
+		 * 		methodMatcher = {AspectJExpressionPointcut@4203} "execution(* org.example.service.tx.*.*(..))"
+		 *
+		 * <aop:aspectj-autoproxy ../> -- @Aspect
+		 * 		methodMatcher = {AspectJExpressionPointcut@4495} "AspectJExpressionPointcut: () updateUserSuccess_JointPointExp()"
+		 *
+		 * <aop:before method="myXMLBeforeMethod" pointcut-ref="pointcutXML"/>
+		 *		methodMatcher = {MethodMatchers$IntersectionIntroductionAwareMethodMatcher@4450}
+		 *							"AbstractAspectJAdvice$AdviceExcludingMethodMatcher:
+		 *								public void org.example.beans.Log_XML_AOP_Aspect_Order_22.myXMLBeforeMethod(JoinPoint),
+		 *								AspectJExpressionPointcut: () execution(* org.example.service.tx.TransactionByAnnotation.*(..))"
+		 */
 		if (methodMatcher instanceof IntroductionAwareMethodMatcher) {
 			introductionAwareMethodMatcher = (IntroductionAwareMethodMatcher) methodMatcher;
 		}
@@ -227,13 +245,18 @@ public abstract class AopUtils {
 			classes.add(ClassUtils.getUserClass(targetClass));
 		}
 		classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
-
-		for (Class<?> clazz : classes) {
+		/*
+		 * CASE 1. classes = {LinkedHashSet@5266}  size = 2
+		 * 				0 = {Class@3824} "class org.example.service.tx.TransactionByAnnotation"
+		 * 				1 = {Class@3918} "interface org.example.service.tx.ITXByAnnotation"
+		 */
+		for (Class<?> clazz : classes) {									// 02、classes = [ targetClass, 其接口类's ]
 			Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
 			for (Method method : methods) {
 				if (introductionAwareMethodMatcher != null ?
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
-						methodMatcher.matches(method, targetClass)) {
+						/** {@link org.springframework.transaction.interceptor.TransactionAttributeSourcePointcut#matches} */
+						methodMatcher.matches(method, targetClass)) {		// =>> 03、方法
 					return true;
 				}
 			}
@@ -270,7 +293,8 @@ public abstract class AopUtils {
 		}
 		else if (advisor instanceof PointcutAdvisor) {
 			PointcutAdvisor pca = (PointcutAdvisor) advisor;
-			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
+			// CASE 1. BeanFactoryTransactionAttributeSourceAdvisor.getPointcut(..)
+			return canApply(pca.getPointcut(), targetClass, hasIntroductions);		// =>>
 		}
 		else {
 			// It doesn't have a pointcut so we assume it applies.
@@ -279,6 +303,8 @@ public abstract class AopUtils {
 	}
 
 	/**
+	 * 确定适用于给定类的 candidateAdvisors 的 sublist
+	 *
 	 * Determine the sublist of the {@code candidateAdvisors} list
 	 * that is applicable to the given class.
 	 * @param candidateAdvisors the Advisors to evaluate
@@ -302,7 +328,7 @@ public abstract class AopUtils {
 				// already processed
 				continue;
 			}
-			if (canApply(candidate, clazz, hasIntroductions)) {
+			if (canApply(candidate, clazz, hasIntroductions)) {		// =>> 看看目标类是否需要被代理
 				eligibleAdvisors.add(candidate);
 			}
 		}
