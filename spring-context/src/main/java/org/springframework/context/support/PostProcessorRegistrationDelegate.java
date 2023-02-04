@@ -46,6 +46,7 @@ final class PostProcessorRegistrationDelegate {
 		// region 按优先级，先收集并分批次执行：BeanDefinitionRegistryPostProcessor.class
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
