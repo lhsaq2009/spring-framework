@@ -29,22 +29,23 @@ import org.springframework.lang.Nullable;
  * @since 2.0.3
  */
 @SuppressWarnings("serial")
-public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializable {
+public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializable {		//
 
+	// config = {ProxyFactory@4565} "org.springframework.aop.framework.ProxyFactory"
 	@Override
-	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
+	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(			//
 			Advised config, Method method, @Nullable Class<?> targetClass) {
 
 		// This is somewhat tricky... We have to process introductions first,
 		// but we need to preserve order in the ultimate list.
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
-		Advisor[] advisors = config.getAdvisors();
+		Advisor[] advisors = config.getAdvisors();								//
 		List<Object> interceptorList = new ArrayList<>(advisors.length);
 		Class<?> actualClass = (targetClass != null ? targetClass : method.getDeclaringClass());
 		Boolean hasIntroductions = null;
-
-		for (Advisor advisor : advisors) {
-			if (advisor instanceof PointcutAdvisor) {  //
+		// TODO：之前多种方式的 advisor，简述出它的：拦截器 在哪
+		for (Advisor advisor : advisors) {										// 遍历 advisors，收集对应的 interceptor
+			if (advisor instanceof PointcutAdvisor) {  							//
 				// Add it conditionally.
 				PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
 				if (config.isPreFiltered() || pointcutAdvisor.getPointcut().getClassFilter().matches(actualClass)) {
@@ -60,7 +61,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 						match = mm.matches(method, actualClass);
 					}
 					if (match) {
-						MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
+						MethodInterceptor[] interceptors = registry.getInterceptors(advisor);	// =>>
 						if (mm.isRuntime()) {
 							// Creating a new object instance in the getInterceptors() method
 							// isn't a problem as we normally cache created chains.
