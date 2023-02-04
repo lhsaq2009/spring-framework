@@ -74,7 +74,7 @@ import org.springframework.util.StringUtils;
  * @see DefaultAdvisorAutoProxyCreator
  */
 @SuppressWarnings("serial")
-public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
+public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport		//
 		implements SmartInstantiationAwareBeanPostProcessor, BeanFactoryAware {
 
 	/**
@@ -424,7 +424,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * @see #buildAdvisors
 	 */
 	protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
-			@Nullable Object[] specificInterceptors, TargetSource targetSource) {
+			@Nullable Object[] specificInterceptors, TargetSource targetSource) {		//
 
 		if (this.beanFactory instanceof ConfigurableListableBeanFactory) {
 			AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);
