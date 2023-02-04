@@ -63,19 +63,30 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	@Nullable
 	private Boolean isAfterAdvice;
 
-
-	public InstantiationModelAwarePointcutAdvisorImpl(AspectJExpressionPointcut declaredPointcut,
+	// 每个切面方法
+	public InstantiationModelAwarePointcutAdvisorImpl(AspectJExpressionPointcut declaredPointcut,		//
 			Method aspectJAdviceMethod, AspectJAdvisorFactory aspectJAdvisorFactory,
 			MetadataAwareAspectInstanceFactory aspectInstanceFactory, int declarationOrder, String aspectName) {
 
+		// declaredPointcut = {AspectJExpressionPointcut@4288} "AspectJExpressionPointcut: () updateUserSuccess_JointPointExp()"
 		this.declaredPointcut = declaredPointcut;
+		// this.declaringClass = {Class@4129} "class org.example.beans.LoggingAspect"… 导航
 		this.declaringClass = aspectJAdviceMethod.getDeclaringClass();
+		// methodName = "myBeforeMethod"
 		this.methodName = aspectJAdviceMethod.getName();
+		/*
+		 * this.parameterTypes = {Class[1]@4815}
+		 * 		0 = {Class@4497} "interface org.aspectj.lang.JoinPoint"
+		 */
 		this.parameterTypes = aspectJAdviceMethod.getParameterTypes();
+		// this.aspectJAdviceMethod = {Method@4176} "public void org.example.beans.LoggingAspect.myBeforeMethod(JoinPoint)"
 		this.aspectJAdviceMethod = aspectJAdviceMethod;
+		// this.aspectJAdvisorFactory = {ReflectiveAspectJAdvisorFactory@4137}
 		this.aspectJAdvisorFactory = aspectJAdvisorFactory;
+		// this.aspectInstanceFactory = {LazySingletonAspectInstanceFactoryDecorator@4174} "LazySingletonAspectInstanceFactoryDecorator: decorating BeanFactoryAspectInstanceFactory: bean name 'loggingAspect'"
 		this.aspectInstanceFactory = aspectInstanceFactory;
 		this.declarationOrder = declarationOrder;
+		// aspectName = "loggingAspect"
 		this.aspectName = aspectName;
 
 		if (aspectInstanceFactory.getAspectMetadata().isLazilyInstantiated()) {
@@ -91,10 +102,10 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 			this.lazy = true;
 		}
 		else {
-			// A singleton aspect.
+			// 单例切面；A singleton aspect.
 			this.pointcut = this.declaredPointcut;
 			this.lazy = false;
-			this.instantiatedAdvice = instantiateAdvice(this.declaredPointcut);
+			this.instantiatedAdvice = instantiateAdvice(this.declaredPointcut);		// =>>
 		}
 	}
 
@@ -130,8 +141,9 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	}
 
 	private Advice instantiateAdvice(AspectJExpressionPointcut pointcut) {
+		// =>> org.springframework.aop.aspectj.annotation.ReflectiveAspectJAdvisorFactory.getAdvice
 		Advice advice = this.aspectJAdvisorFactory.getAdvice(this.aspectJAdviceMethod, pointcut,
-				this.aspectInstanceFactory, this.declarationOrder, this.aspectName);
+				this.aspectInstanceFactory, this.declarationOrder, this.aspectName);	// =>>
 		return (advice != null ? advice : EMPTY_ADVICE);
 	}
 
