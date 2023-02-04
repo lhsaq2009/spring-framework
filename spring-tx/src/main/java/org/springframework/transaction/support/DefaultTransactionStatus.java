@@ -31,22 +31,33 @@ import org.springframework.util.Assert;
  * @see #rollbackToSavepoint
  * @see #releaseSavepoint
  * @see SimpleTransactionStatus
+ *
+ * ----------------------------
+ *
+ * Flushable  SavepointManager  TransactionExecution
+ *     ▲              ▲                   ▲
+ *     └────────────┐ │ ┌─────────────────┘
+ *           TransactionStatus
+ *                    ▲
+ *   AbstractTransactionStatus
+ *                    ▲
+ *    DefaultTransactionStatus
  */
-public class DefaultTransactionStatus extends AbstractTransactionStatus {
+public class DefaultTransactionStatus extends AbstractTransactionStatus {	//
 
 	@Nullable
 	private final Object transaction;
 
-	private final boolean newTransaction;
+	private final boolean newTransaction;			// TODO：何时？？
 
-	private final boolean newSynchronization;
+	private final boolean newSynchronization;		// 代表有事务
 
 	private final boolean readOnly;
 
 	private final boolean debug;
 
 	@Nullable
-	private final Object suspendedResources;
+	private final Object suspendedResources;		// 被挂起的事务，{AbstractPlatformTransactionManager$SuspendedResourcesHolder@5523}
 
 
 	/**
