@@ -97,11 +97,11 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 	protected transient Log logger = LogFactory.getLog(getClass());
 
-	private int transactionSynchronization = SYNCHRONIZATION_ALWAYS;
+	private int transactionSynchronization = SYNCHRONIZATION_ALWAYS;	//
 
 	private int defaultTimeout = TransactionDefinition.TIMEOUT_DEFAULT;
 
-	private boolean nestedTransactionAllowed = false;
+	private boolean nestedTransactionAllowed = false;					// 构造函数置为 true
 
 	private boolean validateExistingTransaction = false;
 
@@ -327,12 +327,12 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 		// Use defaults if no transaction definition given.
 		TransactionDefinition def = (definition != null ? definition : TransactionDefinition.withDefaults());
-
-		Object transaction = doGetTransaction();
+		// eg1：getUserList，new 一个对象：transaction = {DataSourceTransactionManager$DataSourceTransactionObject@5252}
+		Object transaction = doGetTransaction();				// =>> new DataSourceTransactionObject();
 		boolean debugEnabled = logger.isDebugEnabled();
 
-		if (isExistingTransaction(transaction)) {
-			// Existing transaction found -> check propagation behavior to find out how to behave.
+		if (isExistingTransaction(transaction)) {			    // 当前线程，已处于事务中，
+			// 找到现有事务 -> 检查传播行为以找出行为方式；Existing transaction found -> check propagation behavior to find out how to behave.
 			return handleExistingTransaction(def, transaction, debugEnabled);
 		}
 
@@ -349,12 +349,13 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 		else if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRED ||
 				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW ||
 				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) {
-			SuspendedResourcesHolder suspendedResources = suspend(null);
+			// eg1：getUserList，suspendedResources = null，TODO：2023-01-12 为什么 ？？？
+			SuspendedResourcesHolder suspendedResources = suspend(null);			// =>>
 			if (debugEnabled) {
 				logger.debug("Creating new transaction with name [" + def.getName() + "]: " + def);
 			}
 			try {
-				return startTransaction(def, transaction, debugEnabled, suspendedResources);
+				return startTransaction(def, transaction, debugEnabled, suspendedResources);	// =>>
 			}
 			catch (RuntimeException | Error ex) {
 				resume(null, suspendedResources);
@@ -431,9 +432,10 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				logger.debug("Suspending current transaction, creating new transaction with name [" +
 						definition.getName() + "]");
 			}
-			SuspendedResourcesHolder suspendedResources = suspend(transaction);
+			// suspendedResources = {AbstractPlatformTransactionManager$SuspendedResourcesHolder@5829}
+			SuspendedResourcesHolder suspendedResources = suspend(transaction);							// =>>
 			try {
-				return startTransaction(definition, transaction, debugEnabled, suspendedResources);
+				return startTransaction(definition, transaction, debugEnabled, suspendedResources);		// =>> 当前存在事务，
 			}
 			catch (RuntimeException | Error beginEx) {
 				resumeAfterBeginException(transaction, suspendedResources, beginEx);
