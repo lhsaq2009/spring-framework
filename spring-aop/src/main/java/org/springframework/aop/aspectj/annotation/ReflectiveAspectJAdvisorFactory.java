@@ -50,9 +50,17 @@ import org.springframework.util.comparator.InstanceComparator;
  * @author Phillip Webb
  * @author Sam Brannen
  * @since 2.0
+ *
+ * --------------------------------------------------
+ *
+ * 		          AspectJAdvisorFactory
+ * 		                        ▲
+ * 		  AbstractAspectJAdvisorFactory ( core )
+ * 		                        ▲
+ * 		ReflectiveAspectJAdvisorFactory
  */
 @SuppressWarnings("serial")
-public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFactory implements Serializable {
+public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFactory implements Serializable {		//
 
 	private static final Comparator<Method> METHOD_COMPARATOR;
 
@@ -101,7 +109,9 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 	@Override
 	public List<Advisor> getAdvisors(MetadataAwareAspectInstanceFactory aspectInstanceFactory) {
+		// aspectClass = {Class@4129} "class org.example.beans.LoggingAspect"
 		Class<?> aspectClass = aspectInstanceFactory.getAspectMetadata().getAspectClass();
+		// aspectName  = "loggingAspect"
 		String aspectName = aspectInstanceFactory.getAspectMetadata().getAspectName();
 		validate(aspectClass);
 
@@ -111,7 +121,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 				new LazySingletonAspectInstanceFactoryDecorator(aspectInstanceFactory);
 
 		List<Advisor> advisors = new ArrayList<>();
-		for (Method method : getAdvisorMethods(aspectClass)) {
+		for (Method method : getAdvisorMethods(aspectClass)) {		// 遍历该切面类的所有 advisor 方法
 			// Prior to Spring Framework 5.2.7, advisors.size() was supplied as the declarationOrderInAspect
 			// to getAdvisor(...) to represent the "current position" in the declared methods list.
 			// However, since Java 7 the "current position" is not valid since the JDK no longer
@@ -120,7 +130,14 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 			// discovered via reflection in order to support reliable advice ordering across JVM launches.
 			// Specifically, a value of 0 aligns with the default value used in
 			// AspectJPrecedenceComparator.getAspectDeclarationOrder(Advisor).
-			Advisor advisor = getAdvisor(method, lazySingletonAspectInstanceFactory, 0, aspectName);
+
+			/*
+			 * advisor = {InstantiationModelAwarePointcutAdvisorImpl@4608} "InstantiationModelAwarePointcutAdvisor:
+			 * 				expression [updateUserSuccess_JointPointExp()];
+			 * 				advice method [public void org.example.beans.LoggingAspect.myBeforeMethod(org.aspectj.lang.JoinPoint)];
+			 * 				perClauseKind=SINGLETON"
+			 */
+			Advisor advisor = getAdvisor(method, lazySingletonAspectInstanceFactory, 0, aspectName);	// =>>
 			if (advisor != null) {
 				advisors.add(advisor);
 			}
@@ -188,26 +205,30 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 		validate(aspectInstanceFactory.getAspectMetadata().getAspectClass());
 
-		AspectJExpressionPointcut expressionPointcut = getPointcut(
+		AspectJExpressionPointcut expressionPointcut = getPointcut(		// =>>
 				candidateAdviceMethod, aspectInstanceFactory.getAspectMetadata().getAspectClass());
 		if (expressionPointcut == null) {
 			return null;
 		}
 
+		// 将给切面方法，进行封装
 		return new InstantiationModelAwarePointcutAdvisorImpl(expressionPointcut, candidateAdviceMethod,
 				this, aspectInstanceFactory, declarationOrderInAspect, aspectName);
 	}
 
 	@Nullable
 	private AspectJExpressionPointcut getPointcut(Method candidateAdviceMethod, Class<?> candidateAspectClass) {
+		// aspectJAnnotation = {AbstractAspectJAdvisorFactory$AspectJAnnotation@4218} "@org.aspectj.lang.annotation.Before(argNames=, value=updateUserSuccess_JointPointExp())"
 		AspectJAnnotation<?> aspectJAnnotation =
 				AbstractAspectJAdvisorFactory.findAspectJAnnotationOnMethod(candidateAdviceMethod);
 		if (aspectJAnnotation == null) {
 			return null;
 		}
 
+		// 每个切面方法，的切点表达式被封装成：AspectJExpressionPointcut
 		AspectJExpressionPointcut ajexp =
 				new AspectJExpressionPointcut(candidateAspectClass, new String[0], new Class<?>[0]);
+		// updateUserSuccess_JointPointExp()
 		ajexp.setExpression(aspectJAnnotation.getPointcutExpression());
 		if (this.beanFactory != null) {
 			ajexp.setBeanFactory(this.beanFactory);
@@ -244,7 +265,7 @@ public class ReflectiveAspectJAdvisorFactory extends AbstractAspectJAdvisorFacto
 
 		AbstractAspectJAdvice springAdvice;
 
-		switch (aspectJAnnotation.getAnnotationType()) {
+		switch (aspectJAnnotation.getAnnotationType()) {		//
 			case AtPointcut:
 				if (logger.isDebugEnabled()) {
 					logger.debug("Processing pointcut '" + candidateAdviceMethod.getName() + "'");
