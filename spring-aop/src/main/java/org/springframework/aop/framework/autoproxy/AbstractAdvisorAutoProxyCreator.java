@@ -53,7 +53,6 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		this.advisorRetrievalHelper = new BeanFactoryAdvisorRetrievalHelperAdapter(beanFactory);
 	}
 
-
 	@Override
 	@Nullable
 	protected Object[] getAdvicesAndAdvisorsForBean(
@@ -120,7 +119,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		/** {@link ProxyCreationContext#currentProxiedBeanName} */
 		ProxyCreationContext.setCurrentProxiedBeanName(beanName);
 		try {
-			return AopUtils.findAdvisorsThatCanApply(candidateAdvisors, beanClass);
+			return AopUtils.findAdvisorsThatCanApply(candidateAdvisors, beanClass);	// =>>
 		}
 		finally {
 			ProxyCreationContext.setCurrentProxiedBeanName(null);
