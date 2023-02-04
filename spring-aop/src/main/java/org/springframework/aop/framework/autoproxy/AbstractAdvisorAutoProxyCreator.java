@@ -67,6 +67,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	}
 
 	/**
+	 * 查找所有符合条件的 Advisors，来自动代理此类
+	 *
 	 * Find all eligible Advisors for auto-proxying this class.
 	 * @param beanClass the clazz to find advisors for
 	 * @param beanName the name of the currently proxied bean
@@ -75,13 +77,20 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #findCandidateAdvisors
 	 * @see #sortAdvisors
 	 * @see #extendAdvisors
-	 */
+	 */  // Eligible：有资格当选的, 有条件被选中的
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
-		List<Advisor> candidateAdvisors = findCandidateAdvisors();
-		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
-		extendAdvisors(eligibleAdvisors);
+		/** =>> 直接跳转：{@link BeanFactoryAdvisorRetrievalHelper#findAdvisorBeans} */
+		List<Advisor> candidateAdvisors = findCandidateAdvisors();				// =>> <tx:annotation-driven ...
+		/*
+		 * 上一步返回结果：
+		 * CASE 1: beanName = "dataSource"
+		 * 		   candidateAdvisors = {ArrayList@4213}  size = 1
+		 * 		       0 = {BeanFactoryTransactionAttributeSourceAdvisor@5779}
+		 */
+		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);	// =>>
+		extendAdvisors(eligibleAdvisors);						// 钩子方法，用于用户自定义实现
 		if (!eligibleAdvisors.isEmpty()) {
-			eligibleAdvisors = sortAdvisors(eligibleAdvisors);
+			eligibleAdvisors = sortAdvisors(eligibleAdvisors);					// 进行排序
 		}
 		return eligibleAdvisors;
 	}
@@ -92,7 +101,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findCandidateAdvisors() {
 		Assert.state(this.advisorRetrievalHelper != null, "No BeanFactoryAdvisorRetrievalHelper available");
-		return this.advisorRetrievalHelper.findAdvisorBeans();
+		return this.advisorRetrievalHelper.findAdvisorBeans();		// =>> 查找已注册的 Advisor.class 子类，
 	}
 
 	/**
