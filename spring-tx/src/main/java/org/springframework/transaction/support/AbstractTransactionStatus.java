@@ -32,10 +32,10 @@ public abstract class AbstractTransactionStatus implements TransactionStatus {
 
 	private boolean rollbackOnly = false;
 
-	private boolean completed = false;
+	private boolean completed = false;			//
 
-	@Nullable
-	private Object savepoint;
+	@Nullable  									/** {@link com.mysql.cj.jdbc.MysqlSavepoint} */
+	private Object savepoint;					// savepoint = {MysqlSavepoint@6133}
 
 
 	//---------------------------------------------------------------------
@@ -119,15 +119,15 @@ public abstract class AbstractTransactionStatus implements TransactionStatus {
 	 * Create a savepoint and hold it for the transaction.
 	 * @throws org.springframework.transaction.NestedTransactionNotSupportedException
 	 * if the underlying transaction does not support savepoints
-	 */
+	 */ // this = {DefaultTransactionStatus@5942}
 	public void createAndHoldSavepoint() throws TransactionException {
-		setSavepoint(getSavepointManager().createSavepoint());
+		setSavepoint(getSavepointManager().createSavepoint());		// =>>
 	}
 
 	/**
 	 * Roll back to the savepoint that is held for the transaction
 	 * and release the savepoint right afterwards.
-	 */
+	 */ // this = {DefaultTransactionStatus@5532}
 	public void rollbackToHeldSavepoint() throws TransactionException {
 		Object savepoint = getSavepoint();
 		if (savepoint == null) {
@@ -142,14 +142,14 @@ public abstract class AbstractTransactionStatus implements TransactionStatus {
 	/**
 	 * Release the savepoint that is held for the transaction.
 	 */
-	public void releaseHeldSavepoint() throws TransactionException {
-		Object savepoint = getSavepoint();
+	public void releaseHeldSavepoint() throws TransactionException {		//
+		Object savepoint = getSavepoint();									// this = {DefaultTransactionStatus@5942}
 		if (savepoint == null) {
 			throw new TransactionUsageException(
 					"Cannot release savepoint - no savepoint associated with current transaction");
 		}
-		getSavepointManager().releaseSavepoint(savepoint);
-		setSavepoint(null);
+		getSavepointManager().releaseSavepoint(savepoint);					// =>>
+		setSavepoint(null);													//
 	}
 
 
