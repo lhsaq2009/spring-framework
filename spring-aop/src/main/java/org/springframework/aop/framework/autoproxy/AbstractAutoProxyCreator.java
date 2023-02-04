@@ -334,7 +334,34 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport		//
 
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
-			Object proxy = createProxy(		// =>> AOP 创建代理对象
+
+			/*
+			 * proxy = {$Proxy27@5475} "org.example.service.tx.TransactionByAnnotation@3132d3c"
+			 * 		h = {JdkDynamicAopProxy@5422}
+			 * 			advised 			= {ProxyFactory@4653} "org...ProxyFactory"
+			 * 			advisorArray 		= {Advisor[6]@4814}
+			 * 			advisorChainFactory = {DefaultAdvisorChainFactory@4810}
+			 * 			advisors 			= {ArrayList@4813}  size = 6
+			 * 				0 = {ExposeInvocationInterceptor$1@4543}
+			 * 				1 = {AspectJPointcutAdvisor@4286}
+			 * 				2 = {InstantiationModelAwarePointcutAdvisorImpl@4544}
+			 * 						"InstantiationModelAwarePointcutAdvisor: expression [updateUserSuccess_JointPointExp()];
+			 * 						advice method [public void ..Log_Annotation_Order_33.myBeforeMethod(JoinPoint)];"
+			 * 				3 = {Log_Service_Advisor_extend_Orders_44@4289}
+			 * 				4 = {DefaultBeanFactoryPointcutAdvisor@4141}
+			 * 						pointcut [AspectJExpressionPointcut: () execution(* ..TransactionByAnnotation.*(..))];
+			 * 						advice bean 'logXML_AOP_Advisor_Implement_Order_55'"
+			 * 				5 = {BeanFactoryTransactionAttributeSourceAdvisor@4366}
+			 * 						"org...BeanFactoryTransactionAttributeSourceAdvisor:
+			 * 						advice bean 'org...TransactionInterceptor#0'"
+			 * 			aopProxyFactory 	= {DefaultAopProxyFactory@4808}
+			 * 			interfaces 			= {ArrayList@4812}  size = 1
+			 * 				0 = {Class@4435} "interface org...ITXByAnnotation"
+			 * 			proxyTargetClass 	= false
+			 * 			targetSource 		= {SingletonTargetSource@4633}
+			 * 						"SingletonTargetSource for target object [TransactionByAnnotation@3132d3c]"
+			 */
+			Object proxy = createProxy(									// =>> AOP 创建代理对象；new JdkDynamicAopProxy(config)
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
 			this.proxyTypes.put(cacheKey, proxy.getClass());			// 加入到缓存
 			return proxy;
