@@ -585,7 +585,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				TransactionSynchronizationManager.setCurrentTransactionIsolationLevel(null);
 				boolean wasActive = TransactionSynchronizationManager.isActualTransactionActive();
 				TransactionSynchronizationManager.setActualTransactionActive(false);
-				return new SuspendedResourcesHolder(
+				return new SuspendedResourcesHolder(		//
 						suspendedResources, suspendedSynchronizations, name, readOnly, isolationLevel, wasActive);
 			}
 			catch (RuntimeException | Error ex) {
@@ -688,7 +688,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 * @see #doCommit
 	 * @see #rollback
 	 */
-	@Override
+	@Override // status 来自 AbstractPlatformTransactionManager.startTransaction =>> new DefaultTransactionStatus(..)
 	public final void commit(TransactionStatus status) throws TransactionException {
 		if (status.isCompleted()) {
 			throw new IllegalTransactionStateException(
@@ -731,13 +731,13 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				triggerBeforeCommit(status);
 				triggerBeforeCompletion(status);
 				beforeCompletionInvoked = true;
-
-				if (status.hasSavepoint()) {
+				// propagation_nested 就不会 commit()，指望外层事务来 commit()
+				if (status.hasSavepoint()) {			// propagation_nested => true，
 					if (status.isDebug()) {
 						logger.debug("Releasing transaction savepoint");
 					}
 					unexpectedRollback = status.isGlobalRollbackOnly();
-					status.releaseHeldSavepoint();
+					status.releaseHeldSavepoint();		// =>> savepoint => null, JDBC 没啥操作呀 ？？？
 				}
 				else if (status.isNewTransaction()) {
 					if (status.isDebug()) {
@@ -795,7 +795,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 		}
 		finally {
-			cleanupAfterCompletion(status);
+			cleanupAfterCompletion(status);		// =>>
 		}
 	}
 
