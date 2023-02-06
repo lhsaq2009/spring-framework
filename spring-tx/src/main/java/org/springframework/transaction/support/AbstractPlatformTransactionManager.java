@@ -575,7 +575,11 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			try {
 				Object suspendedResources = null;
 				if (transaction != null) {
-					suspendedResources = doSuspend(transaction);
+					/*
+					 * txObject.setConnectionHolder(null);
+					 * TransactionSynchronizationManager.resources -> map.remove(actualKey( 数据源 ))；
+					 */
+					suspendedResources = doSuspend(transaction);		// =>> 移除绑定，当前线程，数据源和事务对象的绑定；
 				}
 				String name = TransactionSynchronizationManager.getCurrentTransactionName();
 				TransactionSynchronizationManager.setCurrentTransactionName(null);
@@ -696,7 +700,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 		}
 
 		DefaultTransactionStatus defStatus = (DefaultTransactionStatus) status;
-		if (defStatus.isLocalRollbackOnly()) {
+		if (defStatus.isLocalRollbackOnly()) {					// TODO：？？？2023-02-03
 			if (defStatus.isDebug()) {
 				logger.debug("Transactional code has requested rollback");
 			}
@@ -708,7 +712,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			if (defStatus.isDebug()) {
 				logger.debug("Global transaction is marked as rollback-only but transactional code requested commit");
 			}
-			processRollback(defStatus, true);
+			processRollback(defStatus, true);		// TODO：??? 2023-02-03
 			return;
 		}
 		// defStatus = {DefaultTransactionStatus@5326}
@@ -814,7 +818,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 		}
 
 		DefaultTransactionStatus defStatus = (DefaultTransactionStatus) status;
-		processRollback(defStatus, false);
+		processRollback(defStatus, false);	// =>>
 	}
 
 	/**
@@ -830,11 +834,11 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			try {
 				triggerBeforeCompletion(status);
 
-				if (status.hasSavepoint()) {
+				if (status.hasSavepoint()) {				//
 					if (status.isDebug()) {
 						logger.debug("Rolling back transaction to savepoint");
 					}
-					status.rollbackToHeldSavepoint();
+					status.rollbackToHeldSavepoint();		// 内存 Propagation.NESTED 时
 				}
 				else if (status.isNewTransaction()) {
 					if (status.isDebug()) {
@@ -1005,10 +1009,10 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 */
 	private void cleanupAfterCompletion(DefaultTransactionStatus status) {
 		status.setCompleted();
-		if (status.isNewSynchronization()) {
+		if (status.isNewSynchronization()) {				// TODO：???
 			TransactionSynchronizationManager.clear();
 		}
-		if (status.isNewTransaction()) {
+		if (status.isNewTransaction()) {					// TODO：????
 			doCleanupAfterCompletion(status.getTransaction());
 		}
 		if (status.getSuspendedResources() != null) {
@@ -1019,7 +1023,6 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			resume(transaction, (SuspendedResourcesHolder) status.getSuspendedResources());
 		}
 	}
-
 
 	//---------------------------------------------------------------------
 	// Template methods to be implemented in subclasses
@@ -1280,7 +1283,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 * Holder for suspended resources.
 	 * Used internally by {@code suspend} and {@code resume}.
 	 */
-	protected static final class SuspendedResourcesHolder {
+	protected static final class SuspendedResourcesHolder {		//
 
 		@Nullable
 		private final Object suspendedResources;

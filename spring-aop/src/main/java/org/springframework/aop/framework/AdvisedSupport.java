@@ -477,8 +477,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			 * 		5 = {AfterReturningAdviceInterceptor@8275}				-- advice = {Log_XML_AOP_Advisor_Implement_Order_55@6757}
 			 * 		6 = {TransactionInterceptor@8382}						-- transactionManagerBeanName = "transactionManager"
 			 */
-			cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(
-					this, method, targetClass);		// =>> 重要，得到对应的 interceptor
+			cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(this, method, targetClass);		// =>> 重要，得到对应的 interceptor
 			this.methodCache.put(cacheKey, cached);
 		}
 		return cached;

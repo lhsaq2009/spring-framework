@@ -422,7 +422,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 
 		if (isEnforceReadOnly() && definition.isReadOnly()) {
 			try (Statement stmt = con.createStatement()) {
-				stmt.executeUpdate("SET TRANSACTION READ ONLY");
+				stmt.executeUpdate("SET TRANSACTION READ ONLY");		// TODO：留意 CASE，2023-02-05
 			}
 		}
 	}

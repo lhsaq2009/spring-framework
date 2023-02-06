@@ -86,7 +86,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {		// 用于扫描 @Aspect 切面
 	 * @return the list of {@link org.springframework.aop.Advisor} beans
 	 * @see #isEligibleBean
 	 */
-	public List<Advisor> buildAspectJAdvisors() {					//
+	public List<Advisor> buildAspectJAdvisors() {					// 收集符合条件的 @AspectJ 切面类
 		List<String> aspectNames = this.aspectBeanNames;			// 所有 切面类's 名字
 
 		if (aspectNames == null) {
