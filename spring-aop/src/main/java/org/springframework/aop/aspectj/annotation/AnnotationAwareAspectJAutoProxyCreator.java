@@ -158,7 +158,7 @@ public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorA
 	 * {@code null} and all beans are included. If "includePatterns" is non-null,
 	 * then one of the patterns must match.
 	 */
-	protected boolean isEligibleAspectBean(String beanName) {		// core
+	protected boolean isEligibleAspectBean(String beanName) {		// core：@Aspect 类，是否可代理别人
 		if (this.includePatterns == null) {
 			return true;
 		}
