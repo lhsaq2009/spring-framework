@@ -76,13 +76,13 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 	 */
 	@Override
 	protected void extendAdvisors(List<Advisor> candidateAdvisors) {
-		AspectJProxyUtils.makeAdvisorChainAspectJCapableIfNecessary(candidateAdvisors);
+		AspectJProxyUtils.makeAdvisorChainAspectJCapableIfNecessary(candidateAdvisors);		// =>>
 	}
 
 	@Override
 	protected boolean shouldSkip(Class<?> beanClass, String beanName) {
 		// TODO: Consider optimization by caching the list of the aspect names
-		List<Advisor> candidateAdvisors = findCandidateAdvisors();		  // =>> <aop:aspectj-autoproxy ..
+		List<Advisor> candidateAdvisors = findCandidateAdvisors();		  // =>> <aop:aspectj-autoproxy .. createProxy(..) 前的检查
 		for (Advisor advisor : candidateAdvisors) {
 			// aspectName = "logXML_AOP_Aspect_Order_22" -- <aop:before ..>
 			if (advisor instanceof AspectJPointcutAdvisor &&
@@ -90,7 +90,7 @@ public class AspectJAwareAdvisorAutoProxyCreator extends AbstractAdvisorAutoProx
 				return true;
 			}
 		}
-		return super.shouldSkip(beanClass, beanName);					// =>>
+		return super.shouldSkip(beanClass, beanName);					  // =>>
 	}
 
 
