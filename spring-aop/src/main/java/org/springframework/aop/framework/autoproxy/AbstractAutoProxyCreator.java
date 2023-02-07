@@ -249,8 +249,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport		//
 				return null;
 			}
 
-			//
-			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {		// =>>
+			// 检查该 Bean 是否需要创建 AOP 代理
+			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {		// =>> createProxy(..) 前的检查
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
 			}
