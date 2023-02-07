@@ -236,7 +236,7 @@ public abstract class AopUtils {
 		 *								public void org.example.beans.Log_XML_AOP_Aspect_Order_22.myXMLBeforeMethod(JoinPoint),
 		 *								AspectJExpressionPointcut: () execution(* org.example.service.tx.TransactionByAnnotation.*(..))"
 		 */
-		if (methodMatcher instanceof IntroductionAwareMethodMatcher) {
+		if (methodMatcher instanceof IntroductionAwareMethodMatcher) {		// CASE：AspectJExpressionPointcut
 			introductionAwareMethodMatcher = (IntroductionAwareMethodMatcher) methodMatcher;
 		}
 
@@ -317,7 +317,7 @@ public abstract class AopUtils {
 			return candidateAdvisors;
 		}
 		List<Advisor> eligibleAdvisors = new ArrayList<>();
-		for (Advisor candidate : candidateAdvisors) {
+		for (Advisor candidate : candidateAdvisors) {		// 不管这个分支
 			if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
 				eligibleAdvisors.add(candidate);
 			}

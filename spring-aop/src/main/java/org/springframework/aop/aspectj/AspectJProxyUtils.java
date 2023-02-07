@@ -61,7 +61,7 @@ public abstract class AspectJProxyUtils {		//
 	 */
 	private static boolean isAspectJAdvice(Advisor advisor) {
 		return (
-				// @Aspect
+				// @Aspect 的切面方法：Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class
 				advisor instanceof InstantiationModelAwarePointcutAdvisor ||
 
 				advisor.getAdvice() instanceof AbstractAspectJAdvice ||

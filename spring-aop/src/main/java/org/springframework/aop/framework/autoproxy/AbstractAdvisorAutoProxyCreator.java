@@ -57,7 +57,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	@Nullable
 	protected Object[] getAdvicesAndAdvisorsForBean(
 			Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
-		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);		// =>>
+		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);		// =>> createProxy() 前，shouldSkip() 后
 		if (advisors.isEmpty()) {
 			return DO_NOT_PROXY;
 		}
@@ -78,7 +78,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */  // Eligible：有资格当选的, 有条件被选中的
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
 		/** =>> 直接跳转：{@link BeanFactoryAdvisorRetrievalHelper#findAdvisorBeans} */
-		List<Advisor> candidateAdvisors = findCandidateAdvisors();				// =>> <tx:annotation-driven ...
+		List<Advisor> candidateAdvisors = findCandidateAdvisors();				// =>> <tx:annotation-driven ... // =>> createProxy() 前，shouldSkip() 后
 		/*
 		 * 上一步返回结果：
 		 * CASE 1: beanName = "dataSource"

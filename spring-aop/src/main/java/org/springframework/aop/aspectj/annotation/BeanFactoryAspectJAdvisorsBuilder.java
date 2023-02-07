@@ -120,7 +120,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {		// 用于扫描 @Aspect 切面
 								MetadataAwareAspectInstanceFactory factory =
 										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);			//
 								// 封装收集该类的所有切面方法
-								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);				// =>>
+								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);				// =>> 1
 								if (this.beanFactory.isSingleton(beanName)) {
 									this.advisorsCache.put(beanName, classAdvisors);	//
 								}
@@ -138,7 +138,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {		// 用于扫描 @Aspect 切面
 								MetadataAwareAspectInstanceFactory factory =
 										new PrototypeAspectInstanceFactory(this.beanFactory, beanName);
 								this.aspectFactoryCache.put(beanName, factory);
-								advisors.addAll(this.advisorFactory.getAdvisors(factory));
+								advisors.addAll(this.advisorFactory.getAdvisors(factory));			// 2
 							}
 						}
 					}
@@ -159,7 +159,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {		// 用于扫描 @Aspect 切面
 			}
 			else {
 				MetadataAwareAspectInstanceFactory factory = this.aspectFactoryCache.get(aspectName);
-				advisors.addAll(this.advisorFactory.getAdvisors(factory));
+				advisors.addAll(this.advisorFactory.getAdvisors(factory));		// 3
 			}
 		}
 		return advisors;

@@ -102,7 +102,7 @@ public class AspectJProxyFactory extends ProxyCreatorSupport {
 	 * @see AspectJProxyUtils#makeAdvisorChainAspectJCapableIfNecessary(List)
 	 */
 	private void addAdvisorsFromAspectInstanceFactory(MetadataAwareAspectInstanceFactory instanceFactory) {
-		List<Advisor> advisors = this.aspectFactory.getAdvisors(instanceFactory);
+		List<Advisor> advisors = this.aspectFactory.getAdvisors(instanceFactory);			// 4
 		Class<?> targetClass = getTargetClass();
 		Assert.state(targetClass != null, "Unresolvable target class");
 		advisors = AopUtils.findAdvisorsThatCanApply(advisors, targetClass);
