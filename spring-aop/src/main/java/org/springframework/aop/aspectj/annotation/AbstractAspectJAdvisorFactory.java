@@ -65,7 +65,7 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	 * when compiled by ajc with the -1.5 flag, yet they cannot be consumed by Spring AOP.
 	 */
 	@Override
-	public boolean isAspect(Class<?> clazz) {		//
+	public boolean isAspect(Class<?> clazz) {				// 判断是否 @Aspect 切面类
 		return (hasAspectAnnotation(clazz) && !compiledByAjc(clazz));
 	}
 
@@ -119,8 +119,8 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	 * (there <i>should</i> only be one anyway...).
 	 */
 	@SuppressWarnings("unchecked")
-	@Nullable
-	protected static AspectJAnnotation<?> findAspectJAnnotationOnMethod(Method method) {
+	@Nullable  // method = {Method@4277} "public void org.example.beans.Log_Annotation_Order_33.myBeforeMethod(org.aspectj.lang.JoinPoint)"
+	protected static AspectJAnnotation<?> findAspectJAnnotationOnMethod(Method method) {		// 查找方法 @Aspect 系列注解，eg：@Pointcut, @Before, ..
 		for (Class<?> clazz : ASPECTJ_ANNOTATION_CLASSES) {
 			AspectJAnnotation<?> foundAnnotation = findAnnotation(method, (Class<Annotation>) clazz);		//
 			if (foundAnnotation != null) {
