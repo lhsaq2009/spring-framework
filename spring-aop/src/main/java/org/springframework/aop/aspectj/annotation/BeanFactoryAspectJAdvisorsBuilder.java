@@ -24,11 +24,11 @@ import org.springframework.util.Assert;
  * @since 2.0.2
  * @see AnnotationAwareAspectJAutoProxyCreator
  */
-public class BeanFactoryAspectJAdvisorsBuilder {		// 用于扫描 @Aspect 切面类，解析切面方法
+public class BeanFactoryAspectJAdvisorsBuilder {		// 扫描 @Aspect 切面类，创建 Advisor 对象
 
 	private final ListableBeanFactory beanFactory;
 
-	private final AspectJAdvisorFactory advisorFactory;	//
+	private final AspectJAdvisorFactory advisorFactory;	// this.advisorFactory = {ReflectiveAspectJAdvisorFactory@4282}
 
 	@Nullable
 	private volatile List<String> aspectBeanNames;		// 所有 切面类's 名字
@@ -112,9 +112,9 @@ public class BeanFactoryAspectJAdvisorsBuilder {		// 用于扫描 @Aspect 切面
 							continue;
 						}
 
-						// 判断，该类是否启用了 @Aspect 类注解
-						if (this.advisorFactory.isAspect(beanType)) {
-							aspectNames.add(beanName);		//
+						// 判断是否 @Aspect 切面类，若是，则将其封装成 Advisor 对象
+						if (this.advisorFactory.isAspect(beanType)) {			// in buildAspectJAdvisors()
+							aspectNames.add(beanName);									//
 							AspectMetadata amd = new AspectMetadata(beanType, beanName);		//
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
 								MetadataAwareAspectInstanceFactory factory =
