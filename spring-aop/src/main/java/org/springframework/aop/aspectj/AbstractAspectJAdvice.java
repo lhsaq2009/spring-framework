@@ -602,12 +602,17 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 	 * @param ex the exception thrown by the method execution (may be null)
 	 * @return the invocation result
 	 * @throws Throwable in case of invocation failure
+	 *
+	 * CASE ==> AspectJMethodBeforeAdvice.before(..)
+	 * CASE ==> AspectJAfterAdvice.invoke(..)
+	 * 	     ==> AbstractAspectJAdvice.invokeAdviceMethod(..)
+	 *     	     =>> AbstractAspectJAdvice.invokeAdviceMethodWithGivenArgs(..)
 	 */
 	protected Object invokeAdviceMethod(
 			@Nullable JoinPointMatch jpMatch, @Nullable Object returnValue, @Nullable Throwable ex)
 			throws Throwable {
 
-		return invokeAdviceMethodWithGivenArgs(argBinding(getJoinPoint(), jpMatch, returnValue, ex));
+		return invokeAdviceMethodWithGivenArgs(argBinding(getJoinPoint(), jpMatch, returnValue, ex));		// =>>
 	}
 
 	// As above, but in this case we are given the join point.
