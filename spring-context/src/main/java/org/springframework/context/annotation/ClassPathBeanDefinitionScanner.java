@@ -273,23 +273,31 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @param basePackages the packages to check for annotated classes
 	 * @return set of beans registered if any for tooling registration purposes (never {@code null})
 	 */
-	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {	//
+	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {				// 不管是读取注解 或 XML 配置方式 bean，最终读取加载 Bean 时都会进入到该方法对相应的包进行处理
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
-		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
+
+		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();				// beanDefinitions 是保存返回 bean 定义的集合
 		for (String basePackage : basePackages) {
-			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);		// =>>
-			for (BeanDefinition candidate : candidates) {
+
+			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);		// =>> 获取满足条件的 bean 定义集合
+
+			for (BeanDefinition candidate : candidates) {								// 对每个 bean 定义进行处理
 				// 解析：@Scope 获取作用于，默认单例
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
-				if (candidate instanceof AbstractBeanDefinition) {			//
+
+				if (candidate instanceof AbstractBeanDefinition) {						// 应用默认配置
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+
+				// 读取 @Lazy、 @Primary 和 @DependsOn 等注解值
 				if (candidate instanceof AnnotatedBeanDefinition) {
 					// 收集定义信息：@Lazy，@Primary，@DependsOn，@Role，@Description，到 AnnotatedBeanDefinition
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
+
+				// 如果候选者满足要求则将其注册到 Bean 定义中心
 				if (checkCandidate(beanName, candidate)) {
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
 					definitionHolder =
@@ -310,6 +318,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @param beanName the generated bean name for the given bean
 	 */
 	protected void postProcessBeanDefinition(AbstractBeanDefinition beanDefinition, String beanName) {
+		// 此处会应用默认值，如 lazyInit、autowireMode、initMethod 等
 		beanDefinition.applyDefaults(this.beanDefinitionDefaults);
 		if (this.autowireCandidatePatterns != null) {
 			beanDefinition.setAutowireCandidate(PatternMatchUtils.simpleMatch(this.autowireCandidatePatterns, beanName));
