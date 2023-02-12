@@ -32,7 +32,7 @@ include "spring-webflux"
 include "spring-websocket"
 include "framework-bom"
 include "integration-tests"
-include "spring-boot-study"
+include "spring-boot-study"		// Spring-Boot:2.3.8.RELEASE
 include "spring-5.0.2-study"
 
 rootProject.name = "spring"
