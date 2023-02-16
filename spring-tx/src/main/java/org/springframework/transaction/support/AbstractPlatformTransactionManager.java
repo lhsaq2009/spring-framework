@@ -799,7 +799,8 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 
 		}
 		finally {
-			cleanupAfterCompletion(status);		// =>>
+			/** =>> {@link org.springframework.jdbc.datasource.DataSourceUtils#doCloseConnection} */
+			cleanupAfterCompletion(status);		// =>> con.close();
 		}
 	}
 
@@ -1009,11 +1010,16 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 */
 	private void cleanupAfterCompletion(DefaultTransactionStatus status) {
 		status.setCompleted();
-		if (status.isNewSynchronization()) {				// TODO：???
+		if (status.isNewSynchronization()) {						// TODO：???
 			TransactionSynchronizationManager.clear();
 		}
-		if (status.isNewTransaction()) {					// TODO：????
-			doCleanupAfterCompletion(status.getTransaction());
+		if (status.isNewTransaction()) {							// TODO：????
+
+			/**
+			 * =>> {@link org.springframework.jdbc.datasource.DataSourceTransactionManager#doCleanupAfterCompletion}
+			 *     DataSourceUtils.releaseConnection(con, this.dataSource);
+			 */
+			doCleanupAfterCompletion(status.getTransaction());		// =>> con.close();
 		}
 		if (status.getSuspendedResources() != null) {
 			if (status.isDebug()) {

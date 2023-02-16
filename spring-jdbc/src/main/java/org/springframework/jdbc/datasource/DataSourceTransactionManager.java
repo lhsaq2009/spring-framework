@@ -396,7 +396,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 			if (logger.isDebugEnabled()) {
 				logger.debug("Releasing JDBC Connection [" + con + "] after transaction");
 			}
-			DataSourceUtils.releaseConnection(con, this.dataSource);
+			DataSourceUtils.releaseConnection(con, this.dataSource);		// =>> con.close();
 		}
 
 		txObject.getConnectionHolder().clear();
