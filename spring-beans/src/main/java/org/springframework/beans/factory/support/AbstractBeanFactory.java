@@ -344,9 +344,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				// Create bean instance.
 				if (mbd.isSingleton()) {
-					sharedInstance = getSingleton(beanName, () -> {// =>> 05、getBean
+					sharedInstance = getSingleton(beanName, () -> {					// =>> 05、getBean ✅✅✅
 						try {
-							return createBean(beanName, mbd, args);                	// =>> 06、
+							return createBean(beanName, mbd, args);                	// =>> 06、05 内部 -> singletonObject = singletonFactory.getObject();
 						}
 						catch (BeansException ex) {
 							// Explicitly remove instance from singleton cache: It might have been put there

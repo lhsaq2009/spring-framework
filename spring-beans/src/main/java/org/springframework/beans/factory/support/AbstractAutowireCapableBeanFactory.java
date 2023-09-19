@@ -630,6 +630,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		if (instanceWrapper == null) {
 			/*
+			 * 实例化
 			 * instanceWrapper = {BeanWrapperImpl@3732} "BeanWrapperImpl: wrapping object [LoggingAdvisor2@346a361]"
 			 * 		wrappedObject = {LoggingAdvisor2@3731}
 			 *      ...
@@ -687,7 +688,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (logger.isTraceEnabled()) {
 				logger.trace("Eagerly caching bean '" + beanName + "' to allow for resolving potential circular references");
 			}
-			/*
+			/**
+			 * 添加到三级缓存
 			 * 存储位置：this.singletonFactories.put(beanName, singletonFactory);
 			 *         =>> {@link org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#doCreateBean}
 			 *             addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
@@ -724,7 +726,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 * 		       =>> 动态代理				：AnnotationAwareAspectJAutoProxyCreator
 			 * 			   =>> 收集监听器到广播器		：ApplicationListenerDetector
 			 */
-			exposedObject = initializeBean(beanName, exposedObject, mbd);		// =>> 执行生命周期相关的方法
+				exposedObject = initializeBean(beanName, exposedObject, mbd);		// =>> 执行生命周期相关的方法
 		}
 		catch (Throwable ex) {
 			if (ex instanceof BeanCreationException && beanName.equals(((BeanCreationException) ex).getBeanName())) {

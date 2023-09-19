@@ -116,7 +116,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport		//
 	private BeanFactory beanFactory;
 	// 已处理过（解析切面时 targetSourcedBeans 出现过），就是自己实现创建动态代理逻辑
 	private final Set<String> targetSourcedBeans = Collections.newSetFromMap(new ConcurrentHashMap<>(16));
-	// TODO：AOP 代理对象缓存 ？？？
+	// TODO：AOP 代理对象缓存 ？？？防止重复创建
 	private final Map<Object, Object> earlyProxyReferences = new ConcurrentHashMap<>(16);	//
 	// TODO："arithmeticCalculator" -> {Class@3578} "class com.sun.proxy.$Proxy23"
 	private final Map<Object, Class<?>> proxyTypes = new ConcurrentHashMap<>(16);
@@ -237,7 +237,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport		//
 	public Object getEarlyBeanReference(Object bean, String beanName) {
 		Object cacheKey = getCacheKey(bean.getClass(), beanName);
 		this.earlyProxyReferences.put(cacheKey, bean);
-		return wrapIfNecessary(bean, beanName, cacheKey);
+		return wrapIfNecessary(bean, beanName, cacheKey);		// getEarlyBeanReference
 	}
 
 	@Override
@@ -297,8 +297,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport		//
 	public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
 		if (bean != null) {
 			Object cacheKey = getCacheKey(bean.getClass(), beanName);		// "arithmeticCalculator"
+
+			// 防止重复代理包装：the previous value associated with key, or null if there was no mapping for key.
 			if (this.earlyProxyReferences.remove(cacheKey) != bean) {
-				return wrapIfNecessary(bean, beanName, cacheKey);					// =>> AOP 创建代理对象
+				return wrapIfNecessary(bean, beanName, cacheKey);					// =>> 后置处理器：AOP 创建代理对象
 			}
 		}
 		return bean;
